@@ -1,0 +1,9 @@
+{
+  "bundle": "0.1.0",
+  "components": {
+    "review": {"version": "0.70.1", "path": "apps/review", "tag": "review/v0.70.1"},
+    "editor": {"version": "0.21.0", "path": "apps/editor", "tag": "editor/v0.21.0"},
+    "api": {"version": "0.21.0", "path": "services/amazon-aigc-workbench-service", "tag": "api/v0.21.0"}
+  },
+  "compatibility": {"editor": "0.21.0", "api": "0.21.0", "database_migration": "017_independent_image_publication.sql"}
+}

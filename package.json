@@ -1,0 +1,17 @@
+{
+  "name": "amazon-sku-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "engines": {"node": ">=22.18"},
+  "scripts": {
+    "install:apps": "npm --prefix apps/review ci && npm --prefix apps/editor ci",
+    "build": "npm --prefix apps/review run build && npm --prefix apps/editor run build",
+    "test": "npm --prefix apps/review test && npm --prefix apps/editor test",
+    "dev:review": "npm --prefix apps/review run dev",
+    "dev:editor": "npm --prefix apps/editor run dev",
+    "build:feishu:editor": "npm --prefix apps/editor run build && node scripts/feishu-manifest.mjs editor",
+    "check:public": "python3 scripts/check_public.py",
+    "check:versions": "python3 scripts/check_versions.py"
+  }
+}

@@ -1,0 +1,55 @@
+name: amazon-sku-workbench
+x-service: &service
+  build: {context: .., dockerfile: deploy/Dockerfile}
+  image: amazon-sku-workbench-api:0.21.0
+  env_file: ../.env
+  environment:
+    DATABASE_URL: postgresql://workbench:${POSTGRES_PASSWORD:?set a private database password}@db:5432/workbench
+    AIGC_WEB_ROOT: /app/web/dist
+    AIGC_STORAGE_ROOT: /data/assets
+  volumes: [assets:/data]
+  depends_on: {db: {condition: service_healthy}}
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: workbench
+      POSTGRES_DB: workbench
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a private database password}
+    ports: [127.0.0.1:15439:5432]
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U workbench -d workbench]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  api:
+    <<: *service
+    ports: [127.0.0.1:8798:8798]
+  model:
+    <<: *service
+    profiles: [workers]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, model]
+  collector:
+    <<: *service
+    profiles: [workers]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, source]
+  sync:
+    <<: *service
+    profiles: [feishu]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, sync]
+  roles:
+    <<: *service
+    profiles: [feishu]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, roles]
+  images:
+    <<: *service
+    profiles: [feishu]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, images]
+  notify:
+    <<: *service
+    profiles: [notifications]
+    command: [python, -m, amazon_aigc.cli, worker, --kind, notify]
+volumes:
+  pgdata:
+  assets:

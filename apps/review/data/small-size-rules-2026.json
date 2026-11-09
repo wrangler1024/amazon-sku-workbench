@@ -1,0 +1,239 @@
+{
+  "sourceNote": "从 1.1.47 页面内的小件尺寸参考迁入；规则以正式 Base 的 FBA尺寸档规则 表为准。",
+  "rows": [
+    {
+      "code": "CA-envelope",
+      "site": "CA",
+      "name": "信封档",
+      "dims": [
+        38,
+        27,
+        2
+      ],
+      "weightG": 500,
+      "source": "https://sellercentral.amazon.ca/help/hub/reference/external/201105770",
+      "order": 1
+    },
+    {
+      "code": "MX-sobre",
+      "site": "MX",
+      "name": "Sobre 信封档",
+      "dims": [
+        38,
+        27,
+        2
+      ],
+      "weightG": null,
+      "source": "https://vender.amazon.com.mx/precios",
+      "order": 1
+    },
+    {
+      "code": "UK-light-envelope",
+      "site": "UK",
+      "name": "轻信封档",
+      "dims": [
+        33,
+        23,
+        2.5
+      ],
+      "weightG": 100,
+      "source": "https://m.media-amazon.com/images/G/02/sell/images/260410-FBA-Rate-Card-EN.pdf",
+      "order": 1
+    },
+    {
+      "code": "UK-standard-envelope",
+      "site": "UK",
+      "name": "标准信封档",
+      "dims": [
+        33,
+        23,
+        2.5
+      ],
+      "weightG": 460,
+      "source": "https://m.media-amazon.com/images/G/02/sell/images/260410-FBA-Rate-Card-EN.pdf",
+      "order": 2
+    },
+    {
+      "code": "UK-large-envelope",
+      "site": "UK",
+      "name": "大信封档",
+      "dims": [
+        33,
+        23,
+        4
+      ],
+      "weightG": 960,
+      "source": "https://m.media-amazon.com/images/G/02/sell/images/260410-FBA-Rate-Card-EN.pdf",
+      "order": 3
+    },
+    {
+      "code": "UK-extra-large-envelope",
+      "site": "UK",
+      "name": "特大信封档",
+      "dims": [
+        33,
+        23,
+        6
+      ],
+      "weightG": 960,
+      "source": "https://m.media-amazon.com/images/G/02/sell/images/260410-FBA-Rate-Card-EN.pdf",
+      "order": 4
+    },
+    {
+      "code": "US-small-standard",
+      "site": "US",
+      "name": "Small standard 小标准件",
+      "dims": [
+        38.1,
+        30.48,
+        1.905
+      ],
+      "weightG": 453.59237,
+      "source": "https://sellercentral.amazon.com/help/hub/reference/external/GJQFCTQM5DNWFKCY",
+      "order": 1
+    },
+    {
+      "code": "AU-small-envelope",
+      "site": "AU",
+      "name": "小信封档",
+      "dims": [
+        20,
+        15,
+        1
+      ],
+      "weightG": 75,
+      "source": "https://sell.amazon.com.au/pricing",
+      "order": 1
+    },
+    {
+      "code": "AU-standard-envelope",
+      "site": "AU",
+      "name": "标准信封档",
+      "dims": [
+        33,
+        23,
+        2.5
+      ],
+      "weightG": 475,
+      "source": "https://sell.amazon.com.au/pricing",
+      "order": 2
+    },
+    {
+      "code": "AU-large-envelope",
+      "site": "AU",
+      "name": "大信封档",
+      "dims": [
+        33,
+        23,
+        5
+      ],
+      "weightG": 975,
+      "source": "https://sell.amazon.com.au/pricing",
+      "order": 3
+    },
+    {
+      "code": "AE-small-envelope",
+      "site": "AE",
+      "name": "小信封档",
+      "dims": [
+        20,
+        15,
+        1
+      ],
+      "weightG": 100,
+      "source": "https://sell.amazon.ae/pricing",
+      "order": 1
+    },
+    {
+      "code": "AE-standard-envelope",
+      "site": "AE",
+      "name": "标准信封档",
+      "dims": [
+        33,
+        23,
+        2.5
+      ],
+      "weightG": 500,
+      "source": "https://sell.amazon.ae/pricing",
+      "order": 2
+    },
+    {
+      "code": "AE-large-envelope",
+      "site": "AE",
+      "name": "大信封档",
+      "dims": [
+        33,
+        23,
+        5
+      ],
+      "weightG": 1000,
+      "source": "https://sell.amazon.ae/pricing",
+      "order": 3
+    },
+    {
+      "code": "SA-small-envelope",
+      "site": "SA",
+      "name": "小信封档",
+      "dims": [
+        20,
+        15,
+        1
+      ],
+      "weightG": 100,
+      "source": "https://sell.amazon.sa/pricing",
+      "order": 1
+    },
+    {
+      "code": "SA-standard-envelope",
+      "site": "SA",
+      "name": "标准信封档",
+      "dims": [
+        33,
+        23,
+        2.5
+      ],
+      "weightG": 500,
+      "source": "https://sell.amazon.sa/pricing",
+      "order": 2
+    },
+    {
+      "code": "SA-large-envelope",
+      "site": "SA",
+      "name": "大信封档",
+      "dims": [
+        33,
+        23,
+        5
+      ],
+      "weightG": 1000,
+      "source": "https://sell.amazon.sa/pricing",
+      "order": 3
+    },
+    {
+      "code": "JP-small-1",
+      "site": "JP",
+      "name": "小型",
+      "dims": [
+        25,
+        18,
+        2
+      ],
+      "weightG": 250,
+      "source": "https://sell.amazon.co.jp/pricing",
+      "order": 1
+    },
+    {
+      "code": "JP-small-2",
+      "site": "JP",
+      "name": "标准薄件",
+      "dims": [
+        35,
+        30,
+        3.3
+      ],
+      "weightG": 1000,
+      "source": "https://sell.amazon.co.jp/pricing",
+      "order": 2
+    }
+  ]
+}

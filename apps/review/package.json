@@ -1,0 +1,32 @@
+{
+  "name": "amazon-sku-review",
+  "version": "0.70.1",
+  "private": true,
+  "description": "Amazon product selection and review workbench",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:feishu": "npm run build && node ../../scripts/feishu-manifest.mjs review"
+  },
+  "dependencies": {
+    "@lark-opdev/block-bitable-api": "0.4.1-alpha.11",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.8.0",
+    "@testing-library/react": "16.3.0",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.7",
+    "@vitejs/plugin-react": "5.0.2",
+    "jsdom": "26.1.0",
+    "typescript": "5.9.2",
+    "vite": "7.3.6",
+    "vitest": "3.2.7",
+    "@types/node": "^22.19.0"
+  },
+  "license": "Apache-2.0"
+}

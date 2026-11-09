@@ -1,0 +1,7 @@
+{
+  "service": "https://workbench.example.com",
+  "baseId": "EXAMPLE_INTEGRATION_BASE",
+  "authTable": "tblExampleProofTest",
+  "proofField": "fldExampleProof",
+  "origin": "https://blk_000000000000000000000001.feishupkg.com"
+}

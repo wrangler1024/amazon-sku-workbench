@@ -1,0 +1,66 @@
+/* Theme tokens copied from sku_selection_base_extension/src/styles.css (1.1.68). */
+:root {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --page-bg: #f3f5f0;
+  --page-glow: #dcece2;
+  --ink: #17251f;
+  --ink-muted: #44584d;
+  --muted: #718078;
+  --surface: #fff;
+  --surface-glass: rgba(255,255,255,.92);
+  --surface-soft: #fbfcfa;
+  --surface-tint: #f0f4f1;
+  --line: #dfe5df;
+  --line-input: #d5dfd7;
+  --accent: #1f6a49;
+  --accent-deep: #1d5a41;
+  --accent-text: #2f6f4f;
+  --accent-soft: #e7efe9;
+  --accent-soft-hover: #dff0e5;
+  --panel-deep: #193b2b;
+  --hero-start: #10291f;
+  --hero-mid: #184432;
+  --hero-end: #246348;
+  --hero-kicker: #8fd7b0;
+  --hero-copy: #d6e8df;
+  --hero-muted: #bcd4c8;
+  color: var(--ink);
+  background: var(--page-bg);
+  font-synthesis: none;
+}
+
+:root[data-amazon-theme="ocean"] {
+  --page-glow: #dceafa; --accent: #225f9f; --accent-deep: #194c80;
+  --accent-text: #205d99; --accent-soft: #e5f0fb; --accent-soft-hover: #d7e8fa;
+  --panel-deep: #18334f; --hero-start: #10273e; --hero-mid: #194669; --hero-end: #246a9a;
+  --hero-kicker: #9bd6ff; --hero-copy: #d8e9f5; --hero-muted: #bfd6e7;
+}
+:root[data-amazon-theme="amber"] {
+  --page-glow: #f8e8d7; --accent: #a95519; --accent-deep: #874111;
+  --accent-text: #965019; --accent-soft: #f9ebdd; --accent-soft-hover: #f6dfc5;
+  --panel-deep: #49311e; --hero-start: #362519; --hero-mid: #70401d; --hero-end: #a75b24;
+  --hero-kicker: #ffd5a1; --hero-copy: #f8e9d7; --hero-muted: #ecd0b0;
+}
+:root[data-amazon-theme="violet"] {
+  --page-glow: #eae2f4; --accent: #7449a8; --accent-deep: #5c378c;
+  --accent-text: #7044a5; --accent-soft: #f0e9f8; --accent-soft-hover: #e6d9f4;
+  --panel-deep: #342448; --hero-start: #241b38; --hero-mid: #493368; --hero-end: #7755a2;
+  --hero-kicker: #dbc2ff; --hero-copy: #eee4fa; --hero-muted: #d3c3e7;
+}
+:root[data-amazon-theme="slate"] {
+  --page-glow: #dceced; --accent: #2e6570; --accent-deep: #244e58;
+  --accent-text: #28616d; --accent-soft: #e2eff0; --accent-soft-hover: #d2e7e9;
+  --panel-deep: #203a40; --hero-start: #182d33; --hero-mid: #27545a; --hero-end: #39747a;
+  --hero-kicker: #abe2df; --hero-copy: #dceeee; --hero-muted: #bfdcdb;
+}
+:root[data-amazon-theme="dark"] {
+  color-scheme: dark;
+  --page-bg: #141b24; --page-glow: #1d2d41; --ink: #eaf0f6;
+  --ink-muted: #cbd7e2; --muted: #aebdca; --surface: #202a36;
+  --surface-glass: rgba(32,42,54,.94); --surface-soft: #25313e;
+  --surface-tint: #293746; --line: #3c4b59; --line-input: #536575;
+  --accent: #4169b0; --accent-deep: #31589f; --accent-text: #a7c5ff;
+  --accent-soft: #2d3d55; --accent-soft-hover: #364b69;
+  --panel-deep: #182434; --hero-start: #101a27; --hero-mid: #1b2a3e; --hero-end: #263c59;
+  --hero-kicker: #a8c8ff; --hero-copy: #dce7f5; --hero-muted: #c0d0e4;
+}

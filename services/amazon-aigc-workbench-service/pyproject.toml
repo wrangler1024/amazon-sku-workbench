@@ -1,0 +1,30 @@
+[project]
+name = "amazon-aigc-workbench-service"
+version = "0.21.0"
+description = "Amazon SKU content and artwork collaboration service"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.34,<1",
+    "psycopg[binary,pool]>=3.2,<4",
+    "pydantic-settings>=2.7,<3",
+    "httpx>=0.28,<1",
+    "beautifulsoup4>=4.13,<5",
+    "pillow>=11,<13",
+    "python-multipart>=0.0.20",
+    "playwright>=1.50,<2",
+    "jsonschema>=4.23,<5",
+    "cryptography>=44,<48",
+]
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+[tool.hatch.build.targets.wheel]
+packages = ["src/amazon_aigc"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+[tool.ruff]
+line-length = 120

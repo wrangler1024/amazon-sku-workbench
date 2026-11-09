@@ -1,0 +1,196 @@
+{
+  "retrievedAt": "2026-10-31",
+  "source": "https://sellercentral.amazon.ca/help/hub/reference/external/GABBX6GZPA8MSZGW",
+  "dimensionalWeightSource": "https://sellercentral.amazon.ca/help/hub/reference/external/G59RXFJCSKH9E9PK",
+  "rows": [
+    {
+      "key": "CA-0001",
+      "tier": "信封Envelope",
+      "weightMinG": 0,
+      "weightMaxG": 100,
+      "baseFee": 4.46,
+      "peakFee": 4.73,
+      "sourceBand": "首100g"
+    },
+    {
+      "key": "CA-0002",
+      "tier": "信封Envelope",
+      "weightMinG": 100,
+      "weightMaxG": 200,
+      "baseFee": 4.71,
+      "peakFee": 4.99,
+      "sourceBand": "100+至200g"
+    },
+    {
+      "key": "CA-0003",
+      "tier": "信封Envelope",
+      "weightMinG": 200,
+      "weightMaxG": 300,
+      "baseFee": 5.01,
+      "peakFee": 5.31,
+      "sourceBand": "200+至300g"
+    },
+    {
+      "key": "CA-0004",
+      "tier": "信封Envelope",
+      "weightMinG": 300,
+      "weightMaxG": 400,
+      "baseFee": 5.28,
+      "peakFee": 5.6,
+      "sourceBand": "300+至400g"
+    },
+    {
+      "key": "CA-0005",
+      "tier": "信封Envelope",
+      "weightMinG": 400,
+      "weightMaxG": 500,
+      "baseFee": 5.62,
+      "peakFee": 5.95,
+      "sourceBand": "400+至500g"
+    },
+    {
+      "key": "CA-0006",
+      "tier": "标准Standard",
+      "weightMinG": 0,
+      "weightMaxG": 100,
+      "baseFee": 5.92,
+      "peakFee": 6.28,
+      "sourceBand": "首100g"
+    },
+    {
+      "key": "CA-0007",
+      "tier": "标准Standard",
+      "weightMinG": 100,
+      "weightMaxG": 200,
+      "baseFee": 6.12,
+      "peakFee": 6.49,
+      "sourceBand": "100+至200g"
+    },
+    {
+      "key": "CA-0008",
+      "tier": "标准Standard",
+      "weightMinG": 200,
+      "weightMaxG": 300,
+      "baseFee": 6.36,
+      "peakFee": 6.74,
+      "sourceBand": "200+至300g"
+    },
+    {
+      "key": "CA-0009",
+      "tier": "标准Standard",
+      "weightMinG": 300,
+      "weightMaxG": 400,
+      "baseFee": 6.73,
+      "peakFee": 7.13,
+      "sourceBand": "300+至400g"
+    },
+    {
+      "key": "CA-0010",
+      "tier": "标准Standard",
+      "weightMinG": 400,
+      "weightMaxG": 500,
+      "baseFee": 7.23,
+      "peakFee": 7.65,
+      "sourceBand": "400+至500g"
+    },
+    {
+      "key": "CA-0011",
+      "tier": "标准Standard",
+      "weightMinG": 500,
+      "weightMaxG": 600,
+      "baseFee": 7.4,
+      "peakFee": 7.84,
+      "sourceBand": "500+至600g"
+    },
+    {
+      "key": "CA-0012",
+      "tier": "标准Standard",
+      "weightMinG": 600,
+      "weightMaxG": 700,
+      "baseFee": 7.71,
+      "peakFee": 8.17,
+      "sourceBand": "600+至700g"
+    },
+    {
+      "key": "CA-0013",
+      "tier": "标准Standard",
+      "weightMinG": 700,
+      "weightMaxG": 800,
+      "baseFee": 7.95,
+      "peakFee": 8.43,
+      "sourceBand": "700+至800g"
+    },
+    {
+      "key": "CA-0014",
+      "tier": "标准Standard",
+      "weightMinG": 800,
+      "weightMaxG": 900,
+      "baseFee": 8.25,
+      "peakFee": 8.74,
+      "sourceBand": "800+至900g"
+    },
+    {
+      "key": "CA-0015",
+      "tier": "标准Standard",
+      "weightMinG": 900,
+      "weightMaxG": 1000,
+      "baseFee": 8.49,
+      "peakFee": 8.99,
+      "sourceBand": "900+至1000g"
+    },
+    {
+      "key": "CA-0016",
+      "tier": "标准Standard",
+      "weightMinG": 1000,
+      "weightMaxG": 1100,
+      "baseFee": 8.58,
+      "peakFee": 9.1,
+      "sourceBand": "1000+至1100g"
+    },
+    {
+      "key": "CA-0017",
+      "tier": "标准Standard",
+      "weightMinG": 1100,
+      "weightMaxG": 1200,
+      "baseFee": 8.84,
+      "peakFee": 9.37,
+      "sourceBand": "1100+至1200g"
+    },
+    {
+      "key": "CA-0018",
+      "tier": "标准Standard",
+      "weightMinG": 1200,
+      "weightMaxG": 1300,
+      "baseFee": 9.04,
+      "peakFee": 9.58,
+      "sourceBand": "1200+至1300g"
+    },
+    {
+      "key": "CA-0019",
+      "tier": "标准Standard",
+      "weightMinG": 1300,
+      "weightMaxG": 1400,
+      "baseFee": 9.29,
+      "peakFee": 9.85,
+      "sourceBand": "1300+至1400g"
+    },
+    {
+      "key": "CA-0020",
+      "tier": "标准Standard",
+      "weightMinG": 1400,
+      "weightMaxG": 1500,
+      "baseFee": 9.6,
+      "peakFee": 10.17,
+      "sourceBand": "1400+至1500g"
+    },
+    {
+      "key": "CA-0021",
+      "tier": "标准Standard",
+      "weightMinG": 1500,
+      "weightMaxG": 9000,
+      "baseFee": 10.32,
+      "peakFee": 11.0,
+      "sourceBand": "1500+至9000g(每100g加CAD0.09)"
+    }
+  ]
+}

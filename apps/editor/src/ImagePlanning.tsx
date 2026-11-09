@@ -1,0 +1,12 @@
+import React from 'react';
+import {Button,Help,Icon} from './prototype/ui';
+import {blankPlan,briefImageCount,planText,plansText,withPlans} from './briefHelpers';
+
+export default function ImagePlanning({brief,onChange,disabled,copy}:any){
+ const plans=brief.plans||[];
+ function change(index:number,key:string,value:string){onChange(withPlans(brief,plans.map((p:any,i:number)=>i===index?{...p,[key]:value}:p)))}
+ return <section className="image-planning" aria-label="套图策划建议"><div className="section-divider"><h3><Icon name="image"/>套图策划建议 <span className="hint-label">{plans.length?plans.length+' 张':'选填'}</span><Help text="套图策划建议选填，可以保留、修改或删除。卡片留空或未填完整也可提交图需；制作以运营确认的图需正文及保留的建议为依据。"/></h3><div className="planning-controls">{plans.length>0&&<Button kind="text small" icon="copy" onClick={()=>copy(plansText(plans))}>复制套图建议</Button>}<Button kind="soft small" disabled={disabled||plans.length>=12} onClick={()=>onChange(withPlans(brief,[...plans,blankPlan(plans.length)]))}>＋添加图片</Button></div></div>
+ {!plans.length?<div className="planning-empty"><p className="subtext">未添加套图建议，可直接按图需正文提交制作。</p><Button kind="small" disabled={disabled} onClick={()=>onChange(withPlans(brief,Array.from({length:briefImageCount(brief)},(_,i)=>blankPlan(i))))}>按交付张数添加建议</Button></div>:<div className="planning-list">{plans.map((plan:any,i:number)=><article className="planning-item" key={i} aria-label={'图片策划 '+(i+1)}><div className="planning-card-title"><span className="plan-no">{String(i+1).padStart(2,'0')}</span><input aria-label={'图片 '+(i+1)+' 主题'} placeholder="图片主题" maxLength={200} value={plan.purpose||''} disabled={disabled} onChange={e=>change(i,'purpose',e.target.value)}/></div><label>画面要求<textarea aria-label={'图片 '+(i+1)+' 画面要求'} rows={3} maxLength={4000} value={plan.composition||''} disabled={disabled} onChange={e=>change(i,'composition',e.target.value)}/></label><label>图中文字 <span>目标站点语言 · 选填</span><textarea aria-label={'图片 '+(i+1)+' 图中文字'} rows={2} maxLength={2000} value={plan.text||''} disabled={disabled} onChange={e=>change(i,'text',e.target.value)}/></label><div className="planning-row-actions"><Button icon="copy" kind="text small" aria-label={'复制图片策划 '+(i+1)} onClick={()=>copy(planText(plan,i))}>复制</Button><Button kind="text small" aria-label={'移除图片策划 '+(i+1)} disabled={disabled} onClick={()=>onChange(withPlans(brief,plans.filter((_:any,j:number)=>i!==j)))}>移除</Button></div></article>)}</div>}
+
+ </section>
+}

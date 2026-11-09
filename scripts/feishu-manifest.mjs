@@ -1,0 +1,11 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+const app=process.argv[2];
+if(!['review','editor'].includes(app))throw new Error('Usage: node scripts/feishu-manifest.mjs review|editor');
+if(!process.env.FEISHU_MANIFEST_CONFIG)throw new Error('Set FEISHU_MANIFEST_CONFIG to a private manifest configuration file');
+const c=JSON.parse(await readFile(resolve(process.env.FEISHU_MANIFEST_CONFIG),'utf8'));
+if(!/^cli_[a-z0-9]+$/.test(c.appId)||!/^blk_[a-f0-9]+$/.test(c.blockTypeId))throw new Error('Explicit Feishu application and block identifiers required');
+const root=new URL('../apps/'+app+'/dist/',import.meta.url);
+await writeFile(new URL('project.config.json',root),JSON.stringify({appid:c.appId,projectname:c.projectName||'amazon-sku-'+app,blocks:['index']},null,2)+'\n');
+await writeFile(new URL('index.json',root),JSON.stringify({blockTypeID:c.blockTypeId,blockRenderType:'offlineWeb'},null,2)+'\n');
+console.log('Generated manifests for '+app+'; upload is a separate explicit operation.');

@@ -1,0 +1,35 @@
+# Private configuration, credentials and runtime data
+.env
+.env.*
+!.env.example
+*.local.json
+*.private.json
+*.pem
+*.key
+*.p12
+*.pfx
+credentials/
+config/private/
+runtime/
+backups/
+evidence/
+output/
+*.ndjson
+*.sqlite*
+*.dump
+# Tool/build files
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.tsbuildinfo
+dist/
+coverage/
+*.egg-info/
+.DS_Store
+.opdev/
+.codex/
+.zcode/
+.workbuddy/

@@ -1,0 +1,9 @@
+{
+  "integration": {"base_id": "EXAMPLE_INTEGRATION_BASE", "table_id": "tblExampleIntegration"},
+  "production": {
+    "base_id": "EXAMPLE_PRODUCTION_BASE", "table_id": "tblExampleProduction",
+    "app_id": "cli_0000000000000002",
+    "plugin_origin": "https://blk_000000000000000000000002.feishupkg.com",
+    "personnel_table_id": "tblExamplePeople"
+  }
+}
