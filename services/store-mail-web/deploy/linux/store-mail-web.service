@@ -1,0 +1,29 @@
+[Unit]
+Description=Store Mail Web (店铺邮箱 Web 客户端)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=storemail
+Group=storemail
+WorkingDirectory=/opt/store-mail-web/current
+EnvironmentFile=/etc/store-mail-web/store-mail-web.env
+ExecStart=/opt/store-mail-web/venv/bin/python -m store_mail_web.main serve
+Restart=always
+RestartSec=5
+
+# 硬化
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/store-mail-web
+
+# 日志走 journald
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=store-mail-web
+
+[Install]
+WantedBy=multi-user.target

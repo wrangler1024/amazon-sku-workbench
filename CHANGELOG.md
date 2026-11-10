@@ -9,6 +9,19 @@
   documentation only. No executable code, API, schema, UI or deployment change;
   existing package versions and runtime behavior remain unchanged.
 
+## Bundle 0.3.0 — 2026-11-10
+
+- Add `services/store-mail-web` as an independent cloud-mail module, version
+  0.13.1 under Apache-2.0, from an allowlisted sanitized source snapshot.
+- Keep its native frontend, Python HTTP service, SQLite storage, mailbox grants,
+  admission, supervisor pilot restrictions and notification behavior independent.
+- Remove internal release records, tenant ledger tooling and named-person wording;
+  use synthetic test identities and generic configuration/deployment examples.
+- Add locked dependencies, module tests/CI, installed-wheel HTTP checks, independent
+  packaging and public-boundary checks for mail/database artifacts.
+- Existing review/editor/API/FBACC versions remain unchanged. No live deployment,
+  mailbox data or permissions change; unified login and database migration are deferred.
+
 ## Bundle 0.2.0 — 2026-11-10
 
 - Import FBACC 0.3.0 as `services/amazon-fbacc`, retaining its MIT license,

@@ -41,3 +41,9 @@ docker compose -f deploy/fbacc.compose.yaml down
 ```
 
 容器仅绑定本机4318端口。独立服务器安装包用`npm run package:fbacc -- fbacc/v0.3.0`导出；安装步骤见[模块Linux部署说明](../services/amazon-fbacc/deploy/linux/README.md)。不要把整个monorepo归档传给模块安装器。生产反向代理、访问控制和服务地址由部署环境配置；不会将企业端点写入公开代码。详细接入和版本边界见[FBACC说明](fbacc.md)。
+
+## 独立云邮箱
+
+云邮箱未加入工作台主compose，不随API部署启动。自己的[compose与systemd模板](../services/store-mail-web/deploy/linux/README.md)保留独立端口、SQLite目录、加密主密钥与飞书应用配置。新环境使用自己的私有配置；现有环境迁移、切换和登录整合需要单独实施。
+
+本地预览使用`npm run dev:mail`，仅生成临时演示数据。正式运行的`serve --no-scheduler`仅关闭IMAP调度，仍可能处理通知任务，不能用于真实数据库上的离线演示。源码包导出用`npm run package:mail -- mail/v0.13.1`；SQLite、邮件、账号和密钥不在归档内。回退代码前核验数据库兼容性，不用旧数据库覆盖新增邮件和用户操作。

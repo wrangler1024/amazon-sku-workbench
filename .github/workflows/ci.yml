@@ -43,6 +43,35 @@ jobs:
         working-directory: services/amazon-fbacc
       - run: npm run package:fbacc
       - run: docker build -t fbacc-ci services/amazon-fbacc
+  mail:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/store-mail-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.11.7'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: uv sync --locked --python 3.12
+      - run: uv run --locked python -m unittest discover -s tests -q
+      - run: |
+          for file in src/store_mail_web/static/*.js; do node --check "$file"; done
+      - run: |
+          uv export --frozen --no-dev --no-emit-project --no-header --format requirements.txt --output-file /tmp/mail-requirements.lock > /dev/null
+          diff requirements.lock /tmp/mail-requirements.lock
+      - run: uv build --out-dir dist
+      - run: |
+          uv venv /tmp/mail-wheel-check --python 3.12
+          uv pip install --python /tmp/mail-wheel-check/bin/python --require-hashes -r requirements.lock
+          uv pip install --python /tmp/mail-wheel-check/bin/python --no-deps dist/*.whl
+          /tmp/mail-wheel-check/bin/python -I scripts/check_installed.py
+      - run: docker build -t cloud-mail-ci .
+      - run: node scripts/package-mail.mjs
+        working-directory: .
   backend:
     runs-on: ubuntu-latest
     services:

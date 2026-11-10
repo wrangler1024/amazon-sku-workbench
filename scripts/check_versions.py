@@ -7,9 +7,10 @@ v=json.loads((root/'versions.json').read_text())
 assert json.loads((root/'package.json').read_text())['version']==v['bundle']
 for name,c in v['components'].items():
  p=root/c['path']
- if name=='api':
+ if name in ('api','mail'):
   actual=tomllib.loads((p/'pyproject.toml').read_text())['project']['version']
-  assert re.search(r'__version__\s*=\s*["\x27]'+re.escape(actual),(p/'src/amazon_aigc/__init__.py').read_text())
+  module='amazon_aigc' if name=='api' else 'store_mail_web'
+  assert re.search(r'__version__\s*=\s*["\x27]'+re.escape(actual),(p/'src'/module/'__init__.py').read_text())
  else:actual=json.loads((p/'package.json').read_text())['version']
  assert actual==c['version'],(name,actual,c['version'])
  assert c['tag']==f'{name}/v{actual}'

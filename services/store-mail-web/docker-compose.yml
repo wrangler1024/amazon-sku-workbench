@@ -1,0 +1,36 @@
+# 店铺邮箱 Web 客户端 Docker 部署
+#
+# 用法:
+#   cp .env.example .env   # 填好 STORE_MAIL_WEB_SECRET_KEY / 管理密码
+#   docker compose up -d --build
+#
+# HTTPS:本服务只监听容器内 8789,由宿主机 Nginx/Caddy 反代并终结 TLS。
+# 下面附一段 Nginx server 块示例(宝塔面板同理:反代目标 http://127.0.0.1:8789,
+# 证书用 Let's Encrypt)。
+#
+#   server {
+#       listen 443 ssl http2;
+#       server_name mail.example.com;
+#       ssl_certificate     /path/fullchain.pem;
+#       ssl_certificate_key /path/privkey.pem;
+#       location / {
+#           proxy_pass http://127.0.0.1:8789;
+#           proxy_set_header Host $host;
+#           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#           proxy_set_header X-Forwarded-Proto https;
+#       }
+#   }
+
+services:
+  store-mail-web:
+    build: .
+    image: amazon-sku-mail:0.13.1
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8789:8789"   # 只暴露给本机,由反代对外
+    env_file: .env
+    environment:
+      STORE_MAIL_WEB_HOST: 0.0.0.0
+      STORE_MAIL_WEB_DB_PATH: /app/var/store_mail_web.sqlite3
+    volumes:
+      - ./var:/app/var          # SQLite 数据落在宿主机,重建容器不丢

@@ -1,6 +1,6 @@
 # Amazon SKU Workbench
 
-亚马逊选品评审、内容编辑与制图协作工作台，包含独立 FBA 费用计算模块。中文界面，主体采用 Apache-2.0，FBACC 模块保留 MIT 许可证。
+亚马逊选品评审、内容编辑与制图协作工作台，包含独立 FBA 费用计算和云邮箱模块。中文界面，主体采用 Apache-2.0，FBACC 模块保留 MIT 许可证。
 
 当前版本从已有业务工作台整理而来：评审前端通过飞书多维表格 SDK 工作；编辑工作台使用独立的 FastAPI / PostgreSQL 服务，通过飞书接入身份和业务数据。**当前还不是完全脱离飞书的一体化 SKU 系统**，迁移边界见 [架构与迁移路线](docs/architecture.md)。
 
@@ -12,6 +12,7 @@
 - **刊登记录**：文案与图片独立登记、撤回、刊登时间、复制五点、长描述HTML、原图整套下载和历史版本。
 - **后台服务**：岗位与数据范围、并发任务、来源采集、图片缓存、协作通知、审计记录及迁移导出。
 - **FBACC 计算器**：17站普通商品 FBA 费用测算、独立网页、纯计算函数、HTTP API、费率来源核验工具；可单独运行，不依赖飞书或工作台数据库。
+- **云邮箱**：独立的聚合收件箱、风险看板、整邮箱授权、飞书认证和个人提醒；保留独立登录及SQLite存储，尚未与工作台统一登录。
 
 手动文案和图需可直接确认；AI生成仍需先确认产品资料。列表使用服务端分页，制图列表每10秒静默刷新，不覆盖正在编辑的草稿、返修意见或图片上传。
 
@@ -24,6 +25,7 @@ apps/
 services/
   amazon-aigc-workbench-service/    独立 API、任务处理、SQL迁移、Python测试
   amazon-fbacc/                    独立 FBA 计算器、网页、API和费率核验工具（MIT）
+  store-mail-web/                  云邮箱网页、服务、SQLite和独立授权
   amazon-erp-material-service/     ERP自动建料模块规划（仅文档，未实现）
 integrations/feishu/               飞书接入说明和配置模板
 integrations/lingxing/             领星能力与接入边界规划（未实现）
@@ -50,6 +52,10 @@ npm run dev:review
 # 另一个终端启动独立计算器；评审台AE本地代理默认连接此端口
 npm run dev:fbacc
 # 计算器页面 http://127.0.0.1:4318
+
+# 云邮箱离线演示：临时数据库、虚构邮件，不连接真实邮箱/飞书
+npm run dev:mail
+# http://127.0.0.1:8791  demo / demo-local-only
 ```
 
 评审模拟入口只演示本地可用页面；实时多站点数据和流程仍需按 [飞书接入说明](integrations/feishu/README.md) 配置。费率 JSON 是有日期的测试/参考样本，部署时应配置自己的生效费率，不能当作持续更新的官方报价。
@@ -95,6 +101,8 @@ python3 scripts/check_versions.py
 python3 scripts/check_public.py  # 检查Git追踪的文件
 npm run check:fbacc
 npm run test:fbacc:integration  # 真实计算器 + 评审适配器 + Vite代理
+npm run test:mail              # 临时SQLite、模拟IMAP/飞书
+npm run build:mail             # 独立wheel及源码包
 ```
 
 ## 接入与部署
@@ -104,6 +112,7 @@ npm run test:fbacc:integration  # 真实计算器 + 评审适配器 + Vite代理
 - [版本、发布与回退](docs/versioning.md)
 - [部署说明](docs/deployment.md)
 - [FBACC 独立模块与接入](docs/fbacc.md)
+- [云邮箱独立模块与集成边界](docs/cloud-mail.md)
 - [ERP自动建料模块规划（未实现）](docs/erp-materials.md)
 - [安全说明](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新记录](CHANGELOG.md)
 

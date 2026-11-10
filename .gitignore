@@ -16,6 +16,10 @@ evidence/
 output/
 *.ndjson
 *.sqlite*
+*.db
+*.db-*
+*.eml
+*.mbox
 *.dump
 # Tool/build files
 node_modules/

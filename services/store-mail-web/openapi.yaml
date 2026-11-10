@@ -1,0 +1,274 @@
+openapi: 3.0.3
+info:
+  title: Xynigo 邮箱客户端 Agent API
+  version: 0.9.2
+  description: |
+    亚马逊店铺 163 邮箱管理的对外 Agent HTTP API。
+
+    ## 鉴权
+    所有 `/api/v1/*` 接口需要 API Key,两种传递方式任选:
+    - 请求头 `X-API-Key: <key>`
+    - 请求头 `Authorization: Bearer <key>`
+
+    API Key 在 Web 管理界面「API Key」页创建,明文只在创建时展示一次。
+    每个 Key 独立限流(默认 60 次/分钟,可按 Key 配置),超限返回 429。
+
+    ## 错误格式
+    ```json
+    {"error": {"code": "not_found", "message": "邮件不存在: 42"}}
+    ```
+
+    常见错误码:unauthorized / invalid_api_key / rate_limited /
+    validation_error / not_found / account_not_found /
+    internal_error。
+
+    ## 典型 Agent 流程
+    1. `GET /api/v1/accounts` 列出邮箱账号(拿到 account_id)
+    2. `POST /api/v1/sync` 触发一次同步(确保拿到最新邮件)
+    3. `GET /api/v1/messages?finance_only=1` 查看资金相关邮件
+    4. `GET /api/v1/messages?shipment_only=1` 查看货件相关邮件
+    5. `GET /api/v1/messages/{id}` 读取原始邮件详情
+servers:
+  - url: /
+    description: 本服务(经反向代理对外时务必使用 HTTPS)
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: agent
+    description: Agent 调用接口
+  - name: system
+    description: 系统接口(无需鉴权)
+paths:
+  /api/v1/accounts:
+    get:
+      tags: [agent]
+      security: [ { ApiKeyAuth: [] } ]
+      summary: 列出邮箱账号
+      description: 返回全部账号(含停用)。不含授权码等敏感字段。
+      responses:
+        "200":
+          description: 账号列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items: { $ref: "#/components/schemas/Account" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/v1/messages:
+    get:
+      tags: [agent]
+      security: [ { ApiKeyAuth: [] } ]
+      summary: 搜索邮件
+      parameters:
+        - { name: account_id, in: query, schema: { type: integer },
+            description: 按账号 id 过滤 }
+        - { name: account, in: query, schema: { type: string },
+            description: 按账号邮箱或店铺名过滤(与 account_id 二选一) }
+        - { name: q, in: query, schema: { type: string },
+            description: 关键词,匹配主题/发件人/预览 }
+        - { name: category, in: query, schema: { type: string,
+            enum: [告警, 侵权, 绩效, 扣款, 回款, 货件, 客户, 广告, 其他] } }
+        - { name: amazon_only, in: query, schema: { type: string, enum: ["1", "0"] },
+            description: 仅看亚马逊相关邮件 }
+        - { name: finance_only, in: query, schema: { type: string, enum: ["1", "0"] },
+            description: 仅看资金相关邮件(扣款/回款分类或资金风险事件) }
+        - { name: shipment_only, in: query, schema: { type: string, enum: ["1", "0"] },
+            description: 仅看货件相关邮件(货件分类或 FBA 风险事件);与 finance_only 同时为 1 时取并集 }
+        - { name: important_only, in: query, schema: { type: string, enum: ["1", "0"] },
+            description: 仅看重要通知(告警/侵权/绩效/扣款/回款) }
+        - { name: unread_only, in: query, schema: { type: string, enum: ["1", "0"] } }
+        - { name: since, in: query, schema: { type: string },
+            description: 起始时间,ISO 格式(2026-09-01 或 2026-09-01T10:00:00+08:00) }
+        - { name: until, in: query, schema: { type: string },
+            description: 截止时间,ISO 格式(日期按当天 23:59:59 计) }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0 } }
+      responses:
+        "200":
+          description: 邮件列表(不含正文)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total: { type: integer }
+                  limit: { type: integer }
+                  offset: { type: integer }
+                  messages:
+                    type: array
+                    items: { $ref: "#/components/schemas/MessageSummary" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/v1/messages/{id}:
+    get:
+      tags: [agent]
+      security: [ { ApiKeyAuth: [] } ]
+      summary: 读取邮件详情
+      description: 返回完整纯文本正文;Agent 视角不带原始 HTML。
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          description: 邮件详情
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { $ref: "#/components/schemas/MessageDetail" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/v1/sync:
+    post:
+      tags: [agent]
+      security: [ { ApiKeyAuth: [] } ]
+      summary: 触发同步
+      description: |
+        同步执行(阻塞到完成或该账号跳过)。拉取增量邮件后返回每账号结果。
+        手动同步有最小间隔保护(默认 30 秒),间隔内的重复请求返回
+        status=skipped,不会触发风控。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account_id: { type: integer, description: 只同步该账号 }
+                account: { type: string, description: 只同步该账号(邮箱/店铺名) }
+                force: { type: boolean, description: 忽略手动同步最小间隔,
+                         default: false }
+      responses:
+        "200":
+          description: 每账号同步结果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        account_id: { type: integer }
+                        email: { type: string }
+                        status: { type: string, enum: [ok, error, auth_error, skipped] }
+                        new_messages: { type: integer }
+                        fetched: { type: integer }
+                        duration_ms: { type: integer }
+                        error: { type: string, nullable: true }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /healthz:
+    get:
+      tags: [system]
+      security: []
+      summary: 健康检查
+      responses:
+        "200":
+          description: 服务状态
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  responses:
+    Unauthorized:
+      description: 鉴权失败
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: 请求过于频繁(响应头含 Retry-After 秒数)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationError:
+      description: 参数错误
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: 资源不存在
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+    Account:
+      type: object
+      properties:
+        id: { type: integer }
+        display_name: { type: string, description: 亚马逊平台前台店铺名 }
+        chinese_name: { type: string, description: 内部中文名称，未设置时为空字符串 }
+        email: { type: string }
+        enabled: { type: boolean }
+        last_sync_at: { type: string, nullable: true }
+        last_success_at: { type: string, nullable: true }
+        last_sync_status: { type: string, nullable: true,
+                            enum: [ok, error, auth_error, null] }
+        last_error: { type: string, nullable: true }
+        message_count: { type: integer }
+        unread_count: { type: integer }
+        latest_message_at: { type: string, nullable: true }
+    MessageSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        account_id: { type: integer }
+        uid: { type: integer }
+        subject: { type: string }
+        from_name: { type: string }
+        from_addr: { type: string }
+        received_at: { type: string, description: ISO UTC 时间 }
+        received_ts: { type: integer, description: epoch 秒 }
+        unread: { type: integer, enum: [0, 1] }
+        is_amazon: { type: integer, enum: [0, 1] }
+        category: { type: string }
+        priority: { type: string }
+        preview: { type: string }
+        has_html: { type: integer }
+    MessageDetail:
+      type: object
+      description: MessageSummary 全部字段,另加下列字段
+      properties:
+        message_id: { type: string, nullable: true, description: 邮件 Message-ID 头 }
+        to_addr: { type: string }
+        internal_date: { type: string, nullable: true }
+        size_bytes: { type: integer }
+        body_text: { type: string, description: 清洗后的纯文本正文 }
+        account_display_name: { type: string }
+        account_email: { type: string }
+    Health:
+      type: object
+      properties:
+        service: { type: string }
+        name: { type: string }
+        version: { type: string }
+        status: { type: string, enum: [ok, degraded] }
+        started_at: { type: string }
+        scheduler_running: { type: boolean }
+        accounts:
+          type: object
+          properties:
+            total: { type: integer }
+            enabled: { type: integer }
+        messages: { type: integer }
+        api_keys_active: { type: integer }

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#082548">
+<title>Xynigo 跨境系统 · 邮箱客户端</title>
+<link rel="icon" href="/static/xynigo-x.png" type="image/png">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="login-layer" class="login-layer hidden">
+  <div class="login-stage" aria-hidden="true">
+    <div class="login-stage-mark"><span class="xynigo-wordmark" role="img" aria-label="Xynigo"><img src="/static/xynigo-logo.png" alt=""></span></div>
+    <div class="login-stage-copy">
+      <span class="eyebrow light">XYNIGO · CROSS-BORDER WORKSPACE</span>
+      <h2>每一封重要邮件，<br>都有明确的下一步。</h2>
+      <p>将账号、商品、货件、资金与客户事件汇成清晰的处理队列。</p>
+    </div>
+    <div class="login-stage-lines"></div>
+  </div>
+  <form id="login-form" class="login-card" autocomplete="on">
+    <div class="login-brand">
+      <span class="brand-symbol"><img src="/static/xynigo-x.png" alt=""></span>
+      <div><span class="eyebrow">XYNIGO 跨境系统</span><h1>登录邮箱客户端</h1></div>
+    </div>
+    <p id="login-lead" class="login-lead">使用公司飞书账号进入邮箱工作台。</p>
+    <button type="button" id="feishu-login" class="btn btn-primary btn-block hidden">企业飞书登录</button>
+    <div id="login-error" class="login-error hidden" role="alert"></div>
+    <details id="local-access" open><summary>已有账号登录 / 管理员应急入口</summary>
+    <label for="login-user">用户名</label>
+    <input id="login-user" name="username" autocomplete="username" required maxlength="64" placeholder="请输入用户名">
+    <label for="login-pass">密码</label>
+    <input id="login-pass" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="请输入密码">
+    <button type="submit" class="btn btn-primary btn-block" id="login-submit">进入工作台 <span aria-hidden="true">→</span></button>
+    </details>
+    <p class="login-foot">邮件是风险线索。实际处置请以卖家后台为准。</p>
+  </form>
+</div>
+
+<div id="admission-layer" class="admission-layer hidden"></div>
+<div id="app" class="app hidden">
+  <div id="nav-backdrop" class="nav-backdrop"></div>
+  <aside class="sidebar" aria-label="主导航">
+    <div class="brand">
+      <div class="xynigo-wordmark" role="img" aria-label="Xynigo"><img src="/static/xynigo-logo.png" alt=""></div>
+      <small class="brand-product">跨境系统 · 邮箱客户端</small>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="nav-label">XYNIGO WORKSPACE</div>
+    <nav id="nav">
+      <a href="#/dashboard" data-view="dashboard" data-permission="dashboard.read"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg></span><span>店铺看板</span></a>
+      <a href="#/inbox" data-view="inbox" data-permission="mail.read"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 8 9 6 9-6"/></svg></span><span>聚合收件箱</span></a>
+      <div class="nav-label nav-label-inner" data-admin="1">系统管理</div>
+      <a href="#/accounts" data-view="accounts" data-permission="accounts.manage" data-admin="1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>邮箱账号</span></a>
+      <a href="#/users" data-view="users" data-permission="members.manage" data-admin="1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 6a3 3 0 0 1 0 6M17 15a5 5 0 0 1 4 5"/></svg></span><span>团队成员</span></a>
+      <a href="#/roles" data-view="roles" data-permission="roles.manage" data-admin="1"><span class="nav-icon" aria-hidden="true">⚙</span><span>角色权限</span></a>
+      <a href="#/keys" data-view="keys" data-permission="api_keys.manage" data-admin="1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v3"/></svg></span><span>Agent 接口</span></a>
+      <a href="#/settings" data-view="settings" data-permission="settings.manage" data-admin="1"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1m0-14.2L17 7m-10 10-2.1 2.1"/></svg></span><span>工作台设置</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="source-card"><span class="source-pulse"></span><div><strong>邮件信号源</strong><small id="sync-meta">正在读取同步状态…</small></div></div>
+      <button id="my-feishu-bind" class="btn btn-block hidden">绑定我的飞书</button>
+      <div class="sidebar-user"><span id="user-avatar" class="user-avatar">X</span><div id="whoami" class="user-meta"></div><button id="logout-btn" class="icon-button logout-button" title="退出登录" aria-label="退出登录">↪</button></div>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button id="mobile-nav" class="icon-button mobile-nav" aria-label="打开导航" aria-expanded="false">☰</button>
+        <span class="topbar-workspace">Xynigo 跨境系统 / 邮箱客户端</span><span class="topbar-sep">/</span><strong id="topbar-view">店铺看板</strong><span id="environment-badge" class="environment-badge"></span>
+      </div>
+      <div class="topbar-actions">
+        <span id="source-indicator" class="source-indicator"><i></i><span>读取同步状态</span></span>
+        <button id="sync-all-btn" class="btn btn-primary btn-sync" title="立即同步所有启用账号">↻ 同步全部</button>
+      </div>
+    </header>
+    <main id="main" class="main" tabindex="-1"></main>
+  </div>
+</div>
+
+<div id="drawer-mask" class="drawer-mask hidden"></div>
+<aside id="drawer" class="drawer hidden" aria-label="详情"></aside>
+<div id="modal-mask" class="drawer-mask hidden"></div>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true"></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>
