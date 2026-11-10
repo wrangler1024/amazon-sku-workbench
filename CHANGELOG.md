@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — Editor 0.21.1
+
+- Add consistent product-thumbnail hover previews to all editor headers, product
+  queues, artwork/review detail pages and publication lists.
+- Keep the preview inside the viewport, close it on scroll, resize or Escape, and
+  retain click-to-toggle behavior for touch and keyboard use.
+- Add synthetic geometry tests and editor build verification. API, database schema,
+  identities, images and production deployment remain unchanged.
+
 ## Unreleased — Planning only
 
 - Document the ERP material-creation workflow and independent module boundary,

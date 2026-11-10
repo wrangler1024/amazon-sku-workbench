@@ -8,14 +8,20 @@ import {Button,Field,Help,Icon,Modal,labels} from './prototype/ui';
 import {apiFetch,dateText} from './api';
 import {createReviewDraft,REVIEW_SAVE_DELAY,type ReviewSaveState} from './reviewDraft';
 import {briefFields,briefImageCount} from './briefHelpers';
+import {positionThumbnailPreview} from './thumbnailPreview';
 export function Thumb({id}:any){return id?<SecureImage className="thumb" src={'/api/assets/'+id+'?size=thumbnail'} alt="商品图片"/>:<div className="thumb mini-illustration" aria-label="商品"><Icon name="box"/></div>}
-export function PreviewThumb({id,name}:any){
- const anchor=useRef<HTMLButtonElement>(null),bubble=useRef<HTMLDivElement>(null),[shown,setShown]=useState(false);
+export function PreviewThumb({id,name,variant='button'}:any){
+ const anchor=useRef<HTMLElement>(null),bubble=useRef<HTMLDivElement>(null),[shown,setShown]=useState(false);
  function hide(){if(bubble.current?.matches(':popover-open'))bubble.current.hidePopover();setShown(false)}
- function show(){const b=bubble.current,a=anchor.current;if(!b||!a)return;b.showPopover();setShown(true);const r=a.getBoundingClientRect(),size=Math.min(300,innerWidth-24);b.style.width=size+'px';b.style.left=Math.max(12,Math.min(r.right+12,innerWidth-size-12))+'px';b.style.top=Math.max(12,Math.min(r.top,innerHeight-size-65))+'px'}
+ function show(){const b=bubble.current,a=anchor.current;if(!b||!a)return;const position=positionThumbnailPreview(a.getBoundingClientRect(),innerWidth,innerHeight);b.style.width=position.width+'px';b.style.left=position.left+'px';b.style.top=position.top+'px';if(!b.matches(':popover-open'))b.showPopover();setShown(true)}
+ function toggle(){shown?hide():show()}
  useEffect(()=>{window.addEventListener('scroll',hide,true);window.addEventListener('resize',hide);return()=>{window.removeEventListener('scroll',hide,true);window.removeEventListener('resize',hide)}},[]);
+ useEffect(()=>{if(!shown)return;const escape=(e:KeyboardEvent)=>{if(e.key==='Escape')hide()};document.addEventListener('keydown',escape);return()=>document.removeEventListener('keydown',escape)},[shown]);
  if(!id)return <Thumb/>;
- return <><button ref={anchor} type="button" className="task-thumbnail-trigger" aria-label={'预览商品图片 '+name} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onClick={show} onKeyDown={e=>{if(e.key==='Escape')hide()}}><Thumb id={id}/></button><div ref={bubble} popover="manual" className="task-thumbnail-popover" role="tooltip">{shown&&<SecureImage src={'/api/assets/'+id+'?size=preview'} loading="eager" alt={name}/>}<span>{name}</span></div></>
+ const trigger=variant==='inline'
+  ? <span ref={anchor as React.RefObject<HTMLSpanElement>} className="task-thumbnail-trigger inline" aria-hidden="true" onMouseEnter={show} onMouseLeave={hide}><Thumb id={id}/></span>
+  : <button ref={anchor as React.RefObject<HTMLButtonElement>} type="button" className="task-thumbnail-trigger" aria-label={'预览商品图片 '+name} aria-expanded={shown} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onClick={toggle}><Thumb id={id}/></button>;
+ return <>{trigger}<div ref={bubble} popover="manual" className="task-thumbnail-popover" role="tooltip">{shown&&<SecureImage src={'/api/assets/'+id+'?size=preview'} loading="eager" alt={name}/>}<span>{name}</span></div></>;
 }
 export function QueueList({items,selected,select,query,setQuery,scope,onScopeChange,pendingCount,confirmedCount,totalCount,busy,mode,page,loading,error,onRetry,onPage,timeRange,dateFrom,dateTo,onTime,historySearch}:any){
  const [dateOpen,setDateOpen]=useState(false),[start,setStart]=useState(''),[end,setEnd]=useState(''),[dateError,setDateError]=useState('');
@@ -35,7 +41,7 @@ export function QueueList({items,selected,select,query,setQuery,scope,onScopeCha
    {error&&<p className="query-error">{error}<Button kind="text small" onClick={onRetry}>重试</Button></p>}
   </div>
   <div className="queue">{items.map((p:any)=>{const editing={pending:pendingEdit(p,mode),todos:[{stage:mode,label:mode==='facts'?'待核对资料':mode==='listing'?'待确认文案':'待提交图需'}]};return <button className={'product-card '+(p.id===selected?'active':'')} key={p.id} disabled={busy} onClick={()=>select(p.id)}>
-   <div className="card-row"><Thumb id={p.thumbnail_id}/><div><h3>{p.name}</h3><p className="code">{p.code} · {p.site}</p></div></div>
+   <div className="card-row"><PreviewThumb variant="inline" id={p.thumbnail_id} name={p.name}/><div><h3>{p.name}</h3><p className="code">{p.code} · {p.site}</p></div></div>
    <div className="card-bottom edit-queue-status"><div className="edit-queue-badges">{(legacyInFlight(p)||legacyArchived(p,mode))?<span className="pill blue">原流程 · {labels[p.task.state]}</span>:editing.pending?editing.todos.map(t=><span className="pill amber" key={t.stage}>{t.label}</span>):<span className="pill green">{mode==='facts'?'资料已确认':mode==='listing'?'文案已确认':'图需已提交'}</span>}</div><span className="queue-owner">{p.owner_name||'未绑定运营'}{p.task?.urgent?' · 加急':''}</span></div>
    {scope==='all'&&p.created_at&&<small className="queue-entered">录入时间 {new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(p.created_at))}</small>}
   </button>})}
