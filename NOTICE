@@ -3,6 +3,8 @@ Copyright 2026 wrangler1024 and contributors.
 
 This project includes application source for product selection review,
 Listing content editing, and artwork collaboration.
+It also includes the independently packaged store-mail-web cloud-mail source
+under Apache-2.0. Private mail data, credentials and deployment records are excluded.
 Third-party dependencies retain their respective licenses.
 The services/amazon-fbacc module was imported from amazon-fbacc, copyright
 2026 fbacc contributors, and remains MIT licensed. See that module's LICENSE,

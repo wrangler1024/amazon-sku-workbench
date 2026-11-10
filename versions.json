@@ -1,5 +1,5 @@
 {
-  "bundle": "0.2.0",
+  "bundle": "0.3.0",
   "components": {
     "review": {
       "version": "0.70.2",
@@ -22,6 +22,11 @@
       "tag": "fbacc/v0.3.0",
       "monitor_version": "0.2.0",
       "rate_snapshot": "2026-10-31.2"
+    },
+    "mail": {
+      "version": "0.13.1",
+      "path": "services/store-mail-web",
+      "tag": "mail/v0.13.1"
     }
   },
   "compatibility": {

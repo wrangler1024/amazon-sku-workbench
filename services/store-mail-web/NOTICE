@@ -1,0 +1,11 @@
+Cloud Mail / store-mail-web
+Copyright 2026 wrangler1024 and contributors.
+
+Original project code is distributed under the Apache License, Version 2.0.
+Xynigo branding is retained for attribution; this license does not grant trademark
+rights. Amazon, NetEase and Feishu/Lark are trademarks of their respective owners.
+This module is not an official product of those organizations.
+
+Dependencies retain their own licenses. cryptography is distributed under
+Apache-2.0 OR BSD-3-Clause; cffi and pycparser retain their package-specific licenses.
+Dependencies are installed separately; their licenses are included in their packages.

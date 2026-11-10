@@ -18,9 +18,10 @@ issues=[]
 for p in files:
  rel=p.relative_to(root)
  if p.is_symlink():issues.append((str(rel),'symlink'));continue
- if any(x in rel.parts for x in ('evidence','backups','credentials','node_modules','.venv')):issues.append((str(rel),'private/generated directory'))
+ if any(x in rel.parts for x in ('evidence','backups','credentials','node_modules','.venv','.local','var')):issues.append((str(rel),'private/generated directory'))
  if p.name.startswith('.env') and p.name!='.env.example':issues.append((str(rel),'private environment file'))
- if p.suffix in ('.pem','.p12','.pfx','.dump','.ndjson'):issues.append((str(rel),'private artifact type'))
+ if p.suffix in ('.pem','.p12','.pfx','.dump','.ndjson','.sqlite','.sqlite3','.db','.eml','.mbox'):issues.append((str(rel),'private artifact type'))
+ if re.search(r'\.(?:sqlite3?|db)-(?:wal|shm|journal)$',p.name):issues.append((str(rel),'private database journal'))
  try:s=p.read_text()
  except UnicodeDecodeError:continue
  for label,pattern in rules.items():

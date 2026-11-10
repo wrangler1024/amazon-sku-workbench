@@ -1,6 +1,6 @@
 {
   "name": "amazon-sku-workbench",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "license": "Apache-2.0",
   "engines": {
@@ -19,6 +19,10 @@
     "test:fbacc": "npm --prefix services/amazon-fbacc test",
     "check:fbacc": "npm --prefix services/amazon-fbacc run check",
     "test:fbacc:integration": "node --test scripts/review-fbacc.test.mjs",
-    "package:fbacc": "node scripts/package-fbacc.mjs"
+    "package:fbacc": "node scripts/package-fbacc.mjs",
+    "test:mail": "uv run --directory services/store-mail-web --locked python -m unittest discover -s tests -q",
+    "dev:mail": "uv run --directory services/store-mail-web --locked python scripts/dashboard_demo.py",
+    "build:mail": "uv build --directory services/store-mail-web --out-dir dist",
+    "package:mail": "node scripts/package-mail.mjs"
   }
 }
