@@ -7,5 +7,5 @@ rights. Amazon, NetEase and Feishu/Lark are trademarks of their respective owner
 This module is not an official product of those organizations.
 
 Dependencies retain their own licenses. cryptography is distributed under
-Apache-2.0 OR BSD-3-Clause; cffi and pycparser use their respective MIT/BSD licenses.
+Apache-2.0 OR BSD-3-Clause; cffi and pycparser retain their package-specific licenses.
 Dependencies are installed separately; their licenses are included in their packages.
