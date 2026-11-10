@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — Planning only
+
+- Document the ERP material-creation workflow and independent module boundary,
+  including unit/cost confirmation, material reuse, partial-failure recovery,
+  Lingxing capability checks and future migration away from Feishu.
+- Reserve `services/amazon-erp-material-service` and `integrations/lingxing` for
+  documentation only. No executable code, API, schema, UI or deployment change;
+  existing package versions and runtime behavior remain unchanged.
+
 ## Bundle 0.2.0 — 2026-11-10
 
 - Import FBACC 0.3.0 as `services/amazon-fbacc`, retaining its MIT license,

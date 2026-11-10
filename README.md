@@ -24,7 +24,9 @@ apps/
 services/
   amazon-aigc-workbench-service/    独立 API、任务处理、SQL迁移、Python测试
   amazon-fbacc/                    独立 FBA 计算器、网页、API和费率核验工具（MIT）
+  amazon-erp-material-service/     ERP自动建料模块规划（仅文档，未实现）
 integrations/feishu/               飞书接入说明和配置模板
+integrations/lingxing/             领星能力与接入边界规划（未实现）
 scripts/                          打包清单、版本与公开边界检查
 deploy/                          本地/自建部署模板
 docs/                            架构、接入、发布及迁移说明
@@ -102,6 +104,7 @@ npm run test:fbacc:integration  # 真实计算器 + 评审适配器 + Vite代理
 - [版本、发布与回退](docs/versioning.md)
 - [部署说明](docs/deployment.md)
 - [FBACC 独立模块与接入](docs/fbacc.md)
+- [ERP自动建料模块规划（未实现）](docs/erp-materials.md)
 - [安全说明](SECURITY.md) · [贡献指南](CONTRIBUTING.md) · [更新记录](CHANGELOG.md)
 
 OpenAI、DeepSeek和采集服务的API密钥只保存在服务端。源站访问权限、供应商配额、生成质量及亚马逊内容合规需由使用者自行核对；AI候选不等于已确认商品事实或最终成品图。
