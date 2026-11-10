@@ -1,0 +1,8374 @@
+{
+  "schemaVersion": 1,
+  "version": "2026-10-31.1",
+  "verifiedAt": "2026-10-31",
+  "scope": "Domestic FBA, general non-apparel non-dangerous goods; published size tiers only.",
+  "markets": {
+    "UK": {
+      "currency": "GBP",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                183
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                187
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                189
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                207
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                208
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                183
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                187
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                189
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                207
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                208
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                146
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                150
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                152
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                167
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                170
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                210
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                216
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                210
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                216
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                173
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                187
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                272
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                279
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                242
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                294
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                301
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                265
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                291
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                300
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                304
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                305
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                325
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                327
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                302
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                311
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                315
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                316
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                337
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                339
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                267
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                270
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                294
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                301
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                306
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                326
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                348
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                349
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                354
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                356
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                357
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                358
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                305
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                312
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                318
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                338
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                361
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                362
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                369
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                370
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                371
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                349
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  25
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "requiresQuote": "OFFICIAL_SOURCE_CONFLICT: UK small-oversize incremental rate differs between PDF pages 6 and 7 (0.25 vs 0.22 GBP/kg).",
+          "quoteAboveWeight": 0.76
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                435
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  15
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                658
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  8
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                567
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  7
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1020
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  24
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1304
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  9
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": {
+        "from": "2026-10-15",
+        "until": "2027-01-15"
+      },
+      "notes": [],
+      "lowPrice": {
+        "maximum": 10,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "DE": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                233
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                237
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                239
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                252
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                254
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                233
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                237
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                239
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                252
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                254
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                207
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                211
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                213
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                226
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                228
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                207
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                211
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                213
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                226
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                228
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                187
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                190
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                192
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                206
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                209
+              ]
+            }
+          ],
+          "lowCep": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                161
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                164
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                166
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                180
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                183
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                257
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                268
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                257
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                268
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                231
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                242
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                231
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                242
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                212
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                228
+              ]
+            }
+          ],
+          "lowCep": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                186
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                202
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                304
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                304
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                278
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                278
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                265
+              ]
+            }
+          ],
+          "lowCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                239
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                342
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                342
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                316
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                316
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                304
+              ]
+            }
+          ],
+          "lowCep": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                278
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                338
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                339
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                340
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                341
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                343
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                454
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                359
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                360
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                361
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                363
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                365
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                483
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                312
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                313
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                314
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                315
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                317
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                428
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                333
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                334
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                335
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                337
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                339
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                457
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                304
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                325
+              ]
+            }
+          ],
+          "lowCep": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                278
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                299
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                339
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                342
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                344
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                393
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                395
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                455
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                509
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                522
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                603
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                665
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                360
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                364
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                366
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                418
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                420
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                484
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                542
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                556
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                642
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                709
+              ]
+            }
+          ],
+          "regularCep": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                313
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                316
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                318
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                369
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                429
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                483
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                496
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                577
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                639
+              ]
+            }
+          ],
+          "peakCep": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                334
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                338
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                340
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                392
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                394
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                458
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                516
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                530
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                616
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                683
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                456
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  18
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                430
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  18
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                459
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  18
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                433
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  18
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                725
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  7
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                699
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  7
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                606
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  8
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                580
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  8
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                824
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  27
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                798
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  27
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1300
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  15
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360,
+          "regularCep": [
+            {
+              "upTo": null,
+              "cents": [
+                1274
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  15
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": {
+        "from": "2026-10-15",
+        "until": "2027-01-15"
+      },
+      "notes": [],
+      "lowPrice": {
+        "maximum": 11,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "FR": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                275
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                276
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                278
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                330
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                332
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                224
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                226
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                227
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                279
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                281
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                333
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                377
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                281
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                331
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                439
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                396
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                472
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                431
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                456
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                507
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                579
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                587
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                610
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                780
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                431
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                471
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                458
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                522
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                601
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                641
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                644
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                708
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                781
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                822
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                884
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                938
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                705
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  20
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                729
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  21
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1042
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  11
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                847
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  13
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1538
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  45
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1559
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  18
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "IT": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                323
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                326
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                328
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                339
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                341
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                264
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                265
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                267
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                279
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                281
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                345
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                364
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                281
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                304
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                394
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                335
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                417
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                359
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                413
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                454
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                495
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                511
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                514
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                516
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                359
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                391
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                429
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                470
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                515
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                526
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                529
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                530
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                535
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                538
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                541
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                625
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                721
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  8
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                745
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  22
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1063
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  8
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                913
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  9
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                959
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  30
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1685
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  15
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "ES": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                277
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                284
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                287
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                321
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                323
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                215
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                221
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                223
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                255
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                259
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                326
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                345
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                261
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                285
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                360
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                300
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                385
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                323
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                352
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                374
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                395
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                421
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                427
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                550
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                323
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                346
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                355
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                377
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                399
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                485
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                494
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                498
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                553
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                596
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                724
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                785
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                568
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  4
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                655
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  34
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1172
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  27
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                676
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  33
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                995
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  43
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1400
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  12
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "NL": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                231
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                235
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                235
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                245
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                247
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                196
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                200
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                200
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                208
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                211
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                251
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                260
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                216
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                225
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                326
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                291
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                361
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                326
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                347
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                351
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                403
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                450
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                482
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                590
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                313
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                317
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                369
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                404
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                439
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                472
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                476
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                482
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                515
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                530
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                574
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                631
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                702
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  7
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                712
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  22
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1024
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  22
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                722
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  23
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                996
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  32
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1622
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  62
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "SE": {
+      "currency": "SEK",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                3335
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                3352
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                3370
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                3508
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                3520
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                2871
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                2891
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                2907
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                3056
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                3074
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                3547
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                4109
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                3156
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                3661
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                4235
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                3779
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                4562
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                4084
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                4541
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                4729
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                4819
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                5268
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                5449
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                6410
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                4123
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                4331
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                4858
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                5170
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                5204
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                5846
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                6153
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                6536
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                6571
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                7020
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                7220
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                8792
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                8232
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  73
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                8259
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  310
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                12909
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  400
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                8309
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  400
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                11802
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  490
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                19214
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  949
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 140,
+        "extendedMaximum": 230,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "PL": {
+      "currency": "PLN",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                304
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                305
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                306
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                313
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                314
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                168
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                170
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                170
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                172
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                173
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                316
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                336
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                174
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                183
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                349
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                189
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                358
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                191
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                361
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                371
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                376
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                381
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                393
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                181
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                186
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                373
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                380
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                389
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                397
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                410
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                415
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                419
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                424
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                437
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                413
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  3
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                415
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  14
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                615
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  15
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                418
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  16
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                627
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  16
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1021
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  39
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 55,
+        "extendedMaximum": 85,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "BE": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Europe rate card, July 2026",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "light-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                226
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                231
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                231
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                241
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                243
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.02,
+              "cents": [
+                174
+              ]
+            },
+            {
+              "upTo": 0.04,
+              "cents": [
+                177
+              ]
+            },
+            {
+              "upTo": 0.06,
+              "cents": [
+                178
+              ]
+            },
+            {
+              "upTo": 0.08,
+              "cents": [
+                183
+              ]
+            },
+            {
+              "upTo": 0.1,
+              "cents": [
+                186
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                247
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                256
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.21,
+              "cents": [
+                198
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                212
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                321
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                266
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                353
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                296
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                339
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                415
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                463
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                495
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                638
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                264
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                296
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                346
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                385
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                439
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                499
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                541
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                627
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                630
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                654
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                690
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                736
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                663
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  4
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-light",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 15,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                666
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  23
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-heavy",
+          "maxDimensions": [
+            101,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 72.72,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1015
+              ],
+              "increment": {
+                "from": 15.76,
+                "step": 1,
+                "cents": [
+                  24
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "standard-oversize-large",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                669
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  29
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "bulky-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 23,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                950
+              ],
+              "increment": {
+                "from": 0.76,
+                "step": 1,
+                "cents": [
+                  35
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        },
+        {
+          "id": "heavy-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 31.5,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 126,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1547
+              ],
+              "increment": {
+                "from": 31.5,
+                "step": 1,
+                "cents": [
+                  68
+                ]
+              }
+            }
+          ],
+          "maxLongestSide": 175,
+          "maxLengthPlusGirth": 360
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "IE": {
+      "currency": "EUR",
+      "effectiveFrom": "2026-07-01",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+          "title": "Amazon Ireland domestic rate card",
+          "pages": [
+            16
+          ]
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "small-envelope",
+          "maxDimensions": [
+            20,
+            15,
+            1
+          ],
+          "maxUnitWeight": 0.08,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.08,
+              "cents": [
+                63
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.08,
+              "cents": [
+                46
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.46,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.06,
+              "cents": [
+                79
+              ]
+            },
+            {
+              "upTo": 0.21,
+              "cents": [
+                94
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                109
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.06,
+              "cents": [
+                62
+              ]
+            },
+            {
+              "upTo": 0.21,
+              "cents": [
+                77
+              ]
+            },
+            {
+              "upTo": 0.46,
+              "cents": [
+                92
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            4
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                135
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                118
+              ]
+            }
+          ]
+        },
+        {
+          "id": "extra-large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            6
+          ],
+          "maxUnitWeight": 0.96,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                153
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.96,
+              "cents": [
+                136
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-parcel",
+          "maxDimensions": [
+            35,
+            25,
+            12
+          ],
+          "maxUnitWeight": 3.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 2.1,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                153
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                168
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                202
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                233
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                254
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                326
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                136
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                151
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-parcel",
+          "maxDimensions": [
+            45,
+            34,
+            26
+          ],
+          "maxUnitWeight": 11.9,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 7.96,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.15,
+              "cents": [
+                187
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                208
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                237
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                275
+              ]
+            },
+            {
+              "upTo": 1.9,
+              "cents": [
+                302
+              ]
+            },
+            {
+              "upTo": 2.9,
+              "cents": [
+                350
+              ]
+            },
+            {
+              "upTo": 3.9,
+              "cents": [
+                352
+              ]
+            },
+            {
+              "upTo": 5.9,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 8.9,
+              "cents": [
+                388
+              ]
+            },
+            {
+              "upTo": 11.9,
+              "cents": [
+                413
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 1.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 25.82,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.76,
+              "cents": [
+                350
+              ]
+            },
+            {
+              "upTo": 1.26,
+              "cents": [
+                373
+              ]
+            },
+            {
+              "upTo": 1.76,
+              "cents": [
+                425
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                425
+              ],
+              "increment": {
+                "from": 1.76,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard-oversize",
+          "maxDimensions": [
+            120,
+            60,
+            60
+          ],
+          "maxUnitWeight": 29.76,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": 86.4,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.76,
+              "cents": [
+                418
+              ]
+            },
+            {
+              "upTo": 1.76,
+              "cents": [
+                433
+              ]
+            },
+            {
+              "upTo": 2.76,
+              "cents": [
+                453
+              ]
+            },
+            {
+              "upTo": 3.76,
+              "cents": [
+                455
+              ]
+            },
+            {
+              "upTo": 4.76,
+              "cents": [
+                458
+              ]
+            },
+            {
+              "upTo": 9.76,
+              "cents": [
+                473
+              ]
+            },
+            {
+              "upTo": 14.76,
+              "cents": [
+                508
+              ]
+            },
+            {
+              "upTo": 19.76,
+              "cents": [
+                513
+              ]
+            },
+            {
+              "upTo": 24.76,
+              "cents": [
+                520
+              ]
+            },
+            {
+              "upTo": 29.76,
+              "cents": [
+                525
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                525
+              ],
+              "increment": {
+                "from": 29.76,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ],
+          "exclusiveMaximums": true
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 150
+      },
+      "peak": null,
+      "notes": [
+        "Ireland promotional domestic rates; Amazon may adjust these with 30 days notice."
+      ],
+      "lowPrice": {
+        "maximum": 12,
+        "extendedMaximum": 20,
+        "inclusive": true,
+        "weightMode": "unit"
+      }
+    },
+    "AU": {
+      "currency": "AUD",
+      "effectiveFrom": "2026-06-10",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 4000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://sellercentral.amazon.com.au/help/hub/reference/external/G4UU2ZQNHJNKAG5Y",
+          "title": "Amazon AU 2026 FBA fee changes"
+        },
+        {
+          "url": "https://sellercentral.amazon.com.au/help/hub/reference/external/201112670",
+          "title": "Amazon AU full fulfilment fee schedule"
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "small-envelope",
+          "maxDimensions": [
+            20,
+            15,
+            1
+          ],
+          "maxUnitWeight": 0.075,
+          "weightMode": "unit",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 0.075,
+          "regular": [
+            {
+              "upTo": 0.075,
+              "cents": [
+                455
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.075,
+              "cents": [
+                364
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            2.5
+          ],
+          "maxUnitWeight": 0.475,
+          "weightMode": "unit",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 0.475,
+          "regular": [
+            {
+              "upTo": 0.075,
+              "cents": [
+                458
+              ]
+            },
+            {
+              "upTo": 0.225,
+              "cents": [
+                526
+              ]
+            },
+            {
+              "upTo": 0.475,
+              "cents": [
+                561
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.075,
+              "cents": [
+                367
+              ]
+            },
+            {
+              "upTo": 0.225,
+              "cents": [
+                435
+              ]
+            },
+            {
+              "upTo": 0.475,
+              "cents": [
+                470
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-envelope",
+          "maxDimensions": [
+            33,
+            23,
+            5
+          ],
+          "maxUnitWeight": 0.975,
+          "weightMode": "unit",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 0.975,
+          "regular": [
+            {
+              "upTo": 0.225,
+              "cents": [
+                678
+              ]
+            },
+            {
+              "upTo": 0.475,
+              "cents": [
+                702
+              ]
+            },
+            {
+              "upTo": 0.975,
+              "cents": [
+                724
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.225,
+              "cents": [
+                587
+              ]
+            },
+            {
+              "upTo": 0.475,
+              "cents": [
+                611
+              ]
+            },
+            {
+              "upTo": 0.975,
+              "cents": [
+                633
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parcel",
+          "maxDimensions": [
+            45,
+            34,
+            20
+          ],
+          "maxUnitWeight": 12.0,
+          "weightMode": "max",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 12.0,
+          "regular": [
+            {
+              "upTo": 0.25,
+              "cents": [
+                705
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                705
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                724
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                888
+              ]
+            },
+            {
+              "upTo": 2.0,
+              "cents": [
+                981
+              ]
+            },
+            {
+              "upTo": 3.0,
+              "cents": [
+                986
+              ]
+            },
+            {
+              "upTo": 4.0,
+              "cents": [
+                1018
+              ]
+            },
+            {
+              "upTo": 5.0,
+              "cents": [
+                1019
+              ]
+            },
+            {
+              "upTo": 6.0,
+              "cents": [
+                1110
+              ]
+            },
+            {
+              "upTo": 7.0,
+              "cents": [
+                1126
+              ]
+            },
+            {
+              "upTo": 8.0,
+              "cents": [
+                1126
+              ]
+            },
+            {
+              "upTo": 9.0,
+              "cents": [
+                1127
+              ]
+            },
+            {
+              "upTo": 10.0,
+              "cents": [
+                1127
+              ]
+            },
+            {
+              "upTo": 11.0,
+              "cents": [
+                1380
+              ]
+            },
+            {
+              "upTo": 12.0,
+              "cents": [
+                1393
+              ]
+            }
+          ],
+          "low": [
+            {
+              "upTo": 0.25,
+              "cents": [
+                614
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                614
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                633
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                797
+              ]
+            },
+            {
+              "upTo": 2.0,
+              "cents": [
+                890
+              ]
+            },
+            {
+              "upTo": 3.0,
+              "cents": [
+                895
+              ]
+            },
+            {
+              "upTo": 4.0,
+              "cents": [
+                927
+              ]
+            },
+            {
+              "upTo": 5.0,
+              "cents": [
+                928
+              ]
+            },
+            {
+              "upTo": 6.0,
+              "cents": [
+                1019
+              ]
+            },
+            {
+              "upTo": 7.0,
+              "cents": [
+                1035
+              ]
+            },
+            {
+              "upTo": 8.0,
+              "cents": [
+                1035
+              ]
+            },
+            {
+              "upTo": 9.0,
+              "cents": [
+                1036
+              ]
+            },
+            {
+              "upTo": 10.0,
+              "cents": [
+                1036
+              ]
+            },
+            {
+              "upTo": 11.0,
+              "cents": [
+                1289
+              ]
+            },
+            {
+              "upTo": 12.0,
+              "cents": [
+                1302
+              ]
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            61,
+            46,
+            46
+          ],
+          "maxUnitWeight": 2,
+          "weightMode": "max",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 1,
+              "cents": [
+                994
+              ]
+            },
+            {
+              "upTo": 1.25,
+              "cents": [
+                1041
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                1065
+              ]
+            },
+            {
+              "upTo": 1.75,
+              "cents": [
+                1066
+              ]
+            },
+            {
+              "upTo": 2,
+              "cents": [
+                1066
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                1143
+              ],
+              "increment": {
+                "from": 2,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ],
+          "low": [
+            {
+              "upTo": 1,
+              "cents": [
+                903
+              ]
+            },
+            {
+              "upTo": 1.25,
+              "cents": [
+                950
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                974
+              ]
+            },
+            {
+              "upTo": 1.75,
+              "cents": [
+                975
+              ]
+            },
+            {
+              "upTo": 2,
+              "cents": [
+                975
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                1052
+              ],
+              "increment": {
+                "from": 2,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "standard-oversize",
+          "maxDimensions": [
+            105,
+            60,
+            60
+          ],
+          "maxUnitWeight": 22,
+          "weightMode": "max",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 1,
+              "cents": [
+                1230
+              ]
+            },
+            {
+              "upTo": 2,
+              "cents": [
+                1295
+              ]
+            },
+            {
+              "upTo": 3,
+              "cents": [
+                1304
+              ]
+            },
+            {
+              "upTo": 4,
+              "cents": [
+                1318
+              ]
+            },
+            {
+              "upTo": 5,
+              "cents": [
+                1341
+              ]
+            },
+            {
+              "upTo": 6,
+              "cents": [
+                1431
+              ]
+            },
+            {
+              "upTo": 7,
+              "cents": [
+                1446
+              ]
+            },
+            {
+              "upTo": 8,
+              "cents": [
+                1448
+              ]
+            },
+            {
+              "upTo": 9,
+              "cents": [
+                1452
+              ]
+            },
+            {
+              "upTo": 10,
+              "cents": [
+                1452
+              ]
+            },
+            {
+              "upTo": 15,
+              "cents": [
+                1586
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                1642
+              ]
+            },
+            {
+              "upTo": 22,
+              "cents": [
+                1642
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                1939
+              ],
+              "increment": {
+                "from": 22,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ],
+          "low": [
+            {
+              "upTo": 1,
+              "cents": [
+                1139
+              ]
+            },
+            {
+              "upTo": 2,
+              "cents": [
+                1204
+              ]
+            },
+            {
+              "upTo": 3,
+              "cents": [
+                1213
+              ]
+            },
+            {
+              "upTo": 4,
+              "cents": [
+                1227
+              ]
+            },
+            {
+              "upTo": 5,
+              "cents": [
+                1250
+              ]
+            },
+            {
+              "upTo": 6,
+              "cents": [
+                1340
+              ]
+            },
+            {
+              "upTo": 7,
+              "cents": [
+                1355
+              ]
+            },
+            {
+              "upTo": 8,
+              "cents": [
+                1357
+              ]
+            },
+            {
+              "upTo": 9,
+              "cents": [
+                1361
+              ]
+            },
+            {
+              "upTo": 10,
+              "cents": [
+                1361
+              ]
+            },
+            {
+              "upTo": 15,
+              "cents": [
+                1495
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                1551
+              ]
+            },
+            {
+              "upTo": 22,
+              "cents": [
+                1551
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                1848
+              ],
+              "increment": {
+                "from": 22,
+                "step": 1,
+                "cents": [
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "large-oversize",
+          "maxDimensions": null,
+          "maxUnitWeight": 35,
+          "weightMode": "max",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 5,
+              "cents": [
+                1780
+              ]
+            },
+            {
+              "upTo": 10,
+              "cents": [
+                1935
+              ]
+            },
+            {
+              "upTo": 15,
+              "cents": [
+                2115
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                2148
+              ]
+            },
+            {
+              "upTo": 25,
+              "cents": [
+                2252
+              ]
+            },
+            {
+              "upTo": 30,
+              "cents": [
+                2688
+              ]
+            },
+            {
+              "upTo": 35,
+              "cents": [
+                2691
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                3859
+              ],
+              "increment": {
+                "from": 35,
+                "step": 1,
+                "cents": [
+                  10
+                ]
+              }
+            }
+          ],
+          "low": [
+            {
+              "upTo": 5,
+              "cents": [
+                1689
+              ]
+            },
+            {
+              "upTo": 10,
+              "cents": [
+                1844
+              ]
+            },
+            {
+              "upTo": 15,
+              "cents": [
+                2024
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                2057
+              ]
+            },
+            {
+              "upTo": 25,
+              "cents": [
+                2161
+              ]
+            },
+            {
+              "upTo": 30,
+              "cents": [
+                2597
+              ]
+            },
+            {
+              "upTo": 35,
+              "cents": [
+                2600
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                3768
+              ],
+              "increment": {
+                "from": 35,
+                "step": 1,
+                "cents": [
+                  10
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "extra-large",
+          "maxDimensions": null,
+          "maxUnitWeight": 250,
+          "weightMode": "max",
+          "weightStep": 0.001,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 35,
+              "cents": [
+                9000
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                9000
+              ],
+              "increment": {
+                "from": 35,
+                "step": 1,
+                "cents": [
+                  10
+                ]
+              }
+            }
+          ],
+          "exclusiveUnitMaximum": true,
+          "low": [
+            {
+              "upTo": 35,
+              "cents": [
+                8909
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                8909
+              ],
+              "increment": {
+                "from": 35,
+                "step": 1,
+                "cents": [
+                  10
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "fuel": null,
+      "peak": null,
+      "notes": [],
+      "lowPrice": {
+        "maximum": 13,
+        "inclusive": false
+      }
+    },
+    "CA": {
+      "currency": "CAD",
+      "effectiveFrom": "2026-01-15",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://sellercentral.amazon.ca/help/hub/reference/external/GABBX6GZPA8MSZGW",
+          "title": "Amazon CA 2026 regular and peak fees"
+        },
+        {
+          "url": "https://sellercentral.amazon.ca/help/hub/reference/external/G59RXFJCSKH9E9PK",
+          "title": "Amazon CA dimensional weight"
+        },
+        {
+          "url": "https://sell.amazon.ca/pricing",
+          "title": "Canada low-price fee reduction"
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "envelope",
+          "maxDimensions": [
+            38,
+            27,
+            2
+          ],
+          "maxUnitWeight": 0.5,
+          "weightMode": "max",
+          "weightStep": 0.1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 0.5,
+          "regular": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                446
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                471
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                501
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                528
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                562
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                473
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                499
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                531
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                560
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                595
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "maxDimensions": [
+            45,
+            35,
+            20
+          ],
+          "maxUnitWeight": 9,
+          "weightMode": "max",
+          "weightStep": 0.1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 9,
+          "regular": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                592
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                612
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                636
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                673
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                723
+              ]
+            },
+            {
+              "upTo": 0.6,
+              "cents": [
+                740
+              ]
+            },
+            {
+              "upTo": 0.7,
+              "cents": [
+                771
+              ]
+            },
+            {
+              "upTo": 0.8,
+              "cents": [
+                795
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                825
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                849
+              ]
+            },
+            {
+              "upTo": 1.1,
+              "cents": [
+                858
+              ]
+            },
+            {
+              "upTo": 1.2,
+              "cents": [
+                884
+              ]
+            },
+            {
+              "upTo": 1.3,
+              "cents": [
+                904
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                929
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                960
+              ]
+            },
+            {
+              "upTo": 9.0,
+              "cents": [
+                1032
+              ],
+              "increment": {
+                "from": 1.5,
+                "step": 0.1,
+                "cents": [
+                  9
+                ]
+              }
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                628
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                649
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                674
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                713
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                765
+              ]
+            },
+            {
+              "upTo": 0.6,
+              "cents": [
+                784
+              ]
+            },
+            {
+              "upTo": 0.7,
+              "cents": [
+                817
+              ]
+            },
+            {
+              "upTo": 0.8,
+              "cents": [
+                843
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                874
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                899
+              ]
+            },
+            {
+              "upTo": 1.1,
+              "cents": [
+                910
+              ]
+            },
+            {
+              "upTo": 1.2,
+              "cents": [
+                937
+              ]
+            },
+            {
+              "upTo": 1.3,
+              "cents": [
+                958
+              ]
+            },
+            {
+              "upTo": 1.4,
+              "cents": [
+                985
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                1017
+              ]
+            },
+            {
+              "upTo": 9.0,
+              "cents": [
+                1100
+              ],
+              "increment": {
+                "from": 1.5,
+                "step": 0.1,
+                "cents": [
+                  9
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "small-oversize",
+          "maxDimensions": [
+            152,
+            76,
+            null
+          ],
+          "maxUnitWeight": 32,
+          "weightMode": "max",
+          "weightStep": 0.5,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 32,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                1543
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  46
+                ]
+              }
+            }
+          ],
+          "maxLengthPlusGirth": 330,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                1677
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  46
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "medium-oversize",
+          "maxDimensions": [
+            270,
+            null,
+            null
+          ],
+          "maxUnitWeight": 68,
+          "weightMode": "max",
+          "weightStep": 0.5,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 68,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                3778
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  52
+                ]
+              }
+            }
+          ],
+          "maxLengthPlusGirth": 330,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                4164
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  52
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "large-oversize",
+          "maxDimensions": [
+            270,
+            null,
+            null
+          ],
+          "maxUnitWeight": 68,
+          "weightMode": "max",
+          "weightStep": 0.5,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 68,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                8220
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  58
+                ]
+              }
+            }
+          ],
+          "maxLengthPlusGirth": 419,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                8959
+              ],
+              "increment": {
+                "from": 0.5,
+                "step": 0.5,
+                "cents": [
+                  58
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 350
+      },
+      "peak": {
+        "from": "2026-10-15",
+        "until": "2027-01-15"
+      },
+      "notes": [
+        "Special oversize requires separate eligibility and quote."
+      ],
+      "lowPriceDiscount": {
+        "below": 14,
+        "cents": 80
+      }
+    },
+    "US": {
+      "currency": "USD",
+      "effectiveFrom": "2026-01-15",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "in",
+      "weightUnit": "lb",
+      "dimensionalDivisor": 139,
+      "feeIncludesTax": false,
+      "sources": [
+        {
+          "url": "https://sellercentral.amazon.com/help/hub/reference/external/GABBX6GZPA8MSZGW",
+          "title": "Amazon US 2026 FBA regular and peak fees"
+        },
+        {
+          "url": "https://sellercentral.amazon.com/help/hub/reference/external/G53Z9EKF8VVZVH29",
+          "title": "Amazon US dimensional weight"
+        },
+        {
+          "url": "https://sellercentral.amazon.com/help/hub/reference/external/GEVWP48HPBLEFJEY",
+          "title": "Amazon US shipping weight"
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": 10,
+          "inclusive": false
+        },
+        {
+          "maximum": 50,
+          "inclusive": true
+        },
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "small-standard",
+          "maxDimensions": [
+            15,
+            12,
+            0.75
+          ],
+          "maxUnitWeight": 1,
+          "weightMode": "unit",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 1,
+          "regular": [
+            {
+              "upTo": 0.125,
+              "cents": [
+                243,
+                332,
+                358
+              ]
+            },
+            {
+              "upTo": 0.25,
+              "cents": [
+                249,
+                342,
+                368
+              ]
+            },
+            {
+              "upTo": 0.375,
+              "cents": [
+                256,
+                345,
+                371
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                266,
+                354,
+                380
+              ]
+            },
+            {
+              "upTo": 0.625,
+              "cents": [
+                277,
+                368,
+                394
+              ]
+            },
+            {
+              "upTo": 0.75,
+              "cents": [
+                282,
+                378,
+                404
+              ]
+            },
+            {
+              "upTo": 0.875,
+              "cents": [
+                292,
+                391,
+                417
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                295,
+                396,
+                422
+              ]
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.125,
+              "cents": [
+                262,
+                351,
+                377
+              ]
+            },
+            {
+              "upTo": 0.25,
+              "cents": [
+                268,
+                361,
+                387
+              ]
+            },
+            {
+              "upTo": 0.375,
+              "cents": [
+                276,
+                365,
+                391
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                286,
+                374,
+                400
+              ]
+            },
+            {
+              "upTo": 0.625,
+              "cents": [
+                298,
+                389,
+                415
+              ]
+            },
+            {
+              "upTo": 0.75,
+              "cents": [
+                303,
+                399,
+                425
+              ]
+            },
+            {
+              "upTo": 0.875,
+              "cents": [
+                314,
+                413,
+                439
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                317,
+                418,
+                444
+              ]
+            }
+          ]
+        },
+        {
+          "id": "large-standard",
+          "maxDimensions": [
+            18,
+            14,
+            8
+          ],
+          "maxUnitWeight": 20,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 20,
+          "regular": [
+            {
+              "upTo": 0.25,
+              "cents": [
+                291,
+                373,
+                399
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                313,
+                395,
+                421
+              ]
+            },
+            {
+              "upTo": 0.75,
+              "cents": [
+                338,
+                420,
+                446
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                378,
+                460,
+                486
+              ]
+            },
+            {
+              "upTo": 1.25,
+              "cents": [
+                422,
+                504,
+                530
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                460,
+                542,
+                568
+              ]
+            },
+            {
+              "upTo": 1.75,
+              "cents": [
+                475,
+                557,
+                583
+              ]
+            },
+            {
+              "upTo": 2.0,
+              "cents": [
+                500,
+                582,
+                608
+              ]
+            },
+            {
+              "upTo": 2.25,
+              "cents": [
+                510,
+                592,
+                618
+              ]
+            },
+            {
+              "upTo": 2.5,
+              "cents": [
+                528,
+                610,
+                636
+              ]
+            },
+            {
+              "upTo": 2.75,
+              "cents": [
+                544,
+                626,
+                652
+              ]
+            },
+            {
+              "upTo": 3.0,
+              "cents": [
+                585,
+                667,
+                693
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                615,
+                697,
+                723
+              ],
+              "increment": {
+                "from": 3,
+                "step": 0.25,
+                "cents": [
+                  8,
+                  8,
+                  8
+                ]
+              }
+            }
+          ],
+          "peak": [
+            {
+              "upTo": 0.25,
+              "cents": [
+                315,
+                397,
+                423
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                339,
+                421,
+                447
+              ]
+            },
+            {
+              "upTo": 0.75,
+              "cents": [
+                366,
+                448,
+                474
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                407,
+                489,
+                515
+              ]
+            },
+            {
+              "upTo": 1.25,
+              "cents": [
+                452,
+                534,
+                560
+              ]
+            },
+            {
+              "upTo": 1.5,
+              "cents": [
+                491,
+                573,
+                599
+              ]
+            },
+            {
+              "upTo": 1.75,
+              "cents": [
+                507,
+                589,
+                615
+              ]
+            },
+            {
+              "upTo": 2.0,
+              "cents": [
+                533,
+                615,
+                641
+              ]
+            },
+            {
+              "upTo": 2.25,
+              "cents": [
+                547,
+                629,
+                655
+              ]
+            },
+            {
+              "upTo": 2.5,
+              "cents": [
+                567,
+                649,
+                675
+              ]
+            },
+            {
+              "upTo": 2.75,
+              "cents": [
+                584,
+                666,
+                692
+              ]
+            },
+            {
+              "upTo": 3.0,
+              "cents": [
+                626,
+                708,
+                734
+              ]
+            },
+            {
+              "upTo": 20,
+              "cents": [
+                669,
+                751,
+                777
+              ],
+              "increment": {
+                "from": 3,
+                "step": 0.25,
+                "cents": [
+                  8,
+                  8,
+                  8
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "small-bulky",
+          "maxDimensions": [
+            37,
+            28,
+            20
+          ],
+          "maxUnitWeight": 150,
+          "weightMode": "max",
+          "weightStep": 1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 50,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                678,
+                755,
+                755
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ],
+          "dimensionalMinimumSides": [
+            0,
+            2,
+            2
+          ],
+          "maxLengthPlusGirth": 130,
+          "maxLongestSide": 96,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                782,
+                859,
+                859
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "large-bulky",
+          "maxDimensions": [
+            59,
+            33,
+            33
+          ],
+          "maxUnitWeight": 150,
+          "weightMode": "max",
+          "weightStep": 1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 50,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                858,
+                935,
+                935
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ],
+          "dimensionalMinimumSides": [
+            0,
+            2,
+            2
+          ],
+          "maxLengthPlusGirth": 130,
+          "maxLongestSide": 96,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                962,
+                1039,
+                1039
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "extra-large-0-50",
+          "maxDimensions": null,
+          "maxUnitWeight": 150,
+          "weightMode": "max",
+          "weightStep": 1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 50,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                2556,
+                2633,
+                2633
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ],
+          "dimensionalMinimumSides": [
+            0,
+            2,
+            2
+          ],
+          "maxLengthPlusGirth": 130,
+          "maxLongestSide": 96,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                2829,
+                2906,
+                2906
+              ],
+              "increment": {
+                "from": 1,
+                "step": 1,
+                "cents": [
+                  38,
+                  38,
+                  38
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "extra-large-50-70",
+          "maxDimensions": null,
+          "maxUnitWeight": 150,
+          "weightMode": "max",
+          "weightStep": 1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 70,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                3655,
+                3732,
+                3732
+              ],
+              "increment": {
+                "from": 51,
+                "step": 1,
+                "cents": [
+                  75,
+                  75,
+                  75
+                ]
+              }
+            }
+          ],
+          "dimensionalMinimumSides": [
+            0,
+            2,
+            2
+          ],
+          "maxLengthPlusGirth": 130,
+          "maxLongestSide": 96,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                3936,
+                4013,
+                4013
+              ],
+              "increment": {
+                "from": 51,
+                "step": 1,
+                "cents": [
+                  75,
+                  75,
+                  75
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "extra-large-70-150",
+          "maxDimensions": null,
+          "maxUnitWeight": 150,
+          "weightMode": "max",
+          "weightStep": 1,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": 150,
+          "regular": [
+            {
+              "upTo": null,
+              "cents": [
+                5055,
+                5132,
+                5132
+              ],
+              "increment": {
+                "from": 71,
+                "step": 1,
+                "cents": [
+                  75,
+                  75,
+                  75
+                ]
+              }
+            }
+          ],
+          "dimensionalMinimumSides": [
+            0,
+            2,
+            2
+          ],
+          "maxLengthPlusGirth": 130,
+          "maxLongestSide": 96,
+          "peak": [
+            {
+              "upTo": null,
+              "cents": [
+                5497,
+                5574,
+                5574
+              ],
+              "increment": {
+                "from": 71,
+                "step": 1,
+                "cents": [
+                  75,
+                  75,
+                  75
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "fuel": {
+        "from": "2026-04-17",
+        "basisPoints": 350
+      },
+      "peak": {
+        "from": "2026-10-15",
+        "until": "2027-01-15"
+      },
+      "notes": [
+        "Overmax and Extra-large 150+ lb require a separate quote."
+      ]
+    },
+    "MX": {
+      "currency": "MXN",
+      "effectiveFrom": "2026-07-06",
+      "verifiedAt": "2026-10-31",
+      "version": "2026-10-31.1",
+      "dimensionUnit": "cm",
+      "weightUnit": "kg",
+      "dimensionalDivisor": 5000,
+      "feeIncludesTax": true,
+      "sources": [
+        {
+          "url": "https://sellercentral.amazon.com.mx/help/hub/reference/external/G200209150?mons_sel_locale=es_MX",
+          "title": "Amazon MX current domestic fulfilment fees"
+        },
+        {
+          "url": "https://sellercentral.amazon.com.mx/help/hub/reference/external/G201411300?mons_sel_locale=es_MX",
+          "title": "Amazon MX June and July 2026 fee changes"
+        }
+      ],
+      "priceBands": [
+        {
+          "maximum": 150,
+          "inclusive": false
+        },
+        {
+          "maximum": 299,
+          "inclusive": false
+        },
+        {
+          "maximum": 499,
+          "inclusive": false
+        },
+        {
+          "maximum": null
+        }
+      ],
+      "tiers": [
+        {
+          "id": "envelope",
+          "maxDimensions": [
+            38,
+            27,
+            2
+          ],
+          "maxUnitWeight": 0.5,
+          "weightMode": "unit_until_half_kg",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                2700,
+                3300,
+                4900,
+                6000
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                2720,
+                3400,
+                5000,
+                6040
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                2740,
+                3500,
+                5100,
+                6080
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                2760,
+                3600,
+                5200,
+                6120
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                2780,
+                3700,
+                5300,
+                6150
+              ]
+            }
+          ]
+        },
+        {
+          "id": "standard",
+          "maxDimensions": [
+            45,
+            35,
+            20
+          ],
+          "maxUnitWeight": null,
+          "weightMode": "unit_until_half_kg",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 0.1,
+              "cents": [
+                2800,
+                3300,
+                5000,
+                6180
+              ]
+            },
+            {
+              "upTo": 0.2,
+              "cents": [
+                2805,
+                3400,
+                5100,
+                6300
+              ]
+            },
+            {
+              "upTo": 0.3,
+              "cents": [
+                2810,
+                3500,
+                5200,
+                6400
+              ]
+            },
+            {
+              "upTo": 0.4,
+              "cents": [
+                2815,
+                3600,
+                5300,
+                6600
+              ]
+            },
+            {
+              "upTo": 0.5,
+              "cents": [
+                2820,
+                3700,
+                5400,
+                6700
+              ]
+            },
+            {
+              "upTo": 0.6,
+              "cents": [
+                2825,
+                3750,
+                5500,
+                6830
+              ]
+            },
+            {
+              "upTo": 0.7,
+              "cents": [
+                2830,
+                3800,
+                5600,
+                6960
+              ]
+            },
+            {
+              "upTo": 0.8,
+              "cents": [
+                2835,
+                3850,
+                5700,
+                7100
+              ]
+            },
+            {
+              "upTo": 0.9,
+              "cents": [
+                2840,
+                3900,
+                5800,
+                7200
+              ]
+            },
+            {
+              "upTo": 1.0,
+              "cents": [
+                2845,
+                3950,
+                5900,
+                7270
+              ]
+            },
+            {
+              "upTo": null,
+              "cents": [
+                2850,
+                4000,
+                6000,
+                7280
+              ],
+              "increment": {
+                "from": 1,
+                "step": 0.25,
+                "cents": [
+                  115,
+                  115,
+                  175,
+                  150
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "oversize",
+          "maxDimensions": [
+            550,
+            270,
+            270
+          ],
+          "maxUnitWeight": null,
+          "weightMode": "max",
+          "weightStep": 0,
+          "maxDimensionalWeight": null,
+          "maxShippingWeight": null,
+          "regular": [
+            {
+              "upTo": 50,
+              "cents": [
+                3200,
+                3800,
+                6100,
+                7540
+              ],
+              "increment": {
+                "from": 1,
+                "step": 0.5,
+                "cents": [
+                  280,
+                  280,
+                  310,
+                  375
+                ]
+              }
+            },
+            {
+              "upTo": 100,
+              "cents": [
+                30640,
+                31240,
+                36480,
+                44290
+              ],
+              "increment": {
+                "from": 50,
+                "step": 0.5,
+                "cents": [
+                  150,
+                  150,
+                  160,
+                  210
+                ]
+              }
+            },
+            {
+              "upTo": null,
+              "cents": [
+                45640,
+                46240,
+                52480,
+                65290
+              ],
+              "increment": {
+                "from": 100,
+                "step": 0.5,
+                "cents": [
+                  150,
+                  150,
+                  300,
+                  360
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "fuel": null,
+      "peak": null,
+      "notes": [
+        "Uses the ordinary/general fee group. Health, grocery and alcohol discounts are not applied. Prices and published fees include IVA."
+      ]
+    }
+  }
+}

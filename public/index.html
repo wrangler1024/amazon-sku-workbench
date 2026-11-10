@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#152b3c" />
+    <meta
+      name="description"
+      content="自定义包装测算亚马逊17个站点的FBA配送费用，支持单站测算、多站对比及费用明细。"
+    />
+    <title>FBA 费用计算器 · Samforo</title>
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/app.css?v=0.3.0" />
+    <script type="module" src="/assets/app.js?v=0.3.0"></script>
+  </head>
+  <body>
+    <svg class="icon-definitions" aria-hidden="true">
+      <defs>
+        <symbol id="i-box" viewBox="0 0 24 24">
+          <path
+            d="m12 3 9 5v8l-9 5-9-5V8l9-5Z M3 8l9 5 9-5 M12 13v8 M7.5 5.5l9 5v4"
+          />
+        </symbol>
+        <symbol id="i-calculator" viewBox="0 0 24 24">
+          <rect x="5" y="3" width="14" height="18" rx="2" />
+          <path
+            d="M8 7h8 M8 11h1 M12 11h1 M16 11h.1 M8 15h1 M12 15h1 M16 15v3 M8 18h1 M12 18h1"
+          />
+        </symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18 M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z" />
+        </symbol>
+        <symbol id="i-code" viewBox="0 0 24 24">
+          <path d="m8 7-5 5 5 5 M16 7l5 5-5 5 M14 4l-4 16" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14 m-5-5 5 5-5 5" />
+        </symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24">
+          <rect x="8" y="8" width="12" height="13" rx="2" />
+          <path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3" />
+        </symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+          <path d="M12 3v12 m-5-5 5 5 5-5 M4 16v4h16v-4" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v6 M12 7v.1" />
+        </symbol>
+      </defs>
+    </svg>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="Samforo FBA 计算器首页"
+          ><span class="brand-mark"
+            ><svg><use href="#i-box" /></svg></span
+          ><span>SAMFORO<small>SELLER TOOLS</small></span></a
+        >
+        <div class="sidebar-label">工作空间</div>
+        <nav class="main-nav" aria-label="主要功能">
+          <button
+            class="nav-item active"
+            data-view="single"
+            aria-current="page"
+          >
+            <svg><use href="#i-calculator" /></svg>单站测算<span
+              class="nav-arrow"
+              >›</span
+            >
+          </button>
+          <button class="nav-item" data-view="compare">
+            <svg><use href="#i-globe" /></svg>多站对比<span class="nav-arrow"
+              >›</span
+            >
+          </button>
+          <button class="nav-item" data-view="api">
+            <svg><use href="#i-code" /></svg>API 与规则<span class="nav-arrow"
+              >›</span
+            >
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="small-box"
+            ><svg><use href="#i-box" /></svg></span
+          ><strong>从包装开始，算清成本</strong>
+          <p>无需 ASIN<br />为未上架新品预估配送费</p>
+          <div class="sidebar-footer">FBA FEE CALCULATOR</div>
+        </div>
+      </aside>
+      <div class="main-shell">
+        <header class="topbar">
+          <div class="breadcrumb">
+            卖家工具<span>/</span
+            ><strong id="breadcrumb-title">单站测算</strong>
+          </div>
+          <div class="connection">
+            <span id="connection-dot" class="status-dot loading"></span
+            ><span id="connection-status">正在连接</span
+            ><button id="retry-connection" class="link-button" hidden>
+              重试
+            </button>
+          </div>
+        </header>
+        <main>
+          <section class="page-heading">
+            <div>
+              <div class="eyebrow">FULFILMENT BY AMAZON</div>
+              <h1 id="page-title">FBA 配送费计算器</h1>
+              <p id="page-description">
+                输入销售包装尺寸，预估每一件商品的配送费用。
+              </p>
+            </div>
+            <div class="coverage-badge">
+              <svg><use href="#i-globe" /></svg
+              ><span
+                ><strong>17</strong> 个站点<span class="coverage-caption"
+                  >统一测算 · 本币展示</span
+                ></span
+              >
+            </div>
+          </section>
+
+          <section id="calculator-view">
+            <div class="calculator-layout">
+              <form id="calculator-form" class="input-column">
+                <section class="card">
+                  <div class="section-heading">
+                    <div>
+                      <span class="section-number">01</span>
+                      <h2>销售设置</h2>
+                    </div>
+                    <span class="quiet-badge">普通商品 · 国内 FBA</span>
+                  </div>
+                  <div id="single-market-fields" class="field-grid two-columns">
+                    <label class="field"
+                      >销售站点<select
+                        id="marketplace"
+                        name="marketplace"
+                        required
+                        aria-label="销售站点"
+                      >
+                        <option value="CA">加拿大 · CAD</option>
+                      </select></label
+                    ><label class="field"
+                      >商品售价
+                      <div class="input-with-addon">
+                        <input
+                          id="price"
+                          name="price"
+                          type="number"
+                          min="0.01"
+                          max="100000000"
+                          step="0.01"
+                          inputmode="decimal"
+                          required
+                          placeholder="输入本币售价"
+                        /><span id="currency-label">CAD</span>
+                      </div></label
+                    >
+                  </div>
+                  <div id="compare-market-fields" hidden>
+                    <div class="compare-selector-heading">
+                      <p>分别填写各站本币售价</p>
+                      <button
+                        id="select-all-markets"
+                        type="button"
+                        class="link-button"
+                      >
+                        选择全部
+                      </button>
+                    </div>
+                    <div id="market-price-grid" class="market-price-grid"></div>
+                    <p class="field-hint">
+                      不换算汇率，各站售价独立填写；未勾选的站点不参与计算。
+                    </p>
+                  </div>
+                  <div class="date-row">
+                    <label class="field"
+                      >预计售出日期<input
+                        id="sale-date"
+                        name="saleDate"
+                        type="date"
+                        required
+                    /></label>
+                    <p class="field-hint">
+                      按售出日期选择常规或旺季费率，<br />不是发货或入库日期。
+                    </p>
+                  </div>
+                </section>
+
+                <section class="card packaging-card">
+                  <div class="section-heading">
+                    <div>
+                      <span class="section-number">02</span>
+                      <h2>销售包装</h2>
+                    </div>
+                    <button id="fill-example" type="button" class="link-button">
+                      填入示例
+                    </button>
+                  </div>
+                  <div class="packaging-intro">
+                    <div>
+                      <p>按最终发给买家的包装测量</p>
+                      <span>组合商品请填写整套包装后的尺寸与重量。</span>
+                    </div>
+                    <svg
+                      class="box-illustration"
+                      viewBox="0 0 130 84"
+                      aria-hidden="true"
+                    >
+                      <path
+                        class="box-fill"
+                        d="m65 8 47 23v28L65 82 18 59V31Z"
+                      />
+                      <path
+                        d="m65 8 47 23v28L65 82 18 59V31L65 8 M18 31l47 23 47-23 M65 54v28 M40 20l48 23v12"
+                      />
+                      <path
+                        class="box-dash"
+                        d="M13 24 58 2 M118 36v22 M22 68l34 16"
+                      />
+                    </svg>
+                  </div>
+                  <div class="field-topline">
+                    <span class="field-label">包装尺寸</span
+                    ><select id="dimension-unit" aria-label="尺寸单位">
+                      <option value="cm">厘米 cm</option>
+                      <option value="in">英寸 in</option>
+                    </select>
+                  </div>
+                  <div class="dimension-fields">
+                    <label class="field"
+                      >长<input
+                        id="length"
+                        name="length"
+                        type="number"
+                        min="0.000001"
+                        max="10000"
+                        step="any"
+                        required
+                        inputmode="decimal"
+                        placeholder="0" /></label
+                    ><span class="dimension-times">×</span
+                    ><label class="field"
+                      >宽<input
+                        id="width"
+                        name="width"
+                        type="number"
+                        min="0.000001"
+                        max="10000"
+                        step="any"
+                        required
+                        inputmode="decimal"
+                        placeholder="0" /></label
+                    ><span class="dimension-times">×</span
+                    ><label class="field"
+                      >高<input
+                        id="height"
+                        name="height"
+                        type="number"
+                        min="0.000001"
+                        max="10000"
+                        step="any"
+                        required
+                        inputmode="decimal"
+                        placeholder="0"
+                    /></label>
+                  </div>
+                  <p class="field-hint">三边会自动按从长到短排序。</p>
+                  <label class="field weight-field"
+                    >包装实重
+                    <div class="weight-input">
+                      <input
+                        id="weight"
+                        name="weight"
+                        type="number"
+                        min="0.000001"
+                        max="1000000"
+                        step="any"
+                        inputmode="decimal"
+                        required
+                        placeholder="0"
+                      /><select id="weight-unit" aria-label="重量单位">
+                        <option value="g">克 g</option>
+                        <option value="kg">千克 kg</option>
+                        <option value="lb">磅 lb</option>
+                        <option value="oz">盎司 oz</option>
+                      </select>
+                    </div></label
+                  >
+                  <div id="example-note" class="example-note" hidden>
+                    <span></span>当前为示例包装，可直接修改参数
+                  </div>
+                </section>
+
+                <div
+                  id="form-error"
+                  class="form-error"
+                  role="alert"
+                  hidden
+                ></div>
+                <button
+                  id="calculate-button"
+                  class="primary-button"
+                  type="submit"
+                  disabled
+                >
+                  <span id="calculate-label">计算 FBA 配送费</span
+                  ><svg><use href="#i-arrow" /></svg>
+                </button>
+                <p class="submission-note">
+                  只计算费用，不创建或修改任何 SKU。
+                </p>
+                <section id="options-card" class="card options-card" hidden>
+                  <details id="options-details">
+                    <summary>计费选项<span>低价资格与站点计划</span></summary>
+                    <div class="options-content">
+                      <p id="low-price-compare-note" class="field-hint" hidden>
+                        各站资格单独选择；仅对所选站点生效。美国、加拿大和墨西哥按售价规则自动计算，无需选择资格。
+                      </p>
+                      <div id="low-price-fields"></div>
+                      <label id="cep-field" class="check-field" hidden
+                        ><input
+                          id="cep"
+                          type="checkbox"
+                        />德国已参加中欧计划（CEP）</label
+                      >
+                      <p id="cep-hint" class="field-hint" hidden>
+                        未勾选时采用仅德国存储的费率。
+                      </p>
+                    </div>
+                  </details>
+                </section>
+              </form>
+
+              <aside
+                class="result-column"
+                aria-live="polite"
+                aria-atomic="false"
+              >
+                <div id="result-placeholder" class="card result-placeholder">
+                  <div class="placeholder-icon">
+                    <svg><use href="#i-calculator" /></svg>
+                  </div>
+                  <h2>包装填好，费用就清楚了</h2>
+                  <p>填写左侧参数，查看配送费用、<br />尺寸档与计费重量。</p>
+                  <div class="placeholder-points">
+                    <span>✓ 实重与体积重</span><span>✓ 低价与旺季规则</span
+                    ><span>✓ 官方费率来源</span>
+                  </div>
+                </div>
+                <div id="single-result" hidden>
+                  <section class="card result-card">
+                    <div class="fee-hero">
+                      <div class="fee-topline">
+                        <span>预估 FBA 配送费</span
+                        ><span id="result-market" class="result-market"></span>
+                      </div>
+                      <div class="fee-amount">
+                        <span id="result-currency"></span
+                        ><strong id="result-total"></strong
+                        ><span class="per-unit">/ 件</span>
+                      </div>
+                      <p id="result-tax"></p>
+                      <div id="result-plan" class="plan-tag"></div>
+                    </div>
+                    <div class="fee-breakdown">
+                      <div>
+                        <span>基础配送费</span><strong id="base-fee"></strong>
+                      </div>
+                      <div>
+                        <span>低价优惠</span
+                        ><strong
+                          id="discount-fee"
+                          class="discount-value"
+                        ></strong>
+                      </div>
+                      <div>
+                        <span
+                          >燃油与物流附加费
+                          <small id="fuel-percent"></small></span
+                        ><strong id="fuel-fee"></strong>
+                      </div>
+                    </div>
+                    <div class="result-dimensions">
+                      <div>
+                        <span>尺寸分档</span><strong id="result-tier"></strong>
+                      </div>
+                      <div>
+                        <span>计费重量</span
+                        ><strong id="result-shipping-weight"></strong>
+                      </div>
+                      <div>
+                        <span>包装实重</span
+                        ><strong id="result-unit-weight"></strong>
+                      </div>
+                      <div>
+                        <span>体积重量</span
+                        ><strong id="result-dimensional-weight"></strong>
+                      </div>
+                    </div>
+                    <div class="result-actions">
+                      <button id="copy-result" type="button">
+                        <svg><use href="#i-copy" /></svg>复制结果</button
+                      ><span id="result-date"></span>
+                    </div>
+                  </section>
+                  <div id="result-notices" class="notice-stack"></div>
+                  <section class="card source-card">
+                    <h3>费率依据 <span id="result-verified-date"></span></h3>
+                    <ul id="result-sources"></ul>
+                  </section>
+                </div>
+                <section id="quote-result" class="card quote-result" hidden>
+                  <div class="quote-icon">
+                    <svg><use href="#i-info" /></svg>
+                  </div>
+                  <span class="quiet-badge">暂不提供金额</span>
+                  <h2>需要官方报价</h2>
+                  <p id="quote-message"></p>
+                  <ul id="quote-sources" class="source-list"></ul>
+                </section>
+                <section id="compare-result" class="card compare-result" hidden>
+                  <div class="section-heading">
+                    <div><h2>多站测算结果</h2></div>
+                    <button
+                      id="download-comparison"
+                      type="button"
+                      class="link-button"
+                    >
+                      <svg><use href="#i-download" /></svg>导出
+                    </button>
+                  </div>
+                  <p class="field-hint">
+                    金额按各站本币展示，不代表跨币种价格排序。
+                  </p>
+                  <div class="table-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>销售站点</th>
+                          <th>售价</th>
+                          <th>FBA / 件</th>
+                          <th>尺寸档</th>
+                        </tr>
+                      </thead>
+                      <tbody id="compare-results-body"></tbody>
+                    </table>
+                  </div>
+                  <div id="compare-detail" class="compare-detail" hidden></div>
+                  <div id="compare-notices" class="notice-stack"></div>
+                </section>
+                <div class="scope-note">
+                  <svg><use href="#i-info" /></svg>
+                  <p>
+                    本工具预估单件国内 FBA
+                    配送费及适用附加费，不含佣金、仓储、头程等成本。最终费用以亚马逊实际测量和账单为准。
+                  </p>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section id="api-view" hidden>
+            <div class="api-grid">
+              <section class="card">
+                <div class="section-heading">
+                  <div>
+                    <span class="section-number">API</span>
+                    <h2>统一费用计算接口</h2>
+                  </div>
+                  <a
+                    class="link-button"
+                    href="/openapi.json"
+                    target="_blank"
+                    rel="noopener"
+                    >OpenAPI 文档 ↗</a
+                  >
+                </div>
+                <p class="api-intro">
+                  以相同的数据结构测算 17 个站点。支持自定义包装，无需 ASIN。
+                </p>
+                <div class="endpoint">
+                  <span>POST</span><code>/v1/fba/calculate</code>
+                </div>
+                <pre id="api-request-example"></pre>
+                <div class="api-endpoints">
+                  <div>
+                    <span>POST</span><code>/v1/fba/calculate-batch</code
+                    ><small>批量 1–100 笔</small>
+                  </div>
+                  <div>
+                    <span>GET</span><code>/v1/fba/marketplaces</code
+                    ><small>支持范围与来源</small>
+                  </div>
+                  <div>
+                    <span>GET</span><code>/healthz</code
+                    ><small>服务健康状态</small>
+                  </div>
+                  <div>
+                    <span>GET</span><code>/readyz</code
+                    ><small>计算就绪状态</small>
+                  </div>
+                </div>
+                <p class="field-hint">
+                  正常计算返回 estimated；不支持或规则不明确时返回
+                  quote_required 和空费用。请勿将空费用处理为 0。
+                </p>
+              </section>
+              <section class="card api-rules">
+                <h2>已支持的站点</h2>
+                <div id="supported-markets"></div>
+                <div class="api-rule-note">
+                  <h3>普通商品 · 国内配送</h3>
+                  <p>
+                    不包含服装、危险品、跨境远程配送、EFN
+                    与特殊计划。各站支持的尺寸和重量上限可通过站点接口查询。
+                  </p>
+                  <h3>版本明确，可追溯</h3>
+                  <p>
+                    每笔结果返回费率版本、核验日期与官方来源。未来日期使用已公布规则，并提示后续费率复核。
+                  </p>
+                  <dl>
+                    <div>
+                      <dt>服务版本</dt>
+                      <dd id="api-service-version">—</dd>
+                    </div>
+                    <div>
+                      <dt>费率版本</dt>
+                      <dd id="api-rate-version">—</dd>
+                    </div>
+                  </dl>
+                </div>
+              </section>
+            </div>
+          </section>
+          <footer class="page-footer">
+            <span>Samforo · FBA Fee Calculator</span
+            ><span id="footer-rate">正在读取费率版本</span>
+          </footer>
+        </main>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status" hidden></div>
+    <noscript
+      ><div class="noscript-message">
+        请启用 JavaScript 以使用费用计算器。费用接口仍可直接调用。
+      </div></noscript
+    >
+  </body>
+</html>

@@ -1,0 +1,477 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+      "markets": [
+        "UK",
+        "DE",
+        "FR",
+        "IT",
+        "ES",
+        "NL",
+        "SE",
+        "PL",
+        "BE",
+        "IE"
+      ],
+      "title": "Amazon Europe rate card, July 2026",
+      "id": "eu-rate-card",
+      "kind": "pdf",
+      "minChars": 10000,
+      "requiredPatterns": [
+        "FBA",
+        "UK",
+        "Ireland"
+      ]
+    },
+    {
+      "url": "https://sellercentral.amazon.com.au/help/hub/reference/external/G4UU2ZQNHJNKAG5Y",
+      "markets": [
+        "AU"
+      ],
+      "title": "Amazon AU 2026 FBA fee changes",
+      "id": "au-fee-changes",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "fee"
+      ],
+      "minTables": 1,
+      "fetchUrl": "https://sellercentral.amazon.com.au/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G4UU2ZQNHJNKAG5Y",
+        "locale": "en_AU",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.com.au/help/hub/reference/external/201112670",
+      "markets": [
+        "AU"
+      ],
+      "title": "Amazon AU full fulfilment fee schedule",
+      "id": "au-fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "fee"
+      ],
+      "minTables": 1,
+      "fetchUrl": "https://sellercentral.amazon.com.au/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201112670",
+        "locale": "en_AU",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.ca/help/hub/reference/external/GABBX6GZPA8MSZGW",
+      "markets": [
+        "CA"
+      ],
+      "title": "Amazon CA 2026 regular and peak fees",
+      "id": "ca-fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "fee"
+      ],
+      "minTables": 1,
+      "fetchUrl": "https://sellercentral.amazon.ca/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "GABBX6GZPA8MSZGW",
+        "locale": "en_CA",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.ca/help/hub/reference/external/G59RXFJCSKH9E9PK",
+      "markets": [
+        "CA"
+      ],
+      "title": "Amazon CA dimensional weight",
+      "id": "ca-dimensions",
+      "kind": "help_json",
+      "minChars": 700,
+      "requiredPatterns": [
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.ca/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G59RXFJCSKH9E9PK",
+        "locale": "en_CA",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sell.amazon.ca/pricing",
+      "markets": [
+        "CA"
+      ],
+      "title": "Canada low-price fee reduction",
+      "id": "ca-pricing",
+      "kind": "html",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "0[.,]80"
+      ]
+    },
+    {
+      "url": "https://sellercentral.amazon.com/help/hub/reference/external/GABBX6GZPA8MSZGW",
+      "markets": [
+        "US"
+      ],
+      "title": "Amazon US 2026 FBA regular and peak fees",
+      "id": "us-fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "fee"
+      ],
+      "minTables": 1,
+      "fetchUrl": "https://sellercentral.amazon.com/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "GABBX6GZPA8MSZGW",
+        "locale": "en_US",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.com/help/hub/reference/external/G53Z9EKF8VVZVH29",
+      "markets": [
+        "US"
+      ],
+      "title": "Amazon US dimensional weight",
+      "id": "us-dimensions",
+      "kind": "help_json",
+      "minChars": 700,
+      "requiredPatterns": [
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.com/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G53Z9EKF8VVZVH29",
+        "locale": "en_US",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.com/help/hub/reference/external/GEVWP48HPBLEFJEY",
+      "markets": [
+        "US"
+      ],
+      "title": "Amazon US shipping weight",
+      "id": "us-shipping",
+      "kind": "help_json",
+      "minChars": 700,
+      "requiredPatterns": [
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.com/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "GEVWP48HPBLEFJEY",
+        "locale": "en_US",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.com.mx/help/hub/reference/external/G200209150?mons_sel_locale=es_MX",
+      "markets": [
+        "MX"
+      ],
+      "title": "Amazon MX current domestic fulfilment fees",
+      "id": "mx-fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "Logística",
+        "tarifas"
+      ],
+      "minTables": 2,
+      "fetchUrl": "https://sellercentral.amazon.com.mx/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G200209150",
+        "locale": "es_MX",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "url": "https://sellercentral.amazon.com.mx/help/hub/reference/external/G201411300?mons_sel_locale=es_MX",
+      "markets": [
+        "MX"
+      ],
+      "title": "Amazon MX June and July 2026 fee changes",
+      "id": "mx-changes",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "Logística",
+        "2026"
+      ],
+      "minTables": 1,
+      "fetchUrl": "https://sellercentral.amazon.com.mx/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G201411300",
+        "locale": "es_MX",
+        "statuses": [
+          "Live"
+        ]
+      },
+      "readerNote": "Public request observed in the official HelpHub JavaScript on 2026-10-31; no credentials or cookies; content assertions detect endpoint/layout changes."
+    },
+    {
+      "id": "eu-rate-discovery",
+      "url": "https://sell.amazon.co.uk/pricing",
+      "markets": [
+        "UK",
+        "DE",
+        "FR",
+        "IT",
+        "ES",
+        "NL",
+        "SE",
+        "PL",
+        "BE",
+        "IE"
+      ],
+      "title": "Europe pricing and replacement rate-card links",
+      "kind": "html",
+      "minChars": 2000,
+      "requiredPatterns": [
+        "FBA",
+        "fulfil"
+      ]
+    },
+    {
+      "id": "ae-fees",
+      "url": "https://sellercentral.amazon.ae/help/hub/reference/external/201112670",
+      "markets": [
+        "AE"
+      ],
+      "title": "FBA fulfilment fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "FBA",
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.ae/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201112670",
+        "locale": "en_AE",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "ae-tiers",
+      "url": "https://sellercentral.amazon.ae/help/hub/reference/external/201105770",
+      "markets": [
+        "AE"
+      ],
+      "title": "Product size tiers",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "FBA",
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.ae/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201105770",
+        "locale": "en_AE",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "ae-pricing",
+      "url": "https://sell.amazon.ae/pricing",
+      "markets": [
+        "AE"
+      ],
+      "title": "Official public pricing cross-check",
+      "kind": "html",
+      "minChars": 3000,
+      "requiredPatterns": [
+        "FBA|الشحن",
+        "25"
+      ]
+    },
+    {
+      "id": "sa-fees",
+      "url": "https://sellercentral.amazon.sa/help/hub/reference/external/201112670",
+      "markets": [
+        "SA"
+      ],
+      "title": "FBA fulfilment fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "FBA",
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.sa/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201112670",
+        "locale": "en_SA",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "sa-tiers",
+      "url": "https://sellercentral.amazon.sa/help/hub/reference/external/201105770",
+      "markets": [
+        "SA"
+      ],
+      "title": "Product size tiers",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "FBA",
+        "weight"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.sa/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201105770",
+        "locale": "en_SA",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "sa-pricing",
+      "url": "https://sell.amazon.sa/pricing",
+      "markets": [
+        "SA"
+      ],
+      "title": "Official public pricing cross-check",
+      "kind": "html",
+      "minChars": 3000,
+      "requiredPatterns": [
+        "FBA|الشحن",
+        "25"
+      ]
+    },
+    {
+      "id": "jp-fees",
+      "url": "https://sellercentral.amazon.co.jp/help/hub/reference/external/201112670",
+      "markets": [
+        "JP"
+      ],
+      "title": "FBA fulfilment fees",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "円"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.co.jp/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "201112670",
+        "locale": "ja_JP",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "jp-tiers",
+      "url": "https://sellercentral.amazon.co.jp/help/hub/reference/external/G201105770",
+      "markets": [
+        "JP"
+      ],
+      "title": "Product size tiers",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "サイズ"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.co.jp/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G201105770",
+        "locale": "ja_JP",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "jp-2026",
+      "url": "https://sellercentral.amazon.co.jp/help/hub/reference/external/GRH54FUTD3C5LWWW",
+      "markets": [
+        "JP"
+      ],
+      "title": "April 2026 fee changes",
+      "kind": "help_json",
+      "minChars": 600,
+      "minTables": 1,
+      "requiredPatterns": [
+        "円"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.co.jp/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "GRH54FUTD3C5LWWW",
+        "locale": "ja_JP",
+        "statuses": [
+          "Live"
+        ]
+      }
+    },
+    {
+      "id": "jp-pricing",
+      "url": "https://sell.amazon.co.jp/pricing",
+      "markets": [
+        "JP"
+      ],
+      "title": "Official public pricing cross-check",
+      "kind": "html",
+      "minChars": 3000,
+      "requiredPatterns": [
+        "FBA",
+        "1,000|1000"
+      ]
+    }
+  ],
+  "verifyCandidates": true
+}

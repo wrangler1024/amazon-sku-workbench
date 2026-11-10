@@ -1,0 +1,17 @@
+node_modules/
+coverage/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.local/
+evidence/
+.venv/
+*.whl
+*.tar.gz
+*.pem
+*.key
+credentials/
