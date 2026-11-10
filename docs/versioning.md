@@ -3,11 +3,11 @@
 ## 单仓库、独立组件、组合发布
 
 - 评审前端：`apps/review/package.json`，tag `review/v0.70.2`。
-- 编辑前端：`apps/editor/package.json`，tag `editor/v0.21.0`。
+- 编辑前端：`apps/editor/package.json`，tag `editor/v0.21.1`。
 - 后台服务：`pyproject.toml`与`amazon_aigc.__version__`，tag `api/v0.21.0`。
 - FBACC：`services/amazon-fbacc/package.json`与`src/index.mjs`，tag `fbacc/v0.3.0`。核验工具版本单独记录于`infra/rates/VERSION`（0.2.0），费率快照为2026-10-31.2；三个版本各自描述代码、工具和规则，不能混用。
 - 云邮箱：`services/store-mail-web/pyproject.toml`与`store_mail_web.__version__`，tag `mail/v0.13.1`，独立SQLite与依赖锁；不与editor/API绑定升级。
-- 组合基线：根package与`versions.json`，tag `v0.3.0`；表示本次验证过的一组版本。
+- 组合基线：根package与`versions.json`，tag `v0.3.1`；表示本次验证过的一组版本。
 - 飞书应用/小组件发布号是环境部署元数据，与开源包版本分别记录。不要因共享飞书应用版本变化而改写未变化的评审包版本。
 
 ERP自动建料目前仅为规划模块，不加入`versions.json`运行组件、不分配API/包版本、不建立发布标签。规划文档的v0.1表示文档修订，不代表软件已实现；未来开始实现后再登记独立模块版本。
