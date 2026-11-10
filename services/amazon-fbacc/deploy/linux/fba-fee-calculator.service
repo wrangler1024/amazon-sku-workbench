@@ -1,0 +1,36 @@
+[Unit]
+Description=Samforo FBA Fee Calculator
+After=network.target
+
+[Service]
+Type=simple
+User=fba-calculator
+Group=fba-calculator
+WorkingDirectory=/opt/fba-fee-calculator/current
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/fba-fee-calculator/service.env
+ExecStart=/usr/bin/node /opt/fba-fee-calculator/current/src/server.mjs
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+UMask=0077
+MemoryMax=192M
+CPUQuota=60%
+TasksMax=48
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fba-fee-calculator
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+{
+  "marketplace": "CA",
+  "price": { "amount": 13.99, "currency": "CAD" },
+  "package": {
+    "dimensions": { "length": 30, "width": 20, "height": 5, "unit": "cm" },
+    "weight": { "value": 200, "unit": "g" }
+  },
+  "saleDate": "2026-10-31",
+  "category": "general"
+}

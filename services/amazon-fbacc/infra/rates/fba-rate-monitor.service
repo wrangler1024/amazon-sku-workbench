@@ -1,0 +1,33 @@
+[Unit]
+Description=Check official Amazon FBA fee sources and prepare review candidates
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=fba-rate-monitor
+Group=fba-rate-monitor
+SupplementaryGroups=fba-calculator
+WorkingDirectory=/opt/fba-rate-monitor/current
+ExecStart=/opt/fba-rate-monitor/venv/bin/python /opt/fba-rate-monitor/current/pipeline.py check
+Environment=PYTHONDONTWRITEBYTECODE=1
+StateDirectory=fba-rate-monitor
+StateDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+MemoryMax=256M
+CPUQuota=30%
+TasksMax=64
+TimeoutStartSec=12min
+StandardOutput=journal
+StandardError=journal

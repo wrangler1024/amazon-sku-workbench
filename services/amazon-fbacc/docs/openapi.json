@@ -1,0 +1,822 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Samforo FBA Fee Calculator",
+    "version": "0.3.0",
+    "description": "Versioned domestic FBA fee estimates for custom packages. No ASIN required. Independent of Feishu and SKU costs."
+  },
+  "servers": [
+    {
+      "url": "https://fbacc.samforo.icu"
+    }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "operationId": "health",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service and rate version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "operationId": "readiness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "All marketplace adapters ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not ready or draining",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fba/marketplaces": {
+      "get": {
+        "operationId": "getMarketplaces",
+        "responses": {
+          "200": {
+            "description": "17 marketplaces with published limits, sources and assumptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fba/calculate": {
+      "post": {
+        "operationId": "calculateFbaFee",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estimate or explicit quote_required with null fee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalculationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fba/calculate-batch": {
+      "post": {
+        "operationId": "calculateBatch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "items": {
+                      "$ref": "#/components/schemas/CalculationRequest"
+                    }
+                  }
+                },
+                "required": [
+                  "items"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ordered, independently validated results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "results"
+                  ],
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "index": {
+                                "type": "integer"
+                              },
+                              "ok": {
+                                "const": true
+                              },
+                              "result": {
+                                "$ref": "#/components/schemas/CalculationResult"
+                              }
+                            },
+                            "required": [
+                              "index",
+                              "ok",
+                              "result"
+                            ]
+                          },
+                          {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "index": {
+                                "type": "integer"
+                              },
+                              "ok": {
+                                "const": false
+                              },
+                              "error": {
+                                "$ref": "#/components/schemas/ErrorDetail"
+                              }
+                            },
+                            "required": [
+                              "index",
+                              "ok",
+                              "error"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Structured error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "getOpenApi",
+        "responses": {
+          "200": {
+            "description": "This OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CalculationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "marketplace": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "AU, US, CA, MX, UK (GB alias), DE, FR, IT, ES, NL, SE, PL, BE, IE, AE, SA, JP"
+          },
+          "price": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "amount": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 100000000,
+                "multipleOf": 0.01
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$"
+              }
+            },
+            "required": [
+              "amount",
+              "currency"
+            ]
+          },
+          "package": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "dimensions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "length": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 10000
+                  },
+                  "width": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 10000
+                  },
+                  "height": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 10000
+                  },
+                  "unit": {
+                    "enum": [
+                      "cm",
+                      "in"
+                    ]
+                  }
+                },
+                "required": [
+                  "length",
+                  "width",
+                  "height",
+                  "unit"
+                ]
+              },
+              "weight": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1000000
+                  },
+                  "unit": {
+                    "enum": [
+                      "g",
+                      "kg",
+                      "lb",
+                      "oz"
+                    ]
+                  }
+                },
+                "required": [
+                  "value",
+                  "unit"
+                ]
+              }
+            },
+            "required": [
+              "dimensions",
+              "weight"
+            ]
+          },
+          "saleDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Expected sale/fulfilment date in the marketplace, not inbound shipment date."
+          },
+          "category": {
+            "enum": [
+              "general",
+              "apparel",
+              "dangerous_goods",
+              "unknown"
+            ],
+            "description": "Only general non-apparel non-dangerous goods currently receive an estimate."
+          },
+          "program": {
+            "enum": [
+              "domestic",
+              "efn",
+              "remote",
+              "pan_eu"
+            ],
+            "default": "domestic",
+            "description": "Only domestic currently supported."
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "lowPriceEligibility": {
+                "enum": [
+                  "conservative",
+                  "confirmed_eligible",
+                  "ineligible"
+                ],
+                "default": "conservative"
+              },
+              "centralEuropeProgram": {
+                "type": "boolean",
+                "default": false,
+                "description": "DE only. false uses Germany-only fee column."
+              }
+            },
+            "required": []
+          }
+        },
+        "required": [
+          "marketplace",
+          "price",
+          "package",
+          "saleDate",
+          "category"
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "marketplace": {
+                  "const": "JP"
+                }
+              },
+              "required": [
+                "marketplace"
+              ]
+            },
+            "then": {
+              "properties": {
+                "price": {
+                  "properties": {
+                    "amount": {
+                      "type": "integer",
+                      "description": "JPY prices must be whole yen."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CalculationResult": {
+        "type": "object",
+        "required": [
+          "status",
+          "marketplace",
+          "currency",
+          "saleDate",
+          "fee",
+          "classification",
+          "sources",
+          "warnings",
+          "rateVersion",
+          "calculatorVersion",
+          "rateCard"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "estimated",
+              "quote_required"
+            ]
+          },
+          "marketplace": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "saleDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "calculatorVersion": {
+            "type": "string"
+          },
+          "rateVersion": {
+            "type": "string"
+          },
+          "rateCard": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "version": {
+                "type": "string"
+              },
+              "verifiedAt": {
+                "type": "string",
+                "format": "date"
+              },
+              "effectiveFrom": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "category": {
+            "type": "string"
+          },
+          "program": {
+            "type": "string"
+          },
+          "package": {
+            "type": "object"
+          },
+          "fee": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "base": {
+                "type": "number"
+              },
+              "lowPriceDiscount": {
+                "type": "number"
+              },
+              "subtotal": {
+                "type": "number"
+              },
+              "fuelSurcharge": {
+                "type": "number"
+              },
+              "fuelRate": {
+                "type": "number"
+              },
+              "total": {
+                "type": "number"
+              },
+              "totalMinorUnits": {
+                "type": "integer"
+              },
+              "includesTax": {
+                "type": "boolean"
+              }
+            }
+          },
+          "classification": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "tier": {
+                "type": "string"
+              },
+              "plan": {
+                "enum": [
+                  "regular",
+                  "low_price",
+                  "peak"
+                ]
+              },
+              "weightUnit": {
+                "enum": [
+                  "kg",
+                  "lb"
+                ]
+              },
+              "shippingWeight": {
+                "type": "number"
+              },
+              "dimensionalWeight": {
+                "type": "number"
+              },
+              "rawWeight": {
+                "type": "number"
+              },
+              "weightBasis": {
+                "enum": [
+                  "unit",
+                  "dimensional"
+                ]
+              },
+              "roundingStep": {
+                "type": "number"
+              },
+              "priceBandIndex": {
+                "type": "integer"
+              },
+              "incrementalSteps": {
+                "type": "integer"
+              }
+            }
+          },
+          "reason": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "message"
+              ]
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "url",
+                "title"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "pages": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          },
+          "assumptions": {
+            "type": "object"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Required when FBA_CALCULATOR_API_KEY is configured; healthz remains public."
+      }
+    }
+  }
+}
