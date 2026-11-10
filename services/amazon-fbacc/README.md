@@ -1,5 +1,7 @@
 # Amazon FBACC
 
+本模块现纳入 [amazon-sku-workbench](../../README.md)，维护入口为`services/amazon-fbacc`，仍可独立运行、测试和部署。原 MIT 许可证保持；导入来源和版本见[UPSTREAM.md](UPSTREAM.md)。monorepo开发、评审台接入和模块打包见[集成说明](../../docs/fbacc.md)。独立导出包不包含这些根目录说明，下方本模块的运行和部署步骤仍可直接使用。
+
 独立的亚马逊 FBA 单件配送费计算服务，输入自定义包装、站点、本币售价和预计售出日期，无需 ASIN 或已上架 SKU。提供 JavaScript 函数、TypeScript 类型及 HTTP JSON 接口。
 
 在线计算器：**https://fbacc.samforo.icu**；[公开 OpenAPI](https://fbacc.samforo.icu/openapi.json)。

@@ -1,6 +1,9 @@
 # Project context
 
 amazon-fbacc is a standalone FBA fee calculator and official-source monitoring toolkit.
+Since 2026-11-10 it is maintained as services/amazon-fbacc in amazon-sku-workbench.
+It remains independently runnable and MIT licensed. The original repository is
+retained as release history; no deployment or rate changes are implied by this import.
 The application is0.3.0, monitoring infra is0.2.0, and the bundled reviewed rate
 snapshot is2026-10-31.2. It supports17 domestic ordinary-goods marketplaces.
 

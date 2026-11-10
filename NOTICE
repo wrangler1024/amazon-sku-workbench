@@ -4,5 +4,8 @@ Copyright 2026 wrangler1024 and contributors.
 This project includes application source for product selection review,
 Listing content editing, and artwork collaboration.
 Third-party dependencies retain their respective licenses.
+The services/amazon-fbacc module was imported from amazon-fbacc, copyright
+2026 fbacc contributors, and remains MIT licensed. See that module's LICENSE,
+NOTICE and UPSTREAM.md. The root Apache-2.0 license does not replace its MIT license.
 Amazon, Feishu, Lark, OpenAI and DeepSeek are trademarks of their respective
 owners. This project is not an official product of those organizations.

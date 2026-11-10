@@ -1,7 +1,9 @@
 # Working on amazon-fbacc
 
 Read PROJECT_CONTEXT.md and TASKS.md, then inspect Git status before editing.
-This is an independent public repository. Do not access or change business
+This is an independently reusable module in the public amazon-sku-workbench monorepo.
+Read the root AGENTS.md and docs/fbacc.md for integration changes; this module remains
+MIT licensed. Do not access or change business
 registries, review applications or production services as part of routine work.
 
 - Do not commit evidence/, .local/, credentials, environment files or operational

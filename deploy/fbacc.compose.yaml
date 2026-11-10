@@ -1,0 +1,15 @@
+name: amazon-sku-fbacc
+services:
+  fbacc:
+    build: {context: ../services/amazon-fbacc}
+    image: amazon-sku-fbacc:0.3.0
+    ports: ["127.0.0.1:4318:4318"]
+    environment:
+      FBA_CALCULATOR_HOST: 0.0.0.0
+      FBA_CALCULATOR_PORT: 4318
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:4318/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -13,4 +13,8 @@ for name,c in v['components'].items():
  else:actual=json.loads((p/'package.json').read_text())['version']
  assert actual==c['version'],(name,actual,c['version'])
  assert c['tag']==f'{name}/v{actual}'
+ if name=='fbacc':
+  assert re.search(r'export const VERSION\s*=\s*["\x27]'+re.escape(actual),(p/'src/index.mjs').read_text())
+  assert (p/'infra/rates/VERSION').read_text().strip()==c['monitor_version']
+  assert json.loads((p/'rates'/f"{c['rate_snapshot']}.json").read_text())['version']==c['rate_snapshot']
 print('Component versions match versions.json')

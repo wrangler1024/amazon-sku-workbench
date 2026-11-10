@@ -1,6 +1,6 @@
 {
   "name": "amazon-sku-review",
-  "version": "0.70.1",
+  "version": "0.70.2",
   "private": true,
   "description": "Amazon product selection and review workbench",
   "type": "module",

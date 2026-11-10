@@ -23,6 +23,26 @@ jobs:
         working-directory: apps/${{ matrix.app }}
       - run: npm run build
         working-directory: apps/${{ matrix.app }}
+      - run: npm run test:fbacc:integration
+        if: matrix.app == 'review'
+  fbacc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm run check:fbacc
+      - run: npm run test:fbacc
+      - run: python -m unittest discover -s infra/rates/tests -v
+        working-directory: services/amazon-fbacc
+      - run: node infra/rates/verify-samples.mjs . infra/rates/samples.json
+        working-directory: services/amazon-fbacc
+      - run: npm run package:fbacc
+      - run: docker build -t fbacc-ci services/amazon-fbacc
   backend:
     runs-on: ubuntu-latest
     services:

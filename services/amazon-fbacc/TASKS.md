@@ -1,5 +1,8 @@
 # Tasks
 
+- [x] Integrate as an independent MIT module in amazon-sku-workbench; add root CI,
+  review-proxy integration validation and standalone Git-based packaging.
+
 - [x] Publish the standalone14-market calculator, web UI and HTTP/OpenAPI interfaces.
 - [x] Provide Linux service, gateway and release/rollback templates.
 - [x] Provide official-source monitoring, candidate validation and review/publish CLI.

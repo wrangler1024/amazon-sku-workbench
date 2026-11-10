@@ -6,17 +6,22 @@ and certificate paths to your host. No server credentials are included.
 
 ## Release archive
 
-From the repository root:
+From the module root (`services/amazon-fbacc` in the monorepo, or the root of an
+extracted standalone package):
 
 ```bash
 npm run check
 npm test
 mkdir -p .local/releases
 COPYFILE_DISABLE=1 tar -czf .local/releases/fbacc.tar.gz \
-  package.json src rates public tests examples deploy/linux \
+  package.json LICENSE NOTICE UPSTREAM.md src rates public tests examples deploy/linux \
   scripts/check-rates.mjs scripts/check-deployed.mjs
 shasum -a 256 .local/releases/fbacc.tar.gz
 ```
+
+From the monorepo root, prefer `npm run package:fbacc -- fbacc/v0.3.0` to export
+only committed module files with a SHA-256 and source-commit manifest. Do not pass
+the whole monorepo archive to the module installer.
 
 Transfer the archive and `install-release.sh` to your own host, then run:
 
