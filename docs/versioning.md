@@ -2,10 +2,11 @@
 
 ## 单仓库、独立组件、组合发布
 
-- 评审前端：`apps/review/package.json`，tag `review/v0.70.1`。
+- 评审前端：`apps/review/package.json`，tag `review/v0.70.2`。
 - 编辑前端：`apps/editor/package.json`，tag `editor/v0.21.0`。
 - 后台服务：`pyproject.toml`与`amazon_aigc.__version__`，tag `api/v0.21.0`。
-- 组合基线：根package与`versions.json`，tag `v0.1.0`；表示本次验证过的一组版本。
+- FBACC：`services/amazon-fbacc/package.json`与`src/index.mjs`，tag `fbacc/v0.3.0`。核验工具版本单独记录于`infra/rates/VERSION`（0.2.0），费率快照为2026-10-31.2；三个版本各自描述代码、工具和规则，不能混用。
+- 组合基线：根package与`versions.json`，tag `v0.2.0`；表示本次验证过的一组版本。
 - 飞书应用/小组件发布号是环境部署元数据，与开源包版本分别记录。不要因共享飞书应用版本变化而改写未变化的评审包版本。
 
 ## 日常开发
@@ -13,6 +14,8 @@
 `main`保存可构建代码，修改通过短期分支和PR。跨模块需求放同一PR，CI同时验证影响范围。代码、必要测试、配置模板和迁移说明一并提交。
 
 开发以本仓库为代码入口；企业环境标识、权限配置、部署凭证及验收数据保留在私有运维目录。此次初始导入保留了现有生产开发目录，未用符号链接替换它们。后续生产升级应先用私有配置构建、在联调核验产物，再切换部署入口，避免新旧目录长期各自修改。
+
+FBACC 由原公开仓库的确定提交通过 squash subtree 导入，来源见模块`UPSTREAM.md`。后续开发在本仓库模块内进行；原仓库保留历史及既有发布。本轮不做双向自动同步，不改变原仓库或线上部署。导出模块时使用`npm run package:fbacc -- REF`，仅导出该提交的模块追踪文件，保留 MIT 许可证及独立目录结构。
 
 ## 发布步骤
 

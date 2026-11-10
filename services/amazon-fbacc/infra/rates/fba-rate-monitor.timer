@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily official FBA fee-source check at 08:30 Asia/Shanghai
+
+[Timer]
+OnCalendar=*-*-* 08:30:00 Asia/Shanghai
+RandomizedDelaySec=300
+Persistent=true
+Unit=fba-rate-monitor.service
+
+[Install]
+WantedBy=timers.target

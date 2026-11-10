@@ -29,3 +29,15 @@ OpenAI可直接接入受支持的API端点，或部署`amazon_aigc.openai_relay`
 ## 数据迁移
 
 SQL迁移位于`services/amazon-aigc-workbench-service/sql`，使用校验和防止已执行文件被修改。历史接管脚本默认应先预览并核对输入、身份、状态及图片归属后再提交，不要在真实记录上运行测试。生产备份不放进本开源仓库。
+
+## 独立 FBACC 服务
+
+FBACC 不需要业务数据库或模型凭证。`npm run dev:fbacc`可独立启动；容器使用单独的compose文件，无需配置工作台`.env`或启动其他服务：
+
+```sh
+docker compose -f deploy/fbacc.compose.yaml up -d --build
+curl http://127.0.0.1:4318/readyz
+docker compose -f deploy/fbacc.compose.yaml down
+```
+
+容器仅绑定本机4318端口。独立服务器安装包用`npm run package:fbacc -- fbacc/v0.3.0`导出；安装步骤见[模块Linux部署说明](../services/amazon-fbacc/deploy/linux/README.md)。不要把整个monorepo归档传给模块安装器。生产反向代理、访问控制和服务地址由部署环境配置；不会将企业端点写入公开代码。详细接入和版本边界见[FBACC说明](fbacc.md)。

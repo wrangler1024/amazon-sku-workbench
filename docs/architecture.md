@@ -9,12 +9,15 @@
 | review | 选品录入、测算、提审与主管审核 | 飞书表格、原生公式及自动化 | review/vX.Y.Z |
 | editor | 产品资料、文案、图需、制图、验收及刊登界面 | 后台API | editor/vX.Y.Z |
 | api | 业务规则、身份范围、版本、任务、图片及模型接入 | PostgreSQL、文件存储，飞书适配 | api/vX.Y.Z |
+| fbacc | FBA 费用计算、计算器网页、HTTP接口与费率核验工具 | 已核验费率JSON，无飞书或数据库依赖 | fbacc/vX.Y.Z |
 
 合并仓库不等于合并为一个运行进程。API、采集、模型和通知可以分别扩容。无需为了开源立即引入微服务拆分或把所有模块强制升级成同一版本。
 
 ```mermaid
 flowchart LR
   Review[选品评审前端] --> Base[飞书选品表/公式/自动化]
+  Review -->|AE参考预估| FBACC[独立FBACC API]
+  FBACC --> Rates[已核验费率快照]
   Editor[编辑与制图前端] --> API[后台业务API]
   API --> DB[(PostgreSQL)]
   API --> Assets[原图与采集素材]
@@ -24,6 +27,8 @@ flowchart LR
   Base --> Identity[人员配置与身份证明]
   Identity --> API
 ```
+
+FBACC 位于 `services/amazon-fbacc`，保留纯函数、网页和独立 HTTP 服务三种使用方式。当前评审适配器只将 AE 参考预估接入该 API；17站计算能力不等于评审台已接入全部17站。人工填写的费用和历史利润不由预估结果覆盖。日后评审服务化可以复用这个稳定接口，无需把计算逻辑并入业务数据库。费率监测只产生待审核资料，不能自动批准新费率。
 
 ## 当前已具备的迁移基础
 

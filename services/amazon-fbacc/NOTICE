@@ -1,0 +1,15 @@
+amazon-fbacc is an independent project and is not affiliated with or endorsed by Amazon.
+Amazon and FBA are trademarks of their respective owners.
+
+The MIT license covers original project code and documentation. It does not
+relicense Amazon documentation, trademarks, or third-party packages. Numeric
+rate snapshots are derived from published fee schedules; source URLs and dates
+are included. Raw Amazon pages/PDFs and private operational evidence are not
+distributed in this repository. Verify applicable fees against official sources.
+
+The calculator has no third-party runtime package dependencies. Optional rate
+monitoring uses pypdf (BSD-3-Clause), installed separately from PyPI with a pinned
+version and hash. See https://github.com/py-pdf/pypdf/blob/main/LICENSE.
+
+Community projects referenced for architectural ideas are listed in
+docs/sources.md. Their calculator source code is not bundled or imported.

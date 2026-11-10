@@ -13,4 +13,8 @@ For a release update the affected package version(s), lockfile(s), `versions.jso
 `CHANGELOG.md`. CI checks these versions. Preserve existing APIs or document migration steps.
 Do not rewrite an applied SQL migration; add the next numbered migration.
 
-Contributions are licensed under Apache-2.0.
+Contributions are licensed under Apache-2.0 except those in services/amazon-fbacc,
+which remain MIT licensed. Preserve the module's LICENSE, NOTICE and provenance.
+For FBACC changes also run its rate validator, Python monitoring tests, reference
+samples and `npm run test:fbacc:integration`; see docs/fbacc.md. Routine work does
+not authorize new fee publication, enabling the monitor timer or production deployment.
