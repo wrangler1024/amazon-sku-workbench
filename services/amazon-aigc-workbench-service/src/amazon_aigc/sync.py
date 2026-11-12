@@ -58,26 +58,102 @@ def reference_urls(row):
     return list(dict.fromkeys(re.findall(r"https?://[^\s<>\"\[\]()，；]+", value(row.get("参考链接")))))[:20]
 
 
+def owner_identity(row):
+    members = row.get("提交运营") or []
+    if isinstance(members, list) and members:
+        first = members[0]
+        if isinstance(first, dict):
+            return value(first.get("id")), value(first.get("name"))
+        if isinstance(first, str):
+            return first, ""
+    return value(row.get("提交运营ID")).strip(), ""
+
+
+def _identity(c, tenant, subject):
+    if not subject:
+        return None
+    return c.execute(
+        "SELECT u.* FROM users u JOIN external_identities e ON e.user_id=u.id "
+        "WHERE e.provider IN ('feishu','feishu_union') AND e.tenant=%s AND e.subject=%s LIMIT 1",
+        (tenant, subject),
+    ).fetchone()
+
+
+def _source_owner_state(c, gateway, record_id):
+    return c.execute(
+        "SELECT * FROM source_owner_state WHERE base_id=%s AND table_id=%s AND record_id=%s",
+        (gateway.s.base_id, gateway.s.sku_table_id, record_id),
+    ).fetchone()
+
+
+def _save_source_owner_state(c, gateway, row, subject, name):
+    c.execute(
+        "INSERT INTO source_owner_state(base_id,table_id,record_id,owner_subject,owner_name,submitter_id,"
+        "group_name,approval_group,sku,record_number,site,updated_at) "
+        "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now()) "
+        "ON CONFLICT(base_id,table_id,record_id) DO UPDATE SET owner_subject=excluded.owner_subject,"
+        "owner_name=excluded.owner_name,submitter_id=excluded.submitter_id,group_name=excluded.group_name,"
+        "approval_group=excluded.approval_group,sku=excluded.sku,record_number=excluded.record_number,"
+        "site=excluded.site,updated_at=now()",
+        (
+            gateway.s.base_id,
+            gateway.s.sku_table_id,
+            row["record_id"],
+            subject,
+            name,
+            value(row.get("提交运营ID")).strip(),
+            value(row.get("运营小组")),
+            value(row.get("审批小组")),
+            value(row.get("选品SKU")),
+            value(row.get("记录序号")),
+            value(row.get("目标站点")),
+        ),
+    )
+
+
+def _queue_owner_handover(c, gateway, row, previous, subject, name, work_item_id, batch_id):
+    change_key = hashlib.sha256(
+        f"{row['record_id']}|{previous['owner_subject'] or ''}|{subject}|{previous['updated_at']}".encode()
+    ).hexdigest()
+    c.execute(
+        "INSERT INTO owner_handover_logs(id,batch_id,change_key,base_id,table_id,record_id,work_item_id,"
+        "sku,record_number,site,old_owner_subject,old_owner_name,old_submitter_id,old_group,old_approval_group,"
+        "new_owner_subject,new_owner_name) "
+        "VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+        "ON CONFLICT(change_key) DO NOTHING",
+        (
+            uuid4(),
+            batch_id,
+            change_key,
+            gateway.s.base_id,
+            gateway.s.sku_table_id,
+            row["record_id"],
+            work_item_id,
+            value(row.get("选品SKU")),
+            value(row.get("记录序号")),
+            value(row.get("目标站点")),
+            previous["owner_subject"],
+            previous["owner_name"],
+            previous["submitter_id"],
+            previous["group_name"],
+            previous["approval_group"],
+            subject,
+            name,
+        ),
+    )
+
+
 def import_records(db, gateway):
     rows = gateway.records(gateway.s.sku_table_id)
+    submitter_ids = _submitter_id_directory(rows)
     count = 0
     images = []
+    batch_id = uuid4()
     with db.connection() as c:
         c.execute("SELECT pg_advisory_xact_lock(58017003)")
         for row in rows:
             legacy = c.execute("SELECT cohort FROM legacy_migration_records WHERE base_id=%s AND table_id=%s AND record_id=%s", (gateway.s.base_id, gateway.s.sku_table_id, row["record_id"])).fetchone()
             if legacy and legacy["cohort"] == "history":
-                continue
-            members = row.get("提交运营") or []
-            subject = (
-                members[0].get("id", "") if isinstance(members, list) and members else value(row.get("提交运营ID"))
-            )
-            ident = c.execute(
-                "SELECT u.* FROM users u JOIN external_identities e ON e.user_id=u.id WHERE e.provider IN ('feishu','feishu_union') AND e.tenant=%s AND e.subject=%s",
-                (gateway.s.tenant, subject),
-            ).fetchone()
-            # Only the explicitly provisioned test roster can create linked work.
-            if not ident or not ident["active"]:
                 continue
             b = c.execute(
                 "SELECT work_item_id FROM external_bindings WHERE provider=%s AND tenant=%s AND environment=%s AND base_id=%s AND table_id=%s AND record_id=%s",
@@ -90,6 +166,32 @@ def import_records(db, gateway):
                     row["record_id"],
                 ),
             ).fetchone()
+            subject, owner_name = owner_identity(row)
+            previous = _source_owner_state(c, gateway, row["record_id"])
+            owner_changed = bool(previous and subject and subject != previous["owner_subject"])
+            if owner_changed:
+                _queue_owner_handover(
+                    c,
+                    gateway,
+                    row,
+                    previous,
+                    subject,
+                    owner_name,
+                    b["work_item_id"] if b else None,
+                    batch_id,
+                )
+            state_stale = previous and any(
+                (
+                    value(row.get("提交运营ID")).strip() != (previous["submitter_id"] or ""),
+                    value(row.get("运营小组")) != (previous["group_name"] or ""),
+                    value(row.get("审批小组")) != (previous["approval_group"] or ""),
+                    value(row.get("选品SKU")) != (previous["sku"] or ""),
+                    value(row.get("记录序号")) != (previous["record_number"] or ""),
+                    value(row.get("目标站点")) != (previous["site"] or ""),
+                )
+            )
+            if subject and (previous is None or owner_changed or state_stale):
+                _save_source_owner_state(c, gateway, row, subject, owner_name)
             status = value(row.get("审核状态"))
             name = value(row.get("中文品名"))
             site = value(row.get("目标站点"))
@@ -97,9 +199,17 @@ def import_records(db, gateway):
                 continue
             if not b and status != "审核通过":
                 continue
+            ident = _identity(c, gateway.s.tenant, subject)
+            # Only the explicitly provisioned test roster can create or transfer linked work.
+            if not ident or not ident["active"] or not ident["groups"]:
+                continue
+            # A handover is completed by process_owner_handovers only after the
+            # Base projection has been written and read back successfully.
+            if owner_changed and not b:
+                continue
             item_id = b["work_item_id"] if b else uuid4()
             fingerprint = hashlib.sha256(json.dumps(row, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-            group = value(row.get("运营小组")) or (ident["groups"][0] if ident["groups"] else "")
+            group = value(row.get("运营小组")) or ident["groups"][0]
             if not b:
                 c.execute(
                     "INSERT INTO work_items(id,environment,site,code,name,owner_id,group_name,review_status,review_snapshot,source_revision) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -157,6 +267,20 @@ def import_records(db, gateway):
                     "INSERT INTO content_documents(id,work_item_id,body) VALUES(%s,%s,%s)",
                     (uuid4(), item_id, Jsonb(body)),
                 )
+            elif owner_changed:
+                c.execute(
+                    "UPDATE work_items SET name=%s,code=%s,site=%s,review_status=%s,source_revision=%s,"
+                    "review_snapshot=%s,updated_at=now() WHERE id=%s",
+                    (
+                        name,
+                        value(row.get("选品SKU")),
+                        site,
+                        status,
+                        fingerprint,
+                        Jsonb(row),
+                        item_id,
+                    ),
+                )
             else:
                 c.execute(
                     "UPDATE work_items SET name=%s,code=%s,site=%s,owner_id=%s,group_name=%s,review_status=%s,source_revision=%s,review_snapshot=%s,updated_at=now() WHERE id=%s",
@@ -179,8 +303,286 @@ def import_records(db, gateway):
             )
             count += 1
             images.append((item_id, ident["id"], row.get("产品图片")))
+    owner_handovers = process_owner_handovers(db, gateway, rows, submitter_ids)
     thumbnails = cache_product_images(db, gateway, images)
-    return {"read": len(rows), "linked": count, "thumbnails": thumbnails}
+    return {
+        "read": len(rows),
+        "linked": count,
+        "owner_handovers": owner_handovers,
+        "thumbnails": thumbnails,
+    }
+
+
+def _when(value, gateway):
+    if not value:
+        return None
+    if gateway.s.feishu_mode == "openapi":
+        return int(value.timestamp() * 1000)
+    return value.astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def _person_identity(c, tenant, subject):
+    if not subject:
+        return None
+    target = c.execute(
+        "SELECT user_id FROM external_identities WHERE tenant=%s AND subject=%s LIMIT 1",
+        (tenant, subject),
+    ).fetchone()
+    if not target:
+        return None
+    rows = c.execute(
+        "SELECT u.id,u.name,u.active,u.internal,u.groups,"
+        "max(e.subject) FILTER (WHERE e.provider='feishu') AS open_id,"
+        "max(e.subject) FILTER (WHERE e.provider='feishu_union') AS union_id "
+        "FROM users u JOIN external_identities e ON e.user_id=u.id "
+        "WHERE e.tenant=%s AND u.id=%s GROUP BY u.id",
+        (tenant, target["user_id"]),
+    ).fetchall()
+    if not rows:
+        return None
+    row = next((r for r in rows if r["active"]), rows[0])
+    open_id = row["open_id"] or (subject if subject.startswith("ou_") else "")
+    union_id = row["union_id"] or (subject if subject.startswith("on_") else "")
+    return {
+        "user_id": row["id"],
+        "name": row["name"],
+        "active": row["active"],
+        "internal": row["internal"],
+        "groups": row["groups"] or [],
+        "open_id": open_id,
+        "union_id": union_id,
+    }
+
+
+def _submitter_id_directory(rows):
+    counts = {}
+    for row in rows:
+        creators = row.get("创建人") or []
+        if not isinstance(creators, list) or not creators or not isinstance(creators[0], dict):
+            continue
+        creator_id = value(creators[0].get("id"))
+        submitter_id = value(row.get("提交运营ID")).strip()
+        if creator_id and submitter_id:
+            counts.setdefault(creator_id, {}).setdefault(submitter_id, 0)
+            counts[creator_id][submitter_id] += 1
+    return {
+        creator_id: max(values, key=values.get)
+        for creator_id, values in counts.items()
+    }
+
+
+def _resolve_owner(c, gateway, subject, roster, submitter_ids):
+    person = _person_identity(c, gateway.s.tenant, subject)
+    if not person:
+        raise RuntimeError("提交运营未同步到工作台人员表")
+    if not person["active"] or not person["internal"]:
+        raise RuntimeError("提交运营已停用或不是内部人员")
+    configured = roster.get(person["union_id"]) or roster.get(subject)
+    if not configured:
+        raise RuntimeError("提交运营未在插件人员权限配置中启用")
+    if "operator" not in configured["roles"] or not configured["groups"]:
+        raise RuntimeError("提交运营角色不是运营或没有所属小组")
+    person["name"] = configured.get("name") or person["name"]
+    person["groups"] = configured["groups"]
+    person["group"] = configured["groups"][0]
+    person["submitter_id"] = submitter_ids.get(subject) or submitter_ids.get(person["open_id"])
+    if not person["submitter_id"]:
+        raise RuntimeError("缺少该运营的Base应用身份映射，请先让本人保存一条选品草稿")
+    return person
+
+
+def _log_labels(log):
+    base = {
+        "pending": "待同步",
+        "succeeded": "成功",
+        "failed": "失败",
+        "superseded": "已取消",
+        "not_applicable": "无需同步",
+    }
+    workbench = dict(base)
+    workbench["not_applicable"] = "无需同步"
+    overall = {
+        "pending": "待处理",
+        "succeeded": "成功",
+        "failed": "失败",
+        "superseded": "已取消",
+    }
+    return base[log["base_state"]], workbench[log["workbench_state"]], overall[log["state"]]
+
+
+def _base_log_fields(gateway, log, old_person, new_person):
+    base_label, workbench_label, overall_label = _log_labels(log)
+    return {
+        "日志ID": str(log["id"]),
+        "交接批次": str(log["batch_id"]),
+        "交接时间": _when(log["created_at"], gateway),
+        "完成时间": _when(log["finished_at"], gateway),
+        "记录序号": log["record_number"] or "",
+        "选品SKU": log["sku"] or "",
+        "目标站点": log["site"] or "",
+        "原提交运营": [{"id": old_person["union_id"]}] if old_person and old_person.get("union_id") else None,
+        "新提交运营": [{"id": new_person["union_id"]}] if new_person and new_person.get("union_id") else None,
+        "原提交运营ID": log["old_submitter_id"] or "",
+        "新提交运营ID": log["new_submitter_id"] or "",
+        "原运营小组": log["old_group"] or "",
+        "新运营小组": log["new_group"] or "",
+        "原审批小组": log["old_approval_group"] or "",
+        "新审批小组": log["new_approval_group"] or "",
+        "Base字段同步": base_label,
+        "工作台同步": workbench_label,
+        "交接状态": overall_label,
+        "失败原因": (log["error"] or "")[:2000],
+        "操作来源": "后台同步",
+        "重试次数": log["attempts"],
+    }
+
+
+def _sync_base_log(gateway, log, old_person, new_person):
+    if not getattr(gateway.s, "handover_log_table_id", ""):
+        return None
+    fields = _base_log_fields(gateway, log, old_person, new_person)
+    record_id = log["base_log_record_id"]
+    if record_id:
+        gateway.update_handover_log(record_id, fields)
+        return record_id
+    existing = None
+    try:
+        existing = next(
+            (r for r in gateway.records(gateway.s.handover_log_table_id) if value(r.get("日志ID")) == fields["日志ID"]),
+            None,
+        )
+    except Exception:  # noqa: BLE001 -- creation below remains the durable path
+        existing = None
+    if existing:
+        gateway.update_handover_log(existing["record_id"], fields)
+        return existing["record_id"]
+    return gateway.create_handover_log(fields)
+
+
+def process_owner_handovers(db, gateway, rows, submitter_ids=None):
+    with db.connection() as c:
+        pending = c.execute(
+            "SELECT * FROM owner_handover_logs WHERE base_id=%s AND table_id=%s "
+            "AND state IN ('pending','failed') AND attempts<20 ORDER BY created_at,id LIMIT 20",
+            (gateway.s.base_id, gateway.s.sku_table_id),
+        ).fetchall()
+    if not pending:
+        return {"processed": 0, "succeeded": 0, "failed": 0}
+    by_record = {row["record_id"]: row for row in rows}
+    submitter_ids = submitter_ids or _submitter_id_directory(rows)
+    roster = {}
+    roster_error = ""
+    personnel_table_id = getattr(gateway.s, "personnel_table_id", "")
+    if not personnel_table_id:
+        roster_error = "插件人员权限配置表未配置"
+    else:
+        try:
+            from .roster_sync import effective_rows
+
+            roster = effective_rows(gateway.records(personnel_table_id))
+        except Exception as exc:  # noqa: BLE001 -- report a bounded, sanitized handover failure
+            roster_error = "人员配置读取失败: " + type(exc).__name__
+    result = {"processed": 0, "succeeded": 0, "failed": 0}
+    for candidate in pending:
+        with db.connection() as c:
+            log = c.execute("SELECT * FROM owner_handover_logs WHERE id=%s", (candidate["id"],)).fetchone()
+        if not log:
+            continue
+        row = by_record.get(log["record_id"])
+        old_person = None
+        new_person = None
+        error = ""
+        base_state = "pending"
+        workbench_state = "pending"
+        state = "failed"
+        if not row:
+            base_state = workbench_state = "superseded"
+            state = "superseded"
+            error = "源记录已从登记表删除"
+        else:
+            current_subject, _ = owner_identity(row)
+            if current_subject != log["new_owner_subject"]:
+                base_state = workbench_state = "superseded"
+                state = "superseded"
+                error = "提交运营已再次变更，本次交接取消"
+            else:
+                with db.connection() as c:
+                    old_person = _person_identity(c, gateway.s.tenant, log["old_owner_subject"])
+                try:
+                    if roster_error:
+                        raise RuntimeError(roster_error)
+                    with db.connection() as c:
+                        new_person = _resolve_owner(
+                            c, gateway, log["new_owner_subject"], roster, submitter_ids
+                        )
+                    fields = {
+                        "提交运营ID": new_person["submitter_id"],
+                        "运营小组": new_person["group"],
+                        "审批小组": new_person["group"],
+                    }
+                    gateway.update(log["record_id"], fields)
+                    verify_projection(gateway.record(log["record_id"]), fields)
+                    base_state = "succeeded"
+                except Exception as exc:  # noqa: BLE001 -- persist a sanitized failure and retry
+                    base_state = "failed"
+                    error = type(exc).__name__ + ": " + str(exc)[:500]
+                if log["work_item_id"] and new_person and base_state == "succeeded":
+                    with db.connection() as c:
+                        changed = c.execute(
+                            "UPDATE work_items SET owner_id=%s,group_name=%s,updated_at=now() "
+                            "WHERE id=%s RETURNING id",
+                            (new_person["user_id"], new_person["group"], log["work_item_id"]),
+                        ).fetchone()
+                    workbench_state = "succeeded" if changed else "failed"
+                elif log["work_item_id"]:
+                    workbench_state = "failed"
+                else:
+                    workbench_state = "not_applicable"
+                if base_state == "succeeded" and workbench_state in ("succeeded", "not_applicable"):
+                    state = "succeeded"
+                else:
+                    state = "failed"
+                    if not error:
+                        error = "工作台负责人更新失败"
+        attempts = log["attempts"] + 1
+        old_submitter_id = submitter_ids.get(log["old_owner_subject"]) or log["old_submitter_id"]
+        with db.connection() as c:
+            c.execute(
+                "UPDATE owner_handover_logs SET base_state=%s,workbench_state=%s,state=%s,attempts=%s,"
+                "error=%s,old_submitter_id=%s,new_submitter_id=%s,new_group=%s,new_approval_group=%s,finished_at=now(),"
+                "updated_at=now() WHERE id=%s",
+                (
+                    base_state,
+                    workbench_state,
+                    state,
+                    attempts,
+                    error[:2000] or None,
+                    old_submitter_id,
+                    new_person["submitter_id"] if new_person else None,
+                    new_person["group"] if new_person else None,
+                    new_person["group"] if new_person else None,
+                    log["id"],
+                ),
+            )
+            updated = c.execute("SELECT * FROM owner_handover_logs WHERE id=%s", (log["id"],)).fetchone()
+        try:
+            record_id = _sync_base_log(gateway, updated, old_person, new_person)
+            if record_id and record_id != updated["base_log_record_id"]:
+                with db.connection() as c:
+                    c.execute(
+                        "UPDATE owner_handover_logs SET base_log_record_id=%s WHERE id=%s",
+                        (record_id, updated["id"]),
+                    )
+        except Exception as exc:  # noqa: BLE001 -- the PostgreSQL log remains the source of truth
+            with db.connection() as c:
+                c.execute(
+                    "UPDATE owner_handover_logs SET state='failed',error=%s,updated_at=now() WHERE id=%s",
+                    (("交接日志镜像失败: " + type(exc).__name__ + ": " + str(exc)[:400]), updated["id"]),
+                )
+            state = "failed"
+        result["processed"] += 1
+        result["succeeded" if state == "succeeded" else "failed"] += 1
+    return result
 
 
 def projection(c, item_id, gateway=None):
