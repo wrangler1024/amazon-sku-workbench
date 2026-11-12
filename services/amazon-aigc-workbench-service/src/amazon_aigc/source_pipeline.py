@@ -43,9 +43,14 @@ def source_inputs(body):
     return list(merged.values())
 
 
-def input_stamp(doc):
+def input_stamp(doc, *, include_manual=True):
     body = doc["body"]
+    from .brief_policy import POLICY_VERSION
+    from .model_gateway import PROMPT_VERSION
+
     basis = {
+        "brief_policy_version": POLICY_VERSION,
+        "prompt_version": PROMPT_VERSION,
         "facts_version": str(doc["facts_version"]),
         "facts": body.get("facts"),
         "keywords": body.get("keywords", ""),
@@ -54,7 +59,7 @@ def input_stamp(doc):
             k: v for k, v in (body.get("brief") or {}).items() if k not in ("plans", "image_count")
         },
         "sources": sorted(
-            (s["url"], s["kind"], json.dumps(s.get("selected_skus", []), sort_keys=True, ensure_ascii=False))
+            (s["url"], s["kind"], (s.get("manual_text", "") if include_manual else ""), json.dumps(s.get("selected_skus", []), sort_keys=True, ensure_ascii=False))
             for s in source_inputs(body)
         ),
     }
@@ -101,6 +106,7 @@ def queue_source(c, item_id, actor_id, source, revision, force=False, collector=
 def attach_sources(c, item_id, actor_id, doc, payload):
     payload["source_inputs"] = source_inputs(doc["body"])
     payload["input_stamp"] = input_stamp(doc)
+    payload["resume_stamp"] = input_stamp(doc, include_manual=False)
     payload["source_jobs"] = [
         queue_source(c, item_id, actor_id, s, doc["revision"], collector=payload.get("collector", "native"))
         for s in payload["source_inputs"]
@@ -241,7 +247,7 @@ def resume(c, user, item_id, job_id, command):
     if not job or job["kind"] != "model" or job["state"] != "waiting_input":
         fail("该任务当前不需要补充资料，请刷新结果")
     payload = job["payload"]
-    if payload["input_stamp"] != input_stamp(doc):
+    if payload.get("resume_stamp", payload["input_stamp"]) != input_stamp(doc, include_manual=False):
         fail("产品事实、关键词或来源链接已变化，请重新生成")
     mode = command.data.get("mode")
     if mode not in ("manual", "confirmed_facts", "retry", "retry_images", "text_only"):
@@ -249,6 +255,7 @@ def resume(c, user, item_id, job_id, command):
     current = {s["url"]: s for s in source_inputs(doc["body"])}
     payload["source_inputs"] = [current[s["url"]] for s in payload["source_inputs"]]
     payload["revision"] = doc["revision"]
+    payload["input_stamp"] = input_stamp(doc)
     report = collection_report(c, payload)
     missing = [
         r

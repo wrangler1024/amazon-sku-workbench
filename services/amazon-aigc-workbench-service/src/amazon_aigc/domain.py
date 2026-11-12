@@ -228,11 +228,13 @@ def detail(c, user, item_id, compact=False):
         "SELECT id,state,error FROM sync_outbox WHERE work_item_id=%s ORDER BY id DESC LIMIT 1", (item_id,)
     ).fetchone()
     legacy = c.execute("SELECT snapshot FROM legacy_migration_records WHERE work_item_id=%s", (item_id,)).fetchone()
+    from .brief_policy import item_policy
     from .feishu import value
 
     return serial(
         {
             "compact": compact,
+            "brief_policy": item_policy(c, item_id, sources),
             "item": public_item(item, include_sources=True),
             "legacy_brief": value(legacy["snapshot"].get("制图需求说明")) if legacy else "",
             "document": doc,

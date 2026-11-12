@@ -8,14 +8,6 @@ export function plansText(plans:any[]=[]){return plans.length?'【套图策划�
 export function briefText(brief:any){return [...briefFields.map(([k,l])=>`【${l}】\n${brief[k]||''}`),'策划建议数量：'+briefImageCount(brief)+'张（交付按实际内容确定）',plansText(brief.plans)].filter(Boolean).join('\n\n')}
 
 export function artworkPacket(name:string,brief:any,sources:any[]=[],legacyBrief='',identity:{task_number?:string;code?:string}={}){
- const links=new Map<string,{kind:string;notes:string[]}>();
- for(const source of [...sources,...(brief?.references||[]).map((url:string)=>({url,kind:'reference'}))]){
-  const url=String(source.url||'').trim();if(!url)continue;
-  const row=links.get(url)||{kind:source.kind,notes:[]};const note=String(source.manual_text||'').trim();
-  if(note&&!row.notes.includes(note))row.notes.push(note);links.set(url,row);
- }
- return [identity.task_number?'任务编号：'+identity.task_number:'',identity.code?'SKU：'+identity.code:'','销售商品：'+name,legacyBrief||briefText(brief||{}),...Array.from(links,([url,row])=>[
-  row.kind==='supplier'?'1688货源链接：':row.kind==='competitor'?'竞品参考链接：':'参考链接：',url,
-  ...(row.notes.length?[(row.kind==='competitor'?'参考重点：':'补充资料：'),...row.notes]:[])
- ].join('\n'))].filter(Boolean).join('\n\n');
+ // Source links/notes stay in the separate reference area, including legacy tasks.
+ return [identity.task_number?'任务编号：'+identity.task_number:'',identity.code?'SKU：'+identity.code:'',legacyBrief||briefText(brief||{})].filter(Boolean).join('\n\n');
 }

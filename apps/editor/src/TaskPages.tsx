@@ -3,6 +3,8 @@ import DeliveryDownload from './DeliveryDownload';
 import {SecureImage,DownloadLink} from './Media';
 import {artworkFacts} from './factsHelpers';
 import {pendingEdit,legacyInFlight,legacyArchived} from './workbenchNavigation';
+import BriefReview from './BriefReview';
+import {textIssues} from './briefPolicy';
 import React,{useEffect,useRef,useState} from 'react';
 import {Button,Field,Help,Icon,Modal,labels} from './prototype/ui';
 import {apiFetch,dateText} from './api';
@@ -80,7 +82,7 @@ export function ArtworkPage({readOnly=false,mode,onJump,error,beforeLeave,data,t
  {mode==='tasks'&&<div className="live-actions">{own&&artist&&<Button kind="primary" onClick={()=>onJump('mine',data.item.id)}>去我的制图</Button>}{canEdit&&!own&&delivery&&<Button kind="primary" onClick={()=>onJump('review',data.item.id)}>查看交付</Button>}</div>}<div className="task-detail-summary"><span>执行美工 <strong>{people.find((p:any)=>p.id===task?.assignee_id)?.name||'公共待认领'}</strong></span><span>交付日期 <strong>{task?.due_date||'未设置'}</strong></span><span>策划建议 <strong>{briefImageCount(brief)} 张</strong></span><span>制作批次 <strong>{task?.batch}</strong></span><span className="pill blue">{labels[task?.state]}</span></div>
  {mode==='review'&&currentDelivery}
  <div className="section-head"><h2><Icon name="file"/>本批次图需与素材</h2>{(artist||readOnly||(mode==='tasks'&&user.roles?.includes('admin')))&&<Button icon="copy" kind="soft" onClick={()=>copy(packet)}>一键复制图需到ChatGPT</Button>}</div>
- <section className="original-brief"><div className="brief-heading"><h3>原始图需</h3><span className="subtext">运营已确认 · 本批次制作依据</span></div>{task?.legacy_takeover&&data.legacy_brief?<div className="candidate-block">{data.legacy_brief}</div>:<div className="brief-grid">{briefFields.map(([k,l])=><article key={k}><h4>{l}</h4><p>{brief[k]||'未填写'}</p></article>)}</div>}</section>
+ <BriefReview issues={textIssues(packet,data.brief_policy)}/><section className="original-brief"><div className="brief-heading"><h3>原始图需</h3><span className="subtext">运营已确认 · 本批次制作依据</span></div>{task?.legacy_takeover&&data.legacy_brief?<div className="candidate-block">{data.legacy_brief}</div>:<div className="brief-grid">{briefFields.map(([k,l])=><article key={k}><h4>{l}</h4><p>{brief[k]||'未填写'}</p></article>)}</div>}</section>
  <div className="demo-source-links">{Array.from(new Set([...(brief.references||[]),...(data.document.body.sources||[]).map((s:any)=>s.url),...(facts.components||[]).map((r:any)=>r.url)])).filter((url:any)=>/^https:\/\//.test(url)).map((url:any,i)=><a key={url} className="button text small" href={url} target="_blank" rel="noreferrer"><Icon name="external"/>{url.includes('1688.com')?'1688货源':'参考链接'} {i+1}</a>)}</div>
  {(facts.components||[]).filter((r:any)=>r.image_asset_ids?.length).map((r:any)=><details className="disclosure" key={r.id}><summary>{r.name} · {r.specification} · 组成产品图</summary><Gallery ids={r.image_asset_ids} assets={data.assets} zoom={zoom}/></details>)}
  <div className="brief-heading"><h3>套图策划建议</h3><Help text="本批次已确认的策划建议；交付张数按实际内容确定，至少1张。"/></div><div className="plans prototype-plans">{(brief.plans||[]).map((p:any,i:number)=><article className="plan-card" key={i}><div className="plan-top"><span className="plan-index">{String(i+1).padStart(2,'0')}</span><h3>{p.purpose}</h3></div><p>{p.composition}</p><div className="plan-copy"><small>图中文字</small><span>{p.text||'不添加文字'}</span></div></article>)}</div>

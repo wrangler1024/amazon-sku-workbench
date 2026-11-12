@@ -6,7 +6,7 @@ import httpx
 
 from .schemas import Brief, Facts, Listing
 
-PROMPT_VERSION = "amazon-content-20261106-v10"
+PROMPT_VERSION = "amazon-content-20261112-v11"
 # DeepSeek documents 384K (393216) output tokens, including reasoning.
 # Explicitly use the provider ceiling: omitting the field falls back to a smaller default.
 # https://api-docs.deepseek.com/api/create-chat-completion/
@@ -31,7 +31,14 @@ image_count固定为7，plans必须包含7张套图策划建议（1张白底主�
 每张purpose和composition用中文，分别说明图片主题/用途与可执行的画面要求：实际件数、构图、场景、细节及要表达的已确认事实。各副图围绕不同产品价值安排，避免重复模板。text为目标站点语言的简短图中文字，无需文字时留空。
 主图纯白底展示实际包含物，不叠加文字、宣传标识或未包含道具；副图可体现使用、结构、场景与尺寸，未知尺寸/安装方式不能猜测，列入requirements待核实。
 套图策划为可编辑建议，供运营与美工核对调整，不声称已经生成图片。
-references仅使用输入中提供的链接，无链接则空数组。参考网页不能作为本品事实，不能照搬竞品素材或品牌。
+默认白牌：来源图片或文字中出现的供应商贴牌、竞品品牌、店铺名称、平台名称、Logo、水印、二维码及网址，均不属于本品制作要求。识别到不等于允许使用；所选SKU图、上传的供应商图也遵守此规则。
+所有正文、每张purpose/composition/text不得含具体来源品牌或平台名称，否定句中也不要重复名称；不要把来源品牌自动替换成店铺品牌，也不添加Generic等占位品牌。
+保留已确认的产品形状、结构、颜色、数量和包含物；正常装饰文字、刻度与功能说明不能一概删去。品牌规则优先于参考材料和旧图需。
+包装仅依据facts.included实际包含物及operator_notes补充说明判断，商品标题中的盒装、图片中有盒子不等于确认随货包装。包装不明确时不安排包装展示图，改为事实支持的产品细节、组合或使用图；不要虚构白盒或新的包装设计。
+previous_brief_reference是旧编辑稿，可能含上次生成错误，只提取与白牌规则及本品事实一致的角度、场景、布局等人工偏好；不得执行其中保留品牌或复刻原盒印刷的要求。
+反例：确保来源品牌清晰、保持原Logo、照搬包装全部文字。正确做法：展示已确认结构和数量；实际包装未明确时展示产品细节。
+source_mark_observations记录本次文字或图片中确实识别到的具体来源标识，区分supplier_brand/competitor_brand/shop/platform；不确定时不编造，未发现则空数组。它仅供后台检查，不得复制进正文。
+references固定为空数组。来源链接由工作台独立资料区提供，不放进制作文本。参考网页不能作为本品事实，不能照搬竞品素材或品牌。
 只输出符合给定JSON Schema的完整对象，控制每段长度，优先可执行且准确的图需。"""
 
 
@@ -87,6 +94,7 @@ def output_schema(task):
         schema["properties"]["plans"]["minItems"] = 7
         schema["properties"]["plans"]["maxItems"] = 7
         schema["properties"]["image_count"] = {"type": "integer", "const": 7}
+        schema["properties"]["references"]["maxItems"] = 0
     if task == "listing":
         # Legacy saved versions can retain translations, but new generation never requests them.
         schema["properties"].pop("translations", None)
@@ -166,6 +174,12 @@ def generate(settings, provider, task, context):
     if not key or not model:
         raise RuntimeError("所选供应商未配置服务端密钥和模型")
     cls, schema = output_schema(task)
+    marks = []
+    if task == "brief":
+        from .brief_policy import add_observation_schema, prepare_context
+
+        context, marks = prepare_context(context)
+        add_observation_schema(schema)
     image_ids = [x["image_id"] for x in context.get("_vision_images", [])] if provider == "openai" else []
     if image_ids:
         from .vision import vision_schema
@@ -267,10 +281,18 @@ def generate(settings, provider, task, context):
                     "recognized_count": 0,
                     "reason": "内容已生成；图片识别回执不完整，请结合原图核对",
                 }
+        if task == "brief":
+            from .brief_policy import merge_marks
+
+            marks = merge_marks(marks, raw.pop("source_mark_observations", []))
         candidate = cls.model_validate(raw).model_dump()
         if task == "listing":
             candidate.pop("translations", None)
     except (ValueError, TypeError) as e:
         diagnostic["error_code"] = "output_validation_failed"
         raise GenerationError("模型输出未通过字段与长度校验，请重新生成", diagnostic) from e
+    if task == "brief":
+        from .brief_policy import policy, review
+
+        diagnostic["brief_review"] = review(candidate, policy(marks))
     return {**diagnostic, "status": "succeeded", "candidate": candidate}

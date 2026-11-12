@@ -1,0 +1,53 @@
+{
+  "version": "white-label-1",
+  "marks": [
+    {
+      "text": "BrightNest",
+      "kind": "supplier_brand"
+    },
+    {
+      "text": "Blue",
+      "kind": "supplier_brand"
+    },
+    {
+      "text": "Bright Nest-Co",
+      "kind": "supplier_brand"
+    }
+  ],
+  "checks": [
+    {
+      "code": "platform",
+      "pattern": "(?<![A-Za-z0-9])(?:amazon|aliexpress|alibaba|temu|shein|ebay|taobao|tmall|1688)(?![A-Za-z0-9])|亚马逊|速卖通|阿里巴巴|淘宝|天猫",
+      "message": "含来源平台标识，请核对移除"
+    },
+    {
+      "code": "link",
+      "pattern": "https?://[^\\s]+|www\\.[^\\s]+|(?:amazon\\.(?:com|ca|co\\.uk|com\\.au)|1688\\.com|alicdn\\.com)",
+      "message": "含来源链接，请移到参考资料区"
+    },
+    {
+      "code": "retain_mark",
+      "pattern": "(?:保留|保持|确保|突出|固定|复刻|照搬)[^。；;\\n]{0,24}(?:品牌|商标|logo|Logo|LOGO)|(?:品牌|商标|logo)[^。；;\\n]{0,16}(?:清晰|醒目|不变)|(?:keep|retain|preserve)[^.;\\n]{0,30}(?:brand|logo)",
+      "message": "疑似要求保留来源品牌或标识，请核对",
+      "skip_negative": true
+    },
+    {
+      "code": "source_mark",
+      "pattern": "(?<![A-Za-z0-9])BrightNest(?![A-Za-z0-9])",
+      "message": "含疑似来源标识：BrightNest",
+      "brand_context_only": false
+    },
+    {
+      "code": "source_mark",
+      "pattern": "(?<![A-Za-z0-9])Blue(?![A-Za-z0-9])",
+      "message": "含疑似来源标识：Blue",
+      "brand_context_only": true
+    },
+    {
+      "code": "source_mark",
+      "pattern": "(?<![A-Za-z0-9])Bright Nest-Co(?![A-Za-z0-9])",
+      "message": "含疑似来源标识：Bright Nest-Co",
+      "brand_context_only": false
+    }
+  ]
+}

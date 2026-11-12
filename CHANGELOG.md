@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+- editor 0.21.2 / api 0.21.1：图需默认白牌，隔离来源标识与旧图需要求；包装不明确时不策划包装图。
+- 候选与编辑稿提示疑似品牌、平台及链接；不自动修改内容、不追加模型调用，仍可采用、编辑和确认。
+- 默认制作复制文本移除独立来源附录，复制前检查未处理标识；原始资料及历史版本保留。
+- 本组合基于已提交的 0.3.1，用于隔离联调；不包含其他工作区尚未提交的负责人交接改动。
+
+
 ## Unreleased — Editor 0.21.1
 
 - Add consistent product-thumbnail hover previews to all editor headers, product
