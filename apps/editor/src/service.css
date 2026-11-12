@@ -135,3 +135,8 @@
 
 .queue-entered{display:block;margin-top:9px;font-size:10px;color:var(--muted)}
 @media(max-width:760px){.workspace>.sidebar>.queue-footer{display:block}.queue-time>span{overflow:hidden;text-overflow:ellipsis}.workspace>.sidebar>.queue>.product-card{flex:0 0 230px}}
+.note-box.brief-review { display: block; padding: 12px 14px; }
+.brief-review > strong { display: block; }
+.brief-review > p { margin: 6px 0; line-height: 1.6; }
+.brief-review > ul { margin: 8px 0 0; padding-left: 1.4em; }
+.brief-review li { line-height: 1.6; overflow-wrap: anywhere; }
