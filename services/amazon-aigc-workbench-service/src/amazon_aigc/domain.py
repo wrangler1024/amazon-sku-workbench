@@ -230,11 +230,29 @@ def detail(c, user, item_id, compact=False):
     legacy = c.execute("SELECT snapshot FROM legacy_migration_records WHERE work_item_id=%s", (item_id,)).fetchone()
     from .brief_policy import item_policy
     from .feishu import value
+    from .listing_quality import policy as listing_policy
+    from .source_identity import item_policy as identifier_policy
+    from .source_identity import prepare_context as prepare_review_context
+
+    confirmed_facts = next((v["body"] for v in versions if v["id"] == doc["facts_version"]), {})
+    source_kinds = {s.get("url"): s.get("kind", "supplier") for s in doc["body"].get("sources") or []}
+    review_context = {
+        "facts": confirmed_facts,
+        "operator_notes": confirmed_facts.get("source_text", ""),
+        "source_materials": [{**s["body"], "kind": source_kinds.get(s["url"], "supplier")} for s in sources] + list(doc["body"].get("sources") or []),
+    }
+    observed = c.execute("SELECT result FROM jobs WHERE work_item_id=%s AND kind='model' AND result->'source_identity' IS NOT NULL ORDER BY created_at DESC LIMIT 100", (item_id,)).fetchall()
+    identifiers = identifier_policy(review_context, observed)
+    listing_context, _ = prepare_review_context(review_context)
+    brief_rules = item_policy(c, item_id, sources)
+    brief_rules["checks"].extend(identifiers["checks"])
 
     return serial(
         {
             "compact": compact,
-            "brief_policy": item_policy(c, item_id, sources),
+            "brief_policy": brief_rules,
+            "source_identity": identifiers,
+            "listing_policy": listing_policy(listing_context, identifiers, confirmed=bool(doc["facts_version"])),
             "item": public_item(item, include_sources=True),
             "legacy_brief": value(legacy["snapshot"].get("制图需求说明")) if legacy else "",
             "document": doc,

@@ -2,7 +2,7 @@ export type BriefIssue={field:string;code:string;message:string};
 export type BriefPolicy={version:string;checks:{code:string;pattern:string;message:string;skip_negative?:boolean;brand_context_only?:boolean}[]};
 const fields=['product','instructions','selling_points','visual_focus','requirements'];
 const labels:Record<string,string>={product:'产品与销售组合',instructions:'使用说明',selling_points:'卖点总结',visual_focus:'产品表现重点',requirements:'特殊要求与核实项',purpose:'主题',composition:'画面要求',text:'图中文字',copy:'待复制内容'};
-export function issueLabel(field:string){const parts=field.split('.');return parts[0]==='plans'?`第 ${Number(parts[1])+1} 张 · ${labels[parts[2]]||parts[2]}`:labels[field]||field}
+export function issueLabel(field:string){const parts=field.split('.');if(parts[0]==='bullets')return `第 ${Number(parts[1])+1} 条五点`;if(parts[0]==='facts')return ({sales_name:'产品名称',quantity:'销售数量',specification:'规格与功能',material:'材质',dimensions:'产品尺寸与重量',included:'实际包含物',excluded:'不包含物与限制',uses:'用途',components:'组成明细'} as Record<string,string>)[parts[1]]||parts[1];return parts[0]==='plans'?`第 ${Number(parts[1])+1} 张 · ${labels[parts[2]]||parts[2]}`:({title:'商品标题',highlights:'商品亮点',description:'长描述',terms:'搜索词'} as Record<string,string>)[field]||labels[field]||field}
 export function textIssues(value:string,policy?:BriefPolicy,field='copy'):BriefIssue[]{
  if(!policy)return [];
  const text=String(value||'').normalize('NFKC');const issues:BriefIssue[]=[];

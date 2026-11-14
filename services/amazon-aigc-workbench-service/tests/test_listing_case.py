@@ -56,7 +56,7 @@ def test_listing_case_rules_reach_provider_and_preserve_language_exceptions(
         assert "英文Title（商品标题）和Item Highlights（商品亮点）的整条内容必须采用Title Case" in rules
         assert "不能只把句首单词大写" in rules
         assert "小词在非首尾位置小写" in rules and "位于整条内容首尾时首字母大写" in rules
-        assert "标准缩写及型号保持正确写法" in rules
+        assert "标准缩写、有效规格及已确认的适配型号保持正确写法" in rules
         assert "单位和尺寸连接符x保留标准写法，优先于Title Case规则" in rules
         assert "墨西哥西语Title和Item Highlights按当地句子大小写" in rules
         assert "不套用英文Title Case" in rules
