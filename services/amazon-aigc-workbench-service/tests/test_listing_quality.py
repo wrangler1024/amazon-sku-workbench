@@ -290,3 +290,17 @@ def test_bullet_schema_and_review_enforce_sop_ending_without_rewriting():
     issues = quality.review(candidate, quality.policy(context()))["issues"]
     assert any(x["code"] == "bullet_ending" for x in issues)
     assert candidate == before
+
+
+@pytest.mark.parametrize("provider", ["openai", "deepseek"])
+def test_provider_payload_activates_only_target_listing_locale(provider):
+    from amazon_aigc.model_gateway import DeepSeekProvider, OpenAIProvider, output_schema
+
+    adapter = OpenAIProvider() if provider == "openai" else DeepSeekProvider()
+    schema = output_schema("listing")[1]
+    us = adapter.payload("synthetic", "listing", {"site": "US"}, schema)["instructions"]
+    mx = adapter.payload("synthetic", "listing", {"site": "MX"}, schema)["instructions"]
+    assert "本次执行英文格式" in us and "本次仅执行墨西哥西语格式" not in us
+    assert "本次仅执行墨西哥西语格式" in mx and "本次执行英文格式" not in mx
+    brief = adapter.payload("synthetic", "brief", {"site": "MX"}, output_schema("brief")[1])["instructions"]
+    assert "本次仅执行墨西哥西语格式" not in brief

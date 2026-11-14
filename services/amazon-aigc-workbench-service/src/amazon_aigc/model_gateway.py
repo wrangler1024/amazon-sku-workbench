@@ -131,6 +131,16 @@ def output_schema(task):
     return model, schema
 
 
+def listing_locale_rules(task, context):
+    if task != "listing":
+        return ""
+    if context.get("site") == "MX":
+        return "\n本次仅执行墨西哥西语格式：title、highlights和每条heading使用西语句子大小写，普通名词、形容词不得逐词大写；句首、专有名词、标准缩写及已确认适配型号保留正确写法。不要把英文Title Case套用到西语。格式示例：Soportes de ABS para equipos；Contenido del paquete。示例仅说明大小写，不添加示例中的事实。逐字段检查后再输出；五条body末尾均不加句尾标点。"
+    if context.get("site") in ("US", "CA", "UK", "GB", "AU"):
+        return "\n本次执行英文格式：title、highlights和五条heading均采用Title Case；a、an、the、and、or、but、nor、of、for、with、in、on、at、to、by、from等小词在非首尾位置小写，此规则同样适用于heading。格式示例：Compatibility with Devices；Size and Weight。缩写、有效规格、已确认适配型号和单位保持标准写法。逐字段检查后再输出；五条body保持正常句子大小写且末尾不加句尾标点。"
+    return ""
+
+
 class OpenAIProvider:
     def url(self, settings):
         return settings.openai_base_url.rstrip("/") + "/v1/responses"
@@ -150,7 +160,7 @@ class OpenAIProvider:
             )
         return {
             "model": model,
-            "instructions": instructions(task, bool(images)),
+            "instructions": instructions(task, bool(images)) + listing_locale_rules(task, context),
             "input": [{"role": "user", "content": content}] if images else text,
             "store": False,
             "max_output_tokens": 16000 if images or task == "brief" else 8000,
@@ -166,7 +176,7 @@ class DeepSeekProvider:
         # Independently map supported parameters; do not pass OpenAI-only options.
         return {
             "model": model,
-            "instructions": instructions(task),
+            "instructions": instructions(task) + listing_locale_rules(task, context),
             "input": json.dumps({"task": task, "data": context}, ensure_ascii=False),
             "max_output_tokens": DEEPSEEK_MAX_OUTPUT_TOKENS,
             **({"reasoning": {"effort": "low"}} if task in ("listing", "brief") else {}),
