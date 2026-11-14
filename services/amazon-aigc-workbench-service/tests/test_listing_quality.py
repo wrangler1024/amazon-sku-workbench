@@ -273,3 +273,20 @@ def test_adopted_candidate_review_uses_the_same_projected_fact_basis(db, setup):
         assert d["listing_policy"]["facts"] == quality.fact_items(projected)
         assert d["document"]["body"]["facts"]["sales_name"] == "XK-108替换支架"
         assert any(x["code"] == "source_identifier" for x in d["listing_policy"]["checks"])
+
+
+def test_bullet_schema_and_review_enforce_sop_ending_without_rewriting():
+    from jsonschema import Draft202012Validator
+
+    from amazon_aigc.model_gateway import output_schema
+
+    bullet_schema = output_schema("listing")[1]["properties"]["bullets"]["items"]
+    validator = Draft202012Validator(bullet_schema)
+    assert not list(validator.iter_errors({"heading": "Contenido del paquete", "body": "Incluye dos soportes"}))
+    assert list(validator.iter_errors({"heading": "Contenido: extra", "body": "Incluye dos soportes."}))
+    candidate = listing()
+    candidate["bullets"][0] += "."
+    before = copy.deepcopy(candidate)
+    issues = quality.review(candidate, quality.policy(context()))["issues"]
+    assert any(x["code"] == "bullet_ending" for x in issues)
+    assert candidate == before

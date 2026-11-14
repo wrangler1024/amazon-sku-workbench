@@ -16,7 +16,7 @@ export function listingFields(value:any):[string,string][]{return [...['title','
 export function listingIssues(value:any,policy?:ListingPolicy,modelReview?:any):BriefIssue[]{
  if(!policy)return [];
  const fields=listingFields(value),issues=fields.flatMap(([k,v])=>textIssues(v,policy,k)),actual:Measurement[]=[];
- (value?.bullets||[]).forEach((b:string,i:number)=>{if(b.trim()&&!/^[^:：\n]{1,160}[:：]\s*\S/u.test(b))issues.push({field:`bullets.${i}`,code:'bullet_format',message:'请按“小标题: 说明”核对本条格式'})});
+ (value?.bullets||[]).forEach((b:string,i:number)=>{if(b.trim()&&!/^[^:：\n]{1,160}[:：]\s*\S/u.test(b))issues.push({field:`bullets.${i}`,code:'bullet_format',message:'请按“小标题: 说明”核对本条格式'});if(/[.!?。！？…]$/u.test(b.trim()))issues.push({field:`bullets.${i}`,code:'bullet_ending',message:'请按SOP去除五点末尾的句尾标点'})});
  if(policy.confirmed){for(const [field,text] of fields){if(field==='terms')continue;for(const m of measurements(text)){actual.push(m);if(!policy.measurements.some(k=>equivalent(m,k)))issues.push({field,code:'unsupported_measurement',message:'本品事实未确认此数值或单位：'+m.text})}}
   for(const fact of policy.facts){const expected=policy.measurements.filter(m=>m.fact===fact.id);if(expected.some(m=>!actual.some(a=>equivalent(a,m))))issues.push({field:'facts.'+fact.id,code:'missing_detail',message:fact.label+'中的已确认数值尚未完整覆盖，请核对补充'})}}
  if(modelReview&&JSON.stringify(modelReview.policy?.facts)===JSON.stringify(policy.facts))issues.push(...(modelReview.issues||[]).filter((i:BriefIssue)=>i.code==='coverage_unverified'));

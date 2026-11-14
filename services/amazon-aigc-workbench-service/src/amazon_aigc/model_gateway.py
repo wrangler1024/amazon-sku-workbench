@@ -21,7 +21,7 @@ PET、USB、USB-C、LED、3D等标准缩写、有效规格及已确认的适配�
 墨西哥西语Title和Item Highlights按当地句子大小写，仅句首、专有名词等按西语规则大写，标准缩写及单位保留；例如Bandejas de PET para cosméticos, 23 x 8 x 5 cm。不套用英文Title Case。其他非英语同样遵循目标语言习惯。
 上述整条Title Case仅适用于英文Title和Item Highlights；五点说明正文和长描述正文仍按正常句子大小写。
 keywords是运营已选关键词。先在标题、亮点、五点或长描述中自然覆盖完整关键词，不能为了压缩字数丢掉购买信息。
-五点固定五条，每条必须分别返回heading小标题和body说明，工作台将其组成“小标题: 说明”。heading不得为空或含冒号，英文heading采用Title Case，西语heading按当地句子大小写；body用正常句子大小写，每条末尾不加句尾标点。
+五点固定五条，每条必须分别返回heading小标题和body说明，工作台将其组成“小标题: 说明”。heading不得为空或含冒号，英文heading采用Title Case，西语heading按当地句子大小写；body用正常句子大小写，每条末尾不加句尾标点。英语和西语body均不得以 . ! ? 。！？ 或省略号结尾，句中正常标点保留。
 五条按产品与核心用途、真实特点与价值、规格与适配、使用方式与场景、实际交付与限制组织；可按本品调整顺序，但每条围绕不同主要购买信息。结合已确认属性说明怎样使用、适配条件与限制，关键词自然覆盖、信息充分，不刻意压短，也不重复或堆词凑长度。
 长描述保留四个栏目Product Overview / Features and Uses / Specifications and Notes / Package Contents，非英语使用当地语言对应标题。
 特点与用途至少两段，每段基于真实信息；规格及包含物逐项写清。Search Terms完整UTF-8含空格不超过249字节，不放品牌、ASIN、重复或无关词。

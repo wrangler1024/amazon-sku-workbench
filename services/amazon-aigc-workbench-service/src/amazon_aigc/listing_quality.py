@@ -144,6 +144,10 @@ def review(candidate, rules, coverage=None, require_coverage=False):
             issues.append(
                 {"field": f"bullets.{i}", "code": "bullet_format", "message": "请按“小标题: 说明”核对本条格式"}
             )
+        if re.search(r"[.!?。！？…]$", str(bullet).strip()):
+            issues.append(
+                {"field": f"bullets.{i}", "code": "bullet_ending", "message": "请按SOP去除五点末尾的句尾标点"}
+            )
     actual = []
     if rules.get("confirmed"):
         for field, text in values:
@@ -193,8 +197,8 @@ def add_schema(schema):
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "heading": {"type": "string", "minLength": 1, "maxLength": 160},
-            "body": {"type": "string", "minLength": 1, "maxLength": 1838},
+            "heading": {"type": "string", "minLength": 1, "maxLength": 160, "pattern": r"^[^:：\n]+$"},
+            "body": {"type": "string", "minLength": 1, "maxLength": 1838, "pattern": r"\S(?:[\s\S]*[^\s.!?。！？…])?$"},
         },
         "required": ["heading", "body"],
     }

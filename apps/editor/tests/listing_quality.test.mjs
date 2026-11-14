@@ -7,9 +7,9 @@ const policy={...identity,confirmed:true,facts:[{id:'dimensions',label:'产品�
 const listing={title:'Brackets for ZX200',highlights:'USB-C, M6, CR2032',bullets:['Dimensions: 20 x 8 x 5 cm','Weight: 0.3 kg'],description:'PET bracket',terms:'mount'};
 test('checks track manual changes while retaining valid specifications and converted units',()=>{
  const value=structuredClone(listing);assert.deepEqual(listingIssues(value,policy),[]);
- value.highlights='XK-108';value.bullets[0]='Unformatted 50 cm';
+ value.highlights='XK-108';value.bullets[0]='Unformatted 50 cm.';
  const before=structuredClone(value),issues=listingIssues(value,policy);
- assert(issues.some(x=>x.code==='source_identifier'));assert(issues.some(x=>x.code==='unsupported_measurement'));assert(issues.some(x=>x.code==='missing_detail'));assert(issues.some(x=>x.code==='bullet_format'));
+ assert(issues.some(x=>x.code==='source_identifier'));assert(issues.some(x=>x.code==='unsupported_measurement'));assert(issues.some(x=>x.code==='missing_detail'));assert(issues.some(x=>x.code==='bullet_format'));assert(issues.some(x=>x.code==='bullet_ending'));
  assert.deepEqual(value,before);
  value.highlights='M6';value.bullets[0]='Dimensions: 200 x 80 x 50 mm';value.bullets[1]='Weight: 300 g';
  assert.deepEqual(listingIssues(value,policy),[]);
