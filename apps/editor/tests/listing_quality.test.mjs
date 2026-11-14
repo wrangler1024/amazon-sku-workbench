@@ -32,3 +32,12 @@ test('source identity guard covers listing fragments and artwork cards without c
  assert(briefIssues({plans:[{text:'XK-108'}]},identity).length);
  await copyReviewedListing('SKU: OWN-XK-108-US',identity,async v=>writes.push(v));
 });
+
+test('operator notes stay in the review panel and never join copied sales text',async()=>{
+ const note={field:'facts.dimensions',code:'operator_review',message:'尺寸归属需运营核实'};
+ const review={policy,issues:[note]},writes=[];
+ assert(listingIssues(listing,policy,review).includes(note));
+ await copyReviewedListing(listing.description,policy,async text=>writes.push(text));
+ assert.deepEqual(writes,[listing.description]);
+ assert(!listingIssues(listing,{...policy,facts:[]},review).includes(note));
+});

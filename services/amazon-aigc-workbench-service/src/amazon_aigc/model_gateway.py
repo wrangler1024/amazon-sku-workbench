@@ -6,7 +6,7 @@ import httpx
 
 from .schemas import Brief, Facts, Listing
 
-PROMPT_VERSION = "amazon-content-20261114-v13"
+PROMPT_VERSION = "amazon-content-20261114-v14"
 # DeepSeek documents 384K (393216) output tokens, including reasoning.
 # Explicitly use the provider ceiling: omitting the field falls back to a smaller default.
 # https://api-docs.deepseek.com/api/create-chat-completion/
@@ -25,7 +25,10 @@ keywords是运营已选关键词。先在标题、亮点、五点或长描述中
 五条按产品与核心用途、真实特点与价值、规格与适配、使用方式与场景、实际交付与限制组织；可按本品调整顺序，但每条围绕不同主要购买信息。结合已确认属性说明怎样使用、适配条件与限制，关键词自然覆盖、信息充分，不刻意压短，也不重复或堆词凑长度。
 长描述保留四个栏目Product Overview / Features and Uses / Specifications and Notes / Package Contents，非英语使用当地语言对应标题。
 特点与用途至少两段，每段基于真实信息；规格及包含物逐项写清。Search Terms完整UTF-8含空格不超过249字节，不放品牌、ASIN、重复或无关词。
-confirmed_fact_checklist来自已确认本品事实。先规划每项事实在五点或长描述中的位置，完整覆盖材质、尺寸、数量、用法、实际包含物、不包含物和适配条件；不能只写概括性卖点。资料不足时保留核对提示，不从竞品补造参数。
+confirmed_fact_checklist来自本品事实。先规划已确认事实在五点或长描述中的位置，完整覆盖材质、尺寸、数量、用法、实际包含物、不包含物和适配条件；不能只写概括性卖点。标为uncertain=true的项目只使用confirmed_text中的明确部分，unconfirmed_text中的待核实部分不用于销售正文；confirmed_text为空则整项省略。不从竞品补造参数。
+title、highlights、bullets.heading/body、description和terms全部面向买家，只包含能直接用于刊登的产品信息。运营待办、资料来源状态、未确认参数、占位符和“请核实/待确认/require confirmation/confirm whether/TBD”等内部说明不得写入这些字段，Specifications and Notes也不是运营核对区。
+需运营处理的事实疑点仅放独立review_notes，每项返回fact_id和中文reason；没有真实疑点就返回空数组。无法确认的属性连同不确定数值一起从销售正文省略，不以“参数+请确认”的方式保留，也不要仅删除限定语后把它当作确定事实。正常面向买家的使用步骤、已确认兼容限制和购买前核对自身设备的说明可以保留。
+已经在本品facts明确确认、没有矛盾或待确认标记的尺寸等信息应正常写出；不得因看起来像包装尺寸或没有标注长宽高顺序就自行宣布它未确认。尺寸有数值但未标明边向时可按原顺序写Dimensions，不猜测Length/Width/Height。不确定的设备型号、同时读写能力等未提供时直接不声称，若确实需要补资料则只在review_notes说明。
 输出前在本次调用内逐项核对事实，返回fact_coverage：对清单每个id给出covered/missing/conflict、实际输出字段和逐字quote。quote必须真实出现在正文；无法证明覆盖或存在冲突就如实标记，不以同义概括冒充所有细节都覆盖。引用仅用于内部核对，不写进销售正文。
 “不包含”只表示交付范围，不得扩写成“另售”“可另购”或卖家另有销售；未确认的供电规格、性能、认证、兼容对象和配件不得添加。引用竞品只学习表达与组织，不继承其产品事实。
 Search Terms应优先放入正文未覆盖的关键词，再用事实支持的高相关近义词、属性、使用场景和用途短语补足，目标200—245 UTF-8字节；不得为凑长度添加无关词或事实不支持的功能。
@@ -78,7 +81,11 @@ operator_notes和editor_requirements为运营补充要求；其中历史“未�
         if vision
         else "\n本次仅使用文字资料与图片链接元数据，没有图片视觉输入；不得推断图中内容。"
     )
-    return (BRIEF_RULES if task == "brief" else RULES) + material_rules + visual_rules
+    buyer_boundary = (
+        "\n本次Listing任务：以上资料和图片规则提到的待核对、冲突及不确定原因，只能写入独立review_notes，绝不能写入面向买家的文案字段。"
+        if task == "listing" else ""
+    )
+    return (BRIEF_RULES if task == "brief" else RULES) + material_rules + visual_rules + buyer_boundary
 
 
 def safe_usage(value):
@@ -296,6 +303,7 @@ def generate(settings, provider, task, context):
     try:
         raw = json.loads(text)
         coverage = raw.pop("fact_coverage", None)
+        review_notes = raw.pop("review_notes", None) if task == "listing" else None
         if identity is not None:
             from .source_identity import merge_identifiers
             from .source_identity import policy as identity_policy
@@ -348,5 +356,5 @@ def generate(settings, provider, task, context):
         from .listing_quality import policy as listing_policy
         from .listing_quality import review as review_listing
 
-        diagnostic["listing_review"] = review_listing(candidate, listing_policy(context, identity), coverage, require_coverage=True)
+        diagnostic["listing_review"] = review_listing(candidate, listing_policy(context, identity), coverage, require_coverage=True, notes=review_notes)
     return {**diagnostic, "status": "succeeded", "candidate": candidate}

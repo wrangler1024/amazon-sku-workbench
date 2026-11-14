@@ -182,11 +182,11 @@ function App(){
  async function listTaskCommand(t:any,action:string,payload:any={}){return act(async()=>{await api('/api/artwork/'+t.id+'/'+action,'POST',{revision:t.revision,data:payload});return selected?api('/api/items/'+selected):true},'任务已更新')}
  async function claim(tasks:any[]){return act(async()=>{await api('/api/artwork/claim-batch','POST',{tasks:tasks.map(t=>({id:t.id,revision:t.revision}))});return selected?api('/api/items/'+selected):true},'已认领，可在我的制图中开工')}
  async function openWork(id:string,version='confirmed'){returnScroll.current[tab]={x:window.scrollX,y:window.scrollY};setPublicationVersion(version);return select(id)}
- async function copyListing(r:any,registered=false){await act(async()=>{const d=await api('/api/items/'+r.id);const current=d.publications.find((p:any)=>!p.withdrawn_at&&p.target_id===d.document.publication_target_id);const id=registered&&current?current.listing_version:d.document.listing_version;await copyReviewedListing(fullCopy(d.versions.find((v:any)=>v.id===id)?.body),d.source_identity,copy);return true},'文案已复制')}
+ async function copyListing(r:any,registered=false){await act(async()=>{const d=await api('/api/items/'+r.id);const current=d.publications.find((p:any)=>!p.withdrawn_at&&p.target_id===d.document.publication_target_id);const id=registered&&current?current.listing_version:d.document.listing_version;await copyReviewedListing(fullCopy(d.versions.find((v:any)=>v.id===id)?.body),d.listing_policy,copy);return true},'文案已复制')}
  async function registerListing(r:any){if(await openWork(r.id))setRegisterNow(Date.now())}
  async function assign(assignee_id:string,tasks:any[]){return act(async()=>{await api('/api/artwork/assign','POST',{assignee_id,tasks:tasks.map(t=>({id:t.id,revision:t.revision}))});return selected?api('/api/items/'+selected):true},'任务已分配')}
  async function copy(text:string){setError('');try{if(await copyContent(text,{allowed:canCopyContent,write:value=>navigator.clipboard.writeText(value),legacy:browserCopy}))setNotice('已复制');else setManualCopy(text)}catch(e:any){setError(e instanceof CopyPermissionError?e.message:'暂时无法核验复制权限，请稍后重试')}}
- async function copyListingText(text:string){try{await copyReviewedListing(text,data?.source_identity,copy)}catch(e:any){setError(e.message)}}
+ async function copyListingText(text:string){try{await copyReviewedListing(text,data?.listing_policy,copy)}catch(e:any){setError(e.message)}}
  async function copyBrief(text:string){
   try{await copyReviewedBrief(text,data?.brief_policy,copy)}catch(e:any){setError(e.message)}
  }

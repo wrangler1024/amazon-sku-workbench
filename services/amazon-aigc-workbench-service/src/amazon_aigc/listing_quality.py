@@ -6,7 +6,7 @@ import re
 
 from .brief_policy import normalized, review_fields
 
-VERSION = "listing-quality-1"
+VERSION = "listing-quality-2"
 FACT_LABELS = {
     "sales_name": "产品名称",
     "quantity": "销售数量",
@@ -53,11 +53,26 @@ DIMENSION = re.compile(
 )
 MEASUREMENT = re.compile(rf"(?<![A-Za-z0-9])({NUMBER})\s*({UNIT_PATTERN})(?![A-Za-z])", re.IGNORECASE)
 SOLD_SEPARATELY = r"\b(?:sold|purchased|available)\s+separately\b|\bse\s+vende(?:n)?\s+por\s+separado\b|\bventa\s+por\s+separado\b|另售|单独销售|单独出售"
+# Shared with browser RegExp; deliberately allow normal buyer instructions such
+# as "check your device before purchase" and confirmed compatibility limits.
+INTERNAL_REVIEW = (
+    r"\b(?:requires?|needs?|awaits?)\s+(?:(?:further|manual|operator)\s+)?(?:confirmation|verification|clarification)\b|"
+    r"\b(?:pending|awaiting)\s+(?:confirmation|verification|clarification)\b|"
+    r"\b(?:to\s+be|not(?:\s+yet)?)\s+(?:confirmed|verified|determined)\b|\b(?:unconfirmed|unverified|TBD|TBC)\b|"
+    r"\b(?:confirm|verify|clarify)\s+(?:whether|which)\s+(?:these|they|the\s+(?:supplied|provided|listed)\s+(?:dimensions|measurements))\b[^.;!?\n]{0,100}\b(?:refer|product|packag(?:e|ing)|measure)\b|"
+    r"\b(?:confirm|verify|clarify)\s+(?:with\s+(?:the\s+)?(?:supplier|manufacturer)|(?:the\s+)?(?:actual|product|packaging)\s+(?:dimensions|measurements|size))\b|"
+    r"\b(?:dimensions?|measurements?|size|material|compatibility)\s*:\s*(?:unknown|not\s+(?:specified|provided|confirmed)|N/?A)\b|"
+    r"待(?:确认|核实|核对|验证|测量)|尚未(?:确认|核实)|(?:请|需|需要)(?:运营|供应商|人工)(?:进一步)?(?:确认|核实|核对)|"
+    r"\b(?:pendientes?\s+de\s+(?:confirmación|verificación)|por\s+confirmar|sin\s+confirmar|requieren?\s+(?:confirmación|verificación))\b"
+)
+UNCERTAIN_FACT = re.compile(
+    INTERNAL_REVIEW + r"|未确认|未核实|不确定|不清楚|不详|待测|尺寸未知|需确认|需核实", re.IGNORECASE
+)
 
 
 def fact_items(context):
     facts = context.get("facts") or {}
-    return [
+    items = [
         {
             "id": key,
             "label": label,
@@ -68,6 +83,13 @@ def fact_items(context):
         for key, label in FACT_LABELS.items()
         if facts.get(key) not in (None, "", [])
     ]
+    for item in items:
+        if UNCERTAIN_FACT.search(item["text"]):
+            item["uncertain"] = True
+            parts = re.split(r"[;；。\n]", item["text"])
+            item["confirmed_text"] = "; ".join(s.strip() for s in parts if s.strip() and not UNCERTAIN_FACT.search(s))
+            item["unconfirmed_text"] = "; ".join(s.strip() for s in parts if UNCERTAIN_FACT.search(s))
+    return items
 
 
 def measurement(value, unit, text):
@@ -113,6 +135,13 @@ def policy(context, identity=None, confirmed=True):
     items = fact_items(context) if confirmed else []
     text = "\n".join(x["text"] for x in items)
     checks = list((identity or {}).get("checks", []))
+    checks.append(
+        {
+            "code": "internal_review",
+            "pattern": INTERNAL_REVIEW,
+            "message": "含内部核对说明，请移出买家文案；未确认信息核实前不要用于刊登",
+        }
+    )
     if not re.search(SOLD_SEPARATELY, text, re.IGNORECASE):
         checks.append(
             {
@@ -125,7 +154,12 @@ def policy(context, identity=None, confirmed=True):
         "version": VERSION,
         "confirmed": confirmed,
         "facts": items,
-        "measurements": [{**m, "fact": x["id"]} for x in items for m in measurements(x["text"])],
+        "measurements": [
+            {**m, "fact": x["id"]} for x in items for m in measurements(x.get("confirmed_text", x["text"]))
+        ],
+        "unconfirmed_measurements": [
+            {**m, "fact": x["id"]} for x in items if x.get("uncertain") for m in measurements(x["unconfirmed_text"])
+        ],
         "checks": checks,
     }
 
@@ -136,7 +170,7 @@ def fields(candidate):
     ]
 
 
-def review(candidate, rules, coverage=None, require_coverage=False):
+def review(candidate, rules, coverage=None, require_coverage=False, notes=None):
     values = fields(candidate)
     issues = review_fields(values, rules)
     for i, bullet in enumerate(candidate.get("bullets") or []):
@@ -156,14 +190,26 @@ def review(candidate, rules, coverage=None, require_coverage=False):
             for value in measurements(text):
                 actual.append(value)
                 if not any(equivalent(value, known) for known in rules["measurements"]):
+                    uncertain = any(equivalent(value, known) for known in rules.get("unconfirmed_measurements", []))
                     issues.append(
                         {
                             "field": field,
-                            "code": "unsupported_measurement",
-                            "message": "本品事实未确认此数值或单位：" + value["text"],
+                            "code": "unconfirmed_measurement" if uncertain else "unsupported_measurement",
+                            "message": (
+                                "仍含待确认数值，核实前请勿用于刊登：" if uncertain else "本品事实未确认此数值或单位："
+                            )
+                            + value["text"],
                         }
                     )
         for item in rules["facts"]:
+            if item.get("uncertain"):
+                issues.append(
+                    {
+                        "field": "facts." + item["id"],
+                        "code": "fact_needs_confirmation",
+                        "message": item["label"] + "含待确认信息，核实后再补入文案",
+                    }
+                )
             expected = [m for m in rules["measurements"] if m["fact"] == item["id"]]
             if any(not any(equivalent(found, value) for found in actual) for value in expected):
                 issues.append(
@@ -177,6 +223,8 @@ def review(candidate, rules, coverage=None, require_coverage=False):
         reports = {r.get("fact_id"): r for r in coverage or [] if isinstance(r, dict)}
         texts = dict(values)
         for item in rules.get("facts", []):
+            if item.get("uncertain"):
+                continue
             report = reports.get(item["id"], {})
             quote = str(report.get("quote") or "").strip()
             content = str(texts.get(report.get("field"), ""))
@@ -188,8 +236,19 @@ def review(candidate, rules, coverage=None, require_coverage=False):
                         "message": item["label"] + "未返回可核对的正文引用，请人工检查遗漏或冲突",
                     }
                 )
+    safe_notes = [
+        {"fact_id": n["fact_id"], "reason": n["reason"].strip()[:600]}
+        for n in (notes if isinstance(notes, list) else [])[:12]
+        if isinstance(n, dict)
+        and n.get("fact_id") in FACT_LABELS
+        and isinstance(n.get("reason"), str)
+        and n["reason"].strip()
+    ]
+    issues.extend(
+        {"field": "facts." + n["fact_id"], "code": "operator_review", "message": n["reason"]} for n in safe_notes
+    )
     unique = {(x["field"], x["code"], x["message"]): x for x in issues}
-    return {"policy": rules, "issues": list(unique.values()), "coverage": coverage or []}
+    return {"policy": rules, "issues": list(unique.values()), "coverage": coverage or [], "notes": safe_notes}
 
 
 def add_schema(schema):
@@ -221,6 +280,20 @@ def add_schema(schema):
         },
     }
     schema["required"].append("fact_coverage")
+    schema["properties"]["review_notes"] = {
+        "type": "array",
+        "maxItems": 12,
+        "items": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {
+                "fact_id": {"type": "string", "enum": list(FACT_LABELS)},
+                "reason": {"type": "string", "minLength": 1, "maxLength": 600},
+            },
+            "required": ["fact_id", "reason"],
+        },
+    }
+    schema["required"].append("review_notes")
 
 
 def assemble_bullets(raw):
