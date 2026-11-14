@@ -304,3 +304,15 @@ def test_provider_payload_activates_only_target_listing_locale(provider):
     assert "本次仅执行墨西哥西语格式" in mx and "本次执行英文格式" not in mx
     brief = adapter.payload("synthetic", "brief", {"site": "MX"}, output_schema("brief")[1])["instructions"]
     assert "本次仅执行墨西哥西语格式" not in brief
+
+
+@pytest.mark.parametrize(
+    "note", ["unconfirmed compatible with AB-900", "not verified: fits AB-900", "sin confirmar: compatible con AB-900"]
+)
+def test_unconfirmed_fitment_notes_never_whitelist_source_models(note):
+    data = context()
+    data["operator_notes"] = note
+    data["facts"]["specification"] = note
+    assert "AB-900" not in identity.compatibility_codes(data)
+    _, rules = identity.prepare_context(data)
+    assert review_fields([("title", "For AB-900")], rules)

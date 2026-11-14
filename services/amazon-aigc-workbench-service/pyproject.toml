@@ -1,6 +1,6 @@
 [project]
 name = "amazon-aigc-workbench-service"
-version = "0.23.0"
+version = "0.23.1"
 description = "Amazon SKU content and artwork collaboration service"
 license = "Apache-2.0"
 requires-python = ">=3.11"

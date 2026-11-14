@@ -9,7 +9,7 @@ resolution-markers = [
 
 [[package]]
 name = "amazon-aigc-workbench-service"
-version = "0.23.0"
+version = "0.23.1"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },

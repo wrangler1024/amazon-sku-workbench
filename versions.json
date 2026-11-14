@@ -1,5 +1,5 @@
 {
-  "bundle": "0.4.0",
+  "bundle": "0.4.1",
   "components": {
     "review": {
       "version": "0.70.2",
@@ -12,9 +12,9 @@
       "tag": "editor/v0.22.0"
     },
     "api": {
-      "version": "0.23.0",
+      "version": "0.23.1",
       "path": "services/amazon-aigc-workbench-service",
-      "tag": "api/v0.23.0"
+      "tag": "api/v0.23.1"
     },
     "fbacc": {
       "version": "0.3.0",
@@ -31,7 +31,7 @@
   },
   "compatibility": {
     "editor": "0.22.0",
-    "api": "0.23.0",
+    "api": "0.23.1",
     "database_migration": "018_owner_handover.sql"
   }
 }

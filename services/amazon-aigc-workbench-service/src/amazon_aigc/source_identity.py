@@ -28,7 +28,8 @@ COMPAT = re.compile(
     r"适配|适用(?:于)?|兼容|匹配|compatible(?:s)?\s+(?:with|con)|fits?\b|\bfor\b|apto(?:s|a|as)?\s+para", re.IGNORECASE
 )
 UNVERIFIED_COMPAT = re.compile(
-    r"待确认|未确认|需核对|待核实|不确定|可能|unverified|not confirmed|unknown|possibly|待验证|\?", re.IGNORECASE
+    r"待确认|未确认|需核对|待核实|不确定|可能|unverified|unconfirmed|not confirmed|not verified|sin confirmar|sin verificar|pendiente de confirmaci[oó]n|unknown|possibly|待验证|\?",
+    re.IGNORECASE,
 )
 TEXT_KEYS = {
     "title",
