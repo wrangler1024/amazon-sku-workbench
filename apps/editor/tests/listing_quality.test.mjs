@@ -41,3 +41,11 @@ test('operator notes stay in the review panel and never join copied sales text',
  assert.deepEqual(writes,[listing.description]);
  assert(!listingIssues(listing,{...policy,facts:[]},review).includes(note));
 });
+
+test('fact review survives database property ordering but rejects changed facts',()=>{
+ const note={field:'facts.dimensions',code:'operator_review',message:'请核实尺寸归属'};
+ const storedPolicy={...policy,facts:policy.facts.map(f=>Object.fromEntries(Object.entries(f).reverse()))};
+ const review={policy:storedPolicy,issues:[note]};
+ assert(listingIssues(listing,policy,review).includes(note));
+ assert(!listingIssues(listing,{...policy,facts:policy.facts.map(f=>({...f,text:'new confirmed size'}))},review).includes(note));
+});

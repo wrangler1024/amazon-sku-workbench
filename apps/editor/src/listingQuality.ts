@@ -1,6 +1,6 @@
 import {textIssues,type BriefIssue,type BriefPolicy} from './briefPolicy.ts';
 type Measurement={family:string;value:number;text:string;scale:number;resolution:number;fact?:string};
-export type ListingPolicy=BriefPolicy&{confirmed:boolean;facts:{id:string;label:string;text:string;uncertain?:boolean}[];measurements:Measurement[];unconfirmed_measurements?:Measurement[]};
+export type ListingPolicy=BriefPolicy&{confirmed:boolean;facts:{id:string;label:string;text:string;uncertain?:boolean;confirmed_text?:string;unconfirmed_text?:string}[];measurements:Measurement[];unconfirmed_measurements?:Measurement[]};
 const units:Record<string,[string,number]>={mm:['length',1],毫米:['length',1],cm:['length',10],厘米:['length',10],m:['length',1000],米:['length',1000],in:['length',25.4],inch:['length',25.4],inches:['length',25.4],g:['weight',1],克:['weight',1],kg:['weight',1000],千克:['weight',1000],公斤:['weight',1000],oz:['weight',28.349523125],lb:['weight',453.59237],lbs:['weight',453.59237],ml:['volume',1],毫升:['volume',1],l:['volume',1000],升:['volume',1000],v:['voltage',1],伏:['voltage',1],w:['power',1],瓦:['power',1],mah:['charge',1]};
 const number='\\d+(?:[.,]\\d+)?';
 const unitPattern=Object.keys(units).sort((a,b)=>b.length-a.length).join('|');
@@ -13,13 +13,15 @@ export function measurements(value:string):Measurement[]{
 }
 function equivalent(a:Measurement,b:Measurement){const tolerance=a.scale!==b.scale?a.resolution/2+1e-6:1e-6;return a.family===b.family&&!(a.value===0&&b.value>0)&&Math.abs(a.value-b.value)<=tolerance}
 export function listingFields(value:any):[string,string][]{return [...['title','highlights','description','terms'].map(k=>[k,String(value?.[k]||'')] as [string,string]),...(value?.bullets||[]).map((b:string,i:number)=>[`bullets.${i}`,b] as [string,string])]}
+// PostgreSQL jsonb may reorder object keys; compare the fact values.
+function factBasis(facts:ListingPolicy['facts']=[]){return JSON.stringify(facts.map(f=>[f.id,f.text,!!f.uncertain,f.confirmed_text||'',f.unconfirmed_text||'']).sort((a,b)=>String(a[0]).localeCompare(String(b[0]))))}
 export function listingIssues(value:any,policy?:ListingPolicy,modelReview?:any):BriefIssue[]{
  if(!policy)return [];
  const fields=listingFields(value),issues=fields.flatMap(([k,v])=>textIssues(v,policy,k)),actual:Measurement[]=[];
  (value?.bullets||[]).forEach((b:string,i:number)=>{if(b.trim()&&!/^[^:：\n]{1,160}[:：]\s*\S/u.test(b))issues.push({field:`bullets.${i}`,code:'bullet_format',message:'请按“小标题: 说明”核对本条格式'});if(/[.!?。！？…]$/u.test(b.trim()))issues.push({field:`bullets.${i}`,code:'bullet_ending',message:'请按SOP去除五点末尾的句尾标点'})});
  if(policy.confirmed){for(const [field,text] of fields){if(field==='terms')continue;for(const m of measurements(text)){actual.push(m);if(!policy.measurements.some(k=>equivalent(m,k))){const uncertain=(policy.unconfirmed_measurements||[]).some(k=>equivalent(m,k));issues.push({field,code:uncertain?'unconfirmed_measurement':'unsupported_measurement',message:(uncertain?'仍含待确认数值，核实前请勿用于刊登：':'本品事实未确认此数值或单位：')+m.text})}}}
   for(const fact of policy.facts){if(fact.uncertain){issues.push({field:'facts.'+fact.id,code:'fact_needs_confirmation',message:fact.label+'含待确认信息，核实后再补入文案'})}const expected=policy.measurements.filter(m=>m.fact===fact.id);if(expected.some(m=>!actual.some(a=>equivalent(a,m))))issues.push({field:'facts.'+fact.id,code:'missing_detail',message:fact.label+'中的已确认数值尚未完整覆盖，请核对补充'})}}
- if(modelReview&&JSON.stringify(modelReview.policy?.facts)===JSON.stringify(policy.facts))issues.push(...(modelReview.issues||[]).filter((i:BriefIssue)=>['coverage_unverified','operator_review'].includes(i.code)));
+ if(modelReview&&factBasis(modelReview.policy?.facts)===factBasis(policy.facts))issues.push(...(modelReview.issues||[]).filter((i:BriefIssue)=>['coverage_unverified','operator_review'].includes(i.code)));
  return [...new Map(issues.map(i=>[i.field+':'+i.code+':'+i.message,i])).values()];
 }
 export function matchingListingReview(value:any,jobs:any[]=[]){const key=JSON.stringify(listingFields(value));return jobs.find(j=>j.task==='listing'&&j.result?.candidate&&JSON.stringify(listingFields(j.result.candidate))===key)?.result?.listing_review}
