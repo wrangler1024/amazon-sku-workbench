@@ -608,7 +608,12 @@ class WorkflowIO:
         return self.gateway.records(self.q.table_ids[table])
 
     def same_version(self, row):
-        return value(row.get("插件提交ID")) == self.run["submission_id"]
+        workflow = self.rules.workflows[self.run["workflow_id"]]
+        original = self.run["execution"]["context"][workflow["trigger"]["id"]]
+        owner = original.get(self.rules.field_ids[self.q.record_table]["提交运营"])
+        return value(row.get("插件提交ID")) == self.run["submission_id"] and self.rules.compare(
+            row.get("提交运营"), "is", owner
+        )
 
     def write(self, node, patch, predicate, context=None):
         operation = stable_key(self.run["run_key"], node)
@@ -764,6 +769,14 @@ class WorkflowIO:
             return
         workflow = self.rules.workflows[self.run["workflow_id"]]
         trigger = workflow["trigger"]
+        definition = next(s for s in workflow["steps"] if s["id"] == node)
+        for receiver in definition["data"]["receiver"]:
+            if receiver.get("value_type") == "ref":
+                parts = receiver["value"].split(".")
+                if len(parts) == 3 and parts[1] == trigger["id"] and parts[2] in self.rules.field_names:
+                    expected_person = context[trigger["id"]].get(parts[2])
+                    if not self.rules.compare(current.get(self.rules.field_names[parts[2]]), "is", expected_person):
+                        return
         watched = {w["field_name"] for w in trigger["data"].get("field_watch_info", [])}
         expected = {
             name: context[trigger["id"]].get(self.rules.field_ids[self.q.record_table][name]) for name in watched
@@ -792,7 +805,9 @@ class WorkflowIO:
         guards = {k: current.get(k) for k in GUARDS}
         guards.update({k: current.get(k) for k in watched})
         if trigger["type"] == "ReminderTrigger":
-            guards.update({k: current.get(k) for k in ("制图截止日期", "制图状态", "制图承接方", "美工")})
+            guards.update(
+                {k: current.get(k) for k in ("制图截止日期", "制图状态", "制图进度留存", "制图承接方", "美工")}
+            )
         for recipient in recipients:
             if not isinstance(recipient, str) or not recipient.startswith("on_"):
                 raise ValueError("A configured message recipient is not mapped to a union identity")

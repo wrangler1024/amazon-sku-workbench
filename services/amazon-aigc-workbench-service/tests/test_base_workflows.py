@@ -399,3 +399,12 @@ def test_timeout_recovery_preserves_cascade_event(coordinator):
     drain(q)
     assert q.gateway.row["ERP录入状态"] == "待录入"
     assert len(q.gateway.writes) == 2
+
+
+def test_handover_invalidates_old_pending_work(coordinator):
+    q = coordinator
+    enqueue(q)
+    q.gateway.row["提交运营"] = [{"id": "on_syntheticnewowner"}]
+    drain(q)
+    assert not q.gateway.writes
+    assert not q.notify_one()
