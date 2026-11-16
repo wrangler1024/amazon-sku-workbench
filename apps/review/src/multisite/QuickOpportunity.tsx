@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { currentShanghaiDate, MARKETPLACES, type FinanceProfile, type Marketplace, type TaxProfile } from "./domain";
 import { calculateRoughOpportunity, type RoughInput } from "./rateCards";
-import type { FbaCard } from "./rateCards";
 import { useFbaReference } from "./useFbaReference";
 import { estimateHeadhaul } from "./headhaul";
 
@@ -18,7 +17,7 @@ export interface QuickCarryValues {
 }
 
 export default function QuickOpportunity({ site, onCarry, tax, finance,
-  purchaseCny, onPurchaseChange, disabled, sitePicker, cards }: {
+  purchaseCny, onPurchaseChange, disabled, sitePicker }: {
   site: Marketplace;
   onCarry: (values: QuickCarryValues) => void;
   tax: TaxProfile | null;
@@ -27,7 +26,6 @@ export default function QuickOpportunity({ site, onCarry, tax, finance,
   onPurchaseChange: (value: NumberValue) => void;
   disabled: boolean;
   sitePicker: React.ReactNode;
-  cards: FbaCard[];
 }) {
   const [expanded, setExpanded] = useState(true);
   const [price, setPrice] = useState<NumberValue>(null);
@@ -56,7 +54,7 @@ export default function QuickOpportunity({ site, onCarry, tax, finance,
     finance.headhaulCnyPerKg > 0 && finance.volumeDivisorCm3PerKg > 0;
   const headhaul = finance ? estimateHeadhaul(lengthCm ?? 0, widthCm ?? 0,
     heightCm ?? 0, weightG ?? 0, finance.volumeDivisorCm3PerKg, finance.headhaulCnyPerKg) : null;
-  const sizeReference = useFbaReference(cards, { site, category: "普通商品", price: price ?? 0,
+  const sizeReference = useFbaReference({ site, category: "普通商品", price: price ?? 0,
     dimensionsCm: [lengthCm ?? 0, widthCm ?? 0, heightCm ?? 0], unitWeightG: weightG ?? 0,
     saleDate: Date.now() }, currentShanghaiDate());
   const sizeEstimate = sizeReference.estimate;

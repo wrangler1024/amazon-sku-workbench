@@ -14,7 +14,6 @@ import QuickOpportunity, { type QuickCarryValues } from "./QuickOpportunity";
 import SiteReviewThumb from "./SiteReviewThumb";
 import ReviewDetail from "./ReviewDetail";
 import { storedReviewQuote, reviewAttention, reviewDate } from "./reviewPresentation";
-import type { FbaCard } from "./rateCards";
 import { useFbaReference } from "./useFbaReference";
 import { summarizePendingReviews, type NumberRange } from "./reviewSummary";
 import { smallSizeAdvice } from "./sizing";
@@ -60,8 +59,6 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const preferenceScope = useRef<SitePreferenceScope | null>(null);
   const preferredSite = useRef<Marketplace | null>(null);
   const siteTouched = useRef(false);
-  const [cards, setCards] = useState<FbaCard[]>([]);
-  const [cardError, setCardError] = useState("");
   const [quickPurchaseCny, setQuickPurchaseCny] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const editingIdentity = useRef<DraftProductIdentity | null>(null);
@@ -124,13 +121,11 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const reload = useCallback(async () => {
     if (demo) {
       const loaded: SiteDashboard = { reviews: [], taxes: [], finances: [], rules: [], problems: ["本地演示仅展示合成评审任务；多站点录入需配置自己的飞书表格。"] };
-      setData(loaded); setCards([]); return loaded;
+      setData(loaded); return loaded;
     }
-    const { loadSiteDashboard, loadFbaRateCards } = await import("./repository");
+    const { loadSiteDashboard } = await import("./repository");
     const loaded = await loadSiteDashboard();
     setData(loaded);
-    try { setCards(await loadFbaRateCards()); setCardError(""); }
-    catch (error) { setCards([]); setCardError(error instanceof Error ? error.message : String(error)); }
     return loaded;
   }, [demo]);
   useEffect(() => { void reload().catch((error) => setMessage(String(error))); }, [reload]);
@@ -264,7 +259,7 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
     price: draft.listedPrice,
     dimensionsCm: [draft.lengthCm, draft.widthCm, draft.heightCm] as [number, number, number],
     unitWeightG: draft.unitWeightG, saleDate: forecast };
-  const fbaReference = useFbaReference(cards, cardRequest, draft.expectedSaleDate, data?.sizeRules ?? {});
+  const fbaReference = useFbaReference(cardRequest, draft.expectedSaleDate, data?.sizeRules ?? {});
   const { estimate: cardEstimate, packing } = fbaReference;
   const referenceInfo = cardEstimate.reference ?? cardEstimate.card;
   const previewReady = [draft.listedPrice, draft.lengthCm, draft.widthCm,
@@ -579,7 +574,6 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
       </section> : <>
       <QuickOpportunity key={draft.site} site={draft.site} sitePicker={sitePicker}
         onCarry={carryQuick} tax={tax} finance={roughFinance}
-        cards={cards}
         purchaseCny={quickPurchaseCny} onPurchaseChange={setQuickPurchaseCny}
         disabled={Boolean(editingId)} />
       <div className="multisite-grid" id="site-review-form">
@@ -659,23 +653,21 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
             {numberField(`FBA 费用（${currency}）`, "fbaFeeLocal", true)}
             <div className="site-fba-preview"><strong>FBA 预估（仅参考）</strong>
               <div role="status" title={cardEstimate.status === "matched"
-                ? `${referenceInfo?.tier} · ${referenceInfo?.plan} · ${referenceInfo?.version}${["AE", "DE"].includes(draft.site) ? " · 未含适用 VAT" : ""}` : cardEstimate.reason}>
+                ? `${referenceInfo?.tier} · ${referenceInfo?.plan} · ${referenceInfo?.version} · ${referenceInfo?.feeIncludesTax ? "已含本站适用税费" : "未另加适用税费"}` : cardEstimate.reason}>
                 {!previewReady ? "待填售价与包装信息"
                   : cardEstimate.status === "matched" ? money(currency, cardEstimate.fee ?? 0)
-                    : ["AE", "DE"].includes(draft.site) ? fbaReference.loading ? "预估计算中…"
-                      : fbaReference.unavailable ? "预估暂不可用" : "需人工核价"
-                      : ["MX", "SA"].includes(draft.site) ? "计费重待确认" : "需逐 SKU 报价"}
-              </div>{["AE", "DE"].includes(draft.site) && fbaReference.unavailable &&
+                    : fbaReference.loading ? "预估计算中…"
+                      : fbaReference.unavailable ? "预估暂不可用" : "需人工核价"}
+              </div>{fbaReference.unavailable &&
                 <button type="button" className="text-button" onClick={fbaReference.retry}>重试预估</button>}</div>
           </div><p className="hint site-form-note">预估按普通商品基准费率计算，不匹配类目专属优惠；手填 FBA 费用用于利润，预估不会自动带入。无匹配档位、特殊商品或危险品需逐 SKU 核价。</p>
             {draft.site === "UK" && <p className="hint site-form-note">英国低价费率仅用于售价不超过 £10 且符合尺寸重量条件的商品；售价超过 £10 按常规费率预估，旺季按适用日期计费。</p>}
             {draft.site === "AE" && <p className="hint site-form-note">阿联酋 FBA 按完整销售包装的尺寸、实重、售价和预计开售日期自动预估，参考金额未含适用 VAT。利润仍以运营手填的 FBA 金额为准，预估不会自动带入；如需进一步确认，可核对亚马逊后台费用。</p>}
-            {["AE", "DE"].includes(draft.site) && previewReady && !fbaReference.loading && cardEstimate.status !== "matched" &&
+            {previewReady && !fbaReference.loading && cardEstimate.status !== "matched" &&
               <p className="hint site-form-note" role="status">{cardEstimate.reason}</p>}
             {draft.site === "DE" && <p className="hint site-form-note">德国参考费按本土配送、未参加中欧计划计算，含适用燃油附加费并按日期匹配旺季；未含 VAT。售价不超过 €11 才默认按低价条件判断。若使用波兰等境外库存配送，请核对账号实际配送计划及报价后手填 FBA 费用。</p>}
-            {draft.site === "SA" && <p className="hint site-form-note">沙特 FBA 按官方出库计费重核价，公开参考费不含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
-            {draft.site === "JP" && <p className="hint site-form-note">日本 FBA 仅预估小型与标准薄件；参考费已含 10% 消费税，不再重复加税。其他尺寸档逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
-            {cardError && !["AE", "DE"].includes(draft.site) && <p role="alert" className="alert warning">分档预估暂不可用：{cardError}</p>}
+            {draft.site === "SA" && <p className="hint site-form-note">沙特 FBA 按完整销售包装实重自动预估，参考费未含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
+            {draft.site === "JP" && <p className="hint site-form-note">日本 FBA 按完整销售包装尺寸与实重自动预估，售价按整数日元填写；参考费已含 10% 消费税，不再重复加税。超出支持规格需逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
           </fieldset>
           <fieldset><legend>供应商可行性（可后补）</legend><div className="field-grid three">
             <label>供应商名称<input value={draft.supplierName} onChange={(event) => update("supplierName", event.target.value)} /></label>

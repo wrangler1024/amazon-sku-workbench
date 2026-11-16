@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { fbaInputProblem, fetchFbaEstimates, usesRemoteFba } from "./aeFbaService";
-import { estimateFbaCard, type CardEstimate, type CardRequest, type FbaCard } from "./rateCards";
-import { comparePackaging, packagingOpportunity, packagingTrial, type SmallSizeRules } from "./sizing";
+import { type CardEstimate, type CardRequest } from "./rateCards";
+import { comparePackaging, packagingTrial, type SmallSizeRules } from "./sizing";
 
 type RemoteState = { key: string; estimates: CardEstimate[]; unavailable: boolean };
-export function useFbaReference(cards: FbaCard[], request: CardRequest, saleDate: string, rules: SmallSizeRules = {}) {
+export function useFbaReference(request: CardRequest, saleDate: string, rules: SmallSizeRules = {}) {
   const trial = packagingTrial(request, rules);
   const problem = fbaInputProblem(request, saleDate);
   // Use input values, not object identities or wall-clock timestamps, as request dependencies.
@@ -31,8 +31,6 @@ export function useFbaReference(cards: FbaCard[], request: CardRequest, saleDate
     return () => { active = false; clearTimeout(timer); controller.abort(); };
   }, [key, retry]);
 
-  if (!usesRemoteFba(request.site)) return { estimate: estimateFbaCard(cards, request), loading: false, unavailable: false,
-    packing: packagingOpportunity(cards, request, rules), retry: () => {} };
   const current = remote?.key === key && key ? remote : null;
   const estimate: CardEstimate = !key ? { status: "quote_required", reason: problem ?? "待填售价与包装信息" }
     : current?.estimates[0] ?? { status: "quote_required", reason: "自动预估计算中…" };

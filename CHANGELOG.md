@@ -1,5 +1,11 @@
 # Changelog
 
+## Review 0.73.0
+
+- Route all nine review marketplaces, quick size references and packaging comparisons through FBACC. Stop loading legacy FBA rate tables; unavailable or conflicting estimates stay explicit and retryable.
+- Validate whole-yen amounts, MX/JP tax-inclusive fees, US pound-based weights, and UK/DE conservative domestic assumptions. Keep manual costs, existing financial snapshots and review workflows authoritative.
+- Cover all nine marketplaces with independently reviewed fee samples, mixed-currency boundaries, extended Japanese tiers and async/manual-cost protection checks.
+
 ## Review 0.72.2
 
 - Apply the shared compact form-help style to all marketplace-specific FBA guidance and quote-required messages. Calculation and submission behavior are unchanged.
