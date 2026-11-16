@@ -1,5 +1,9 @@
 # Changelog
 
+## Review 0.72.2
+
+- Apply the shared compact form-help style to all marketplace-specific FBA guidance and quote-required messages. Calculation and submission behavior are unchanged.
+
 ## Review 0.72.1 / FBACC 0.3.1
 
 - Render German reference guidance in the same compact muted style as adjacent form help.

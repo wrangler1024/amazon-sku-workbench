@@ -668,13 +668,13 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
               </div>{["AE", "DE"].includes(draft.site) && fbaReference.unavailable &&
                 <button type="button" className="text-button" onClick={fbaReference.retry}>重试预估</button>}</div>
           </div><p className="hint site-form-note">预估按普通商品基准费率计算，不匹配类目专属优惠；手填 FBA 费用用于利润，预估不会自动带入。无匹配档位、特殊商品或危险品需逐 SKU 核价。</p>
-            {draft.site === "UK" && <p className="hint">英国低价费率仅用于售价不超过 £10 且符合尺寸重量条件的商品；售价超过 £10 按常规费率预估，旺季按适用日期计费。</p>}
-            {draft.site === "AE" && <p className="hint">阿联酋 FBA 按完整销售包装的尺寸、实重、售价和预计开售日期自动预估，参考金额未含适用 VAT。利润仍以运营手填的 FBA 金额为准，预估不会自动带入；如需进一步确认，可核对亚马逊后台费用。</p>}
+            {draft.site === "UK" && <p className="hint site-form-note">英国低价费率仅用于售价不超过 £10 且符合尺寸重量条件的商品；售价超过 £10 按常规费率预估，旺季按适用日期计费。</p>}
+            {draft.site === "AE" && <p className="hint site-form-note">阿联酋 FBA 按完整销售包装的尺寸、实重、售价和预计开售日期自动预估，参考金额未含适用 VAT。利润仍以运营手填的 FBA 金额为准，预估不会自动带入；如需进一步确认，可核对亚马逊后台费用。</p>}
             {["AE", "DE"].includes(draft.site) && previewReady && !fbaReference.loading && cardEstimate.status !== "matched" &&
-              <p className="hint" role="status">{cardEstimate.reason}</p>}
+              <p className="hint site-form-note" role="status">{cardEstimate.reason}</p>}
             {draft.site === "DE" && <p className="hint site-form-note">德国参考费按本土配送、未参加中欧计划计算，含适用燃油附加费并按日期匹配旺季；未含 VAT。售价不超过 €11 才默认按低价条件判断。若使用波兰等境外库存配送，请核对账号实际配送计划及报价后手填 FBA 费用。</p>}
-            {draft.site === "SA" && <p className="hint">沙特 FBA 按官方出库计费重核价，公开参考费不含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
-            {draft.site === "JP" && <p className="hint">日本 FBA 仅预估小型与标准薄件；参考费已含 10% 消费税，不再重复加税。其他尺寸档逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
+            {draft.site === "SA" && <p className="hint site-form-note">沙特 FBA 按官方出库计费重核价，公开参考费不含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
+            {draft.site === "JP" && <p className="hint site-form-note">日本 FBA 仅预估小型与标准薄件；参考费已含 10% 消费税，不再重复加税。其他尺寸档逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
             {cardError && !["AE", "DE"].includes(draft.site) && <p role="alert" className="alert warning">分档预估暂不可用：{cardError}</p>}
           </fieldset>
           <fieldset><legend>供应商可行性（可后补）</legend><div className="field-grid three">
