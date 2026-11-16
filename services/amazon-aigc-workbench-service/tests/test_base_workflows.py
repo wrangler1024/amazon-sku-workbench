@@ -506,3 +506,39 @@ def test_bulk_gateway_rejects_nonadvancing_pages(repeated_records):
     with pytest.raises(RuntimeError, match="pagination"):
         g.records(TEST_TABLE)
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize("result", ["present", "absent", "forbidden", "wrong_record"])
+def test_single_record_batch_read_checks_identity_and_access(result):
+    import json
+
+    import httpx
+
+    from amazon_aigc.base_workflows import WorkflowGateway
+    from amazon_aigc.config import TEST_BASE, TEST_TABLE
+
+    cfg = config()
+    cfg["base_id"] = TEST_BASE
+    cfg["tables"][0]["id"] = TEST_TABLE
+    fields = {"插件提交ID": [{"text": "synthetic-version", "type": "text"}], "审核状态": "草稿"}
+
+    def handle(request):
+        assert request.method == "POST" and request.url.path.endswith("/records/batch_get")
+        assert json.loads(request.content) == {
+            "record_ids": [RID], "user_id_type": "union_id", "automatic_fields": False,
+        }
+        data = {"records": [{"record_id": RID, "fields": fields}]}
+        if result in ("absent", "forbidden"):
+            data = {"records": [], result + "_record_ids": [RID]}
+        elif result == "wrong_record":
+            data["records"][0]["record_id"] = RID + "other"
+        return httpx.Response(200, json={"code": 0, "data": data})
+
+    s = SimpleNamespace(environment="integration", base_id=TEST_BASE, sku_table_id=TEST_TABLE, feishu_mode="openapi")
+    g = WorkflowGateway(s, cfg, client=httpx.Client(transport=httpx.MockTransport(handle)))
+    g.token, g.expires = "synthetic-token", 9999999999
+    if result in ("forbidden", "wrong_record"):
+        with pytest.raises(PermissionError if result == "forbidden" else RuntimeError):
+            g.record(RID)
+    else:
+        assert g.record(RID) == ({"record_id": RID, **fields} if result == "present" else None)

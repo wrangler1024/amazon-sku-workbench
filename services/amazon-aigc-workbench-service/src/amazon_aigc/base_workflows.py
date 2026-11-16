@@ -96,28 +96,11 @@ class WorkflowGateway(FeishuGateway):
             }
             if page:
                 params["page_token"] = page
-            for attempt in range(3):
-                try:
-                    data = self.request(
-                        "POST",
-                        f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records/search",
-                        params=params,
-                        json={"field_names": fields, "automatic_fields": False},
-                        timeout=60,
-                    )
-                    break
-                except (httpx.TimeoutException, httpx.HTTPStatusError) as e:
-                    retry = isinstance(e, httpx.TimeoutException)
-                    if isinstance(e, httpx.HTTPStatusError):
-                        retry = e.response.status_code in (429, 500, 502, 503, 504)
-                        if e.response.status_code == 400:
-                            try:
-                                retry = e.response.json().get("code") == 1254607
-                            except ValueError:
-                                pass
-                    if attempt == 2 or not retry:
-                        raise
-                    time.sleep(attempt + 1)
+            data = self.read(
+                f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records/search",
+                params=params,
+                json={"field_names": fields, "automatic_fields": False},
+            )
             ids = [r["record_id"] for r in data["items"]]
             if len(set(ids)) != len(ids) or seen_records.intersection(ids):
                 raise RuntimeError("Workflow source pagination repeated records")
@@ -129,6 +112,39 @@ class WorkflowGateway(FeishuGateway):
             if not page or page in seen_pages:
                 raise RuntimeError("Workflow source pagination did not advance")
             seen_pages.add(page)
+
+    def read(self, path, **kwargs):
+        for attempt in range(3):
+            try:
+                return self.request("POST", path, timeout=60, **kwargs)
+            except (httpx.TimeoutException, httpx.HTTPStatusError) as e:
+                retry = isinstance(e, httpx.TimeoutException)
+                if isinstance(e, httpx.HTTPStatusError):
+                    retry = e.response.status_code in (429, 500, 502, 503, 504)
+                    if e.response.status_code == 400:
+                        try:
+                            retry = e.response.json().get("code") == 1254607
+                        except ValueError:
+                            pass
+                if attempt == 2 or not retry:
+                    raise
+                time.sleep(attempt + 1)
+
+    def record(self, record_id):
+        if not re.fullmatch(r"rec[A-Za-z0-9]{6,60}", record_id):
+            raise ValueError("Invalid workflow record")
+        data = self.read(
+            f"/bitable/v1/apps/{self.s.base_id}/tables/{self.s.sku_table_id}/records/batch_get",
+            json={"record_ids": [record_id], "user_id_type": "union_id", "automatic_fields": False},
+        )
+        if data.get("forbidden_record_ids"):
+            raise PermissionError("Workflow record access refused")
+        if record_id in data.get("absent_record_ids", []):
+            return None
+        rows = data.get("records", [])
+        if len(rows) != 1 or rows[0]["record_id"] != record_id:
+            raise RuntimeError("Workflow record response mismatch")
+        return {"record_id": record_id, **rows[0]["fields"]}
 
     def workflow_update(self, record_id, fields):
         if not re.fullmatch(r"rec[A-Za-z0-9]{6,60}", record_id):
@@ -953,14 +969,25 @@ def main():
             signal.signal(sig, lambda *_: stop.set())
         listener = threading.Thread(target=listen, args=(q, stop), daemon=True)
         listener.start()
+
+        def heartbeat():
+            with db.connection() as c:
+                c.execute(
+                    "UPDATE base_workflow_control SET heartbeat_at=now(),listener_alive=%s WHERE singleton=true",
+                    (listener.is_alive() and bool(getattr(getattr(q, "listener_client", None), "_conn", None)),),
+                )
+
         last_reminder = 0.0
         while not stop.is_set():
             try:
                 if q.enabled():
                     for _ in range(40):
+                        if stop.is_set() or not q.enabled():
+                            break
                         worked = q.process_event()
                         worked = q.run_one() or worked
                         worked = q.notify_one() or worked
+                        heartbeat()
                         if not worked:
                             break
                     q.poll()
@@ -968,11 +995,7 @@ def main():
                         q.reconcile()
                         q.reminders()
                         last_reminder = time.monotonic()
-                with db.connection() as c:
-                    c.execute(
-                        "UPDATE base_workflow_control SET heartbeat_at=now(),listener_alive=%s WHERE singleton=true",
-                        (listener.is_alive() and bool(getattr(getattr(q, "listener_client", None), "_conn", None)),),
-                    )
+                heartbeat()
             except Exception as e:  # noqa: BLE001 -- Keep the listener alive after an isolated processing failure.
                 print(json.dumps({"workflow_error": type(e).__name__}), flush=True)
             stop.wait(0.5)
