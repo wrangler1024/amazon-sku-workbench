@@ -237,6 +237,49 @@ def test_route_once_and_preserve_original_time(coordinator):
     assert len(q.gateway.sent) == 1
 
 
+@pytest.mark.parametrize("offset_ms", [16829, 1000, -1000])
+def test_route_corrects_submission_time_in_either_direction(coordinator, offset_ms):
+    q = coordinator
+    q.gateway.row["最近提交审核时间"] = int(AT.timestamp() * 1000) + offset_ms
+    enqueue(q)
+    drain(q)
+    assert q.gateway.row["最近提交审核时间"] == int(AT.timestamp() * 1000)
+    assert q.gateway.row["审核状态"] == "待审核"
+    assert q.notify_one() and not q.notify_one()
+    enqueue(q)
+    drain(q)
+    assert len(q.gateway.writes) == len(q.gateway.sent) == 1
+
+
+@pytest.mark.parametrize("future_version", [False, True])
+def test_submission_start_time_uses_committed_version_not_delivery_time(coordinator, future_version):
+    cfg = config("formula")
+    steps = cfg["workflows"][0]["steps"]
+    steps[0]["type"] = "SetRecordTrigger"
+    steps[0]["data"] = {"table_name": "Records", "field_watch_info": [cond("提交校验状态", "校验中")]}
+    steps[1]["data"]["field_values"] = [
+        {"field_name": "最近提交审核时间", "value": [{"value_type": "date", "value": "now"}]},
+    ]
+    steps[1]["next"] = None
+    steps.pop()
+    q = Coordinator(coordinator.db, coordinator.gateway, cfg, now=coordinator.now)
+    q.gateway.row["提交校验状态"] = "校验中"
+    delivery = AT + timedelta(seconds=17)
+    if future_version:
+        q.gateway.row["插件提交ID"] = "selection-v1-recSynthetic01-" + str(int((delivery + timedelta(seconds=10)).timestamp() * 1000))
+    with q.db.connection() as c:
+        q.dispatch(c, q.gateway.row, {}, OWNER, delivery, "synthetic-delayed-event", {"提交校验状态"})
+    drain(q)
+    if future_version:
+        assert not q.gateway.writes
+        with q.db.connection() as c:
+            assert "future" in c.execute("SELECT error FROM base_workflow_runs").fetchone()["error"]
+    else:
+        assert q.gateway.row["最近提交审核时间"] == int(AT.timestamp() * 1000)
+        assert q.gateway.row["审核状态"] == "草稿"
+    assert not q.notify_one()
+
+
 def test_stale_version_has_no_write_or_notice(coordinator):
     q = coordinator
     enqueue(q)

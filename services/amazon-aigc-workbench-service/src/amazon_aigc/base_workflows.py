@@ -754,19 +754,24 @@ class WorkflowIO:
             return False
         if patch.get("审核状态") == "审核通过" and value(current.get("审核状态")) != "审核通过":
             self._verify_self_exemption(current)
-        # Routing must also repair the corresponding original submission time,
-        # including an event received after the client's formula fallback.
-        if patch.get("审核状态") in ("待审核", "审核通过") and value(current.get("审核状态")) in (
+        # Transport delivery time can lag the immutable submission timestamp.
+        # Both the start-time rule and routing must use the committed version,
+        # including when a previously written timestamp is too late.
+        routes_submission = patch.get("审核状态") in ("待审核", "审核通过") and value(current.get("审核状态")) in (
             "",
             "草稿",
             "打回修改",
-        ):
+        )
+        writes_submission_time = patch.get("最近提交审核时间") is not None
+        if routes_submission or writes_submission_time:
             original = re.search(r"-(\d{13})$", self.run["submission_id"])
             attempt = datetime.fromtimestamp(int(original[1]) / 1000, UTC) if original else self.run["occurred_at"]
             if attempt > self.run["occurred_at"] + timedelta(seconds=5):
                 raise ValueError("Submission timestamp is in the future")
-            if not current.get("最近提交审核时间") or parsed_time(current["最近提交审核时间"]) < attempt - timedelta(
-                seconds=2
+            if (
+                writes_submission_time
+                or not current.get("最近提交审核时间")
+                or parsed_time(current["最近提交审核时间"]) != attempt
             ):
                 patch["最近提交审核时间"] = millis(attempt)
         with self.q.db.connection() as c:
