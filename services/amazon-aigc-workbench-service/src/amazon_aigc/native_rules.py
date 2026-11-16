@@ -36,6 +36,7 @@ class Rules:
         self.identities = config.get("identities", {})
         self.workflows = {w["workflow_id"]: w for w in config["workflows"]}
         self.field_names = {f["id"]: f["name"] for t in self.tables.values() for f in t["fields"]}
+        self.field_types = {f["id"]: f["type"] for t in self.tables.values() for f in t["fields"]}
         self.field_ids = {t: {f["name"]: f["id"] for f in v["fields"]} for t, v in self.tables.items()}
         self.option_names = {
             o["id"]: o["name"]
@@ -124,8 +125,17 @@ class Rules:
         kind, v = values["value_type"], values.get("value")
         if kind == "ref":
             result = context
-            for p in v.split(".")[1:]:
+            path = v.split(".")
+            for p in path[1:]:
                 result = result.get(p) if isinstance(result, dict) else None
+            if (
+                self.field_types.get(path[-1]) in ("formula", "lookup")
+                and isinstance(result, dict)
+                and "type" in result
+                and "value" in result
+            ):
+                values = result["value"]
+                return (values[0] if len(values) == 1 else values or None) if isinstance(values, list) else values
             return result
         if kind == "option":
             return v["name"]

@@ -121,6 +121,9 @@ class Gateway:
     def record(self, rid):
         return copy.deepcopy(self.row)
 
+    def is_workflow_actor(self, identity):
+        return identity.get("open_id") == "ou_syntheticworkflowbot"
+
     def workflow_update(self, rid, patch):
         self.writes.append(copy.deepcopy(patch))
         self.row.update(patch)
@@ -399,6 +402,56 @@ def test_null_event_serial_does_not_block_current_submission(coordinator):
     drain(q)
     assert q.gateway.row["审核状态"] == "待审核"
     assert q.notify_one()
+
+
+@pytest.mark.parametrize("count", [0, 1])
+def test_formula_cell_wrapper_is_unwrapped_for_numeric_write(coordinator, count):
+    cfg = config()
+    cfg["tables"][0]["fields"].extend([
+        {"id": "synthetic_formula", "name": "Next count", "type": "formula"},
+        {"id": "synthetic_count", "name": "Count", "type": "number"},
+    ])
+    cfg["writable_fields"].append("Count")
+    cfg["workflows"][0]["steps"][1]["data"]["field_values"] = [
+        {"field_name": "Count", "value": [{"value_type": "ref", "value": "$.tr.synthetic_formula"}]},
+    ]
+    q = Coordinator(coordinator.db, coordinator.gateway, cfg, now=coordinator.now)
+    q.gateway.row["Next count"] = {"type": 2, "value": [count]}
+    enqueue(q)
+    drain(q)
+    assert q.gateway.row["Count"] == count
+    assert q.gateway.writes == [{"Count": count}]
+
+
+@pytest.mark.parametrize("own_bot", [True, False])
+def test_only_the_application_actor_can_echo_an_applied_approval(coordinator, own_bot):
+    import json
+
+    q = Coordinator(coordinator.db, coordinator.gateway, config("approval"), now=coordinator.now)
+    q.gateway.row["审核状态"] = "审核通过"
+    q.seed()
+    with q.db.connection() as c:
+        key = q.queue(c, q.rules.workflows["syntheticWorkflow"], q.gateway.row, [], AT, "synthetic-operation", finished=True)
+        c.execute(
+            "INSERT INTO base_workflow_operations(operation_key,run_key,record_id,patch,before_snapshot,state) "
+            "VALUES('synthetic-echo-operation',%s,%s,%s,%s,'applied')",
+            (key, RID, Jsonb({"审核状态": "审核通过"}), Jsonb({})),
+        )
+    payload = event(q)
+    payload["event"]["operator_id"] = {
+        "open_id": "ou_syntheticworkflowbot" if own_bot else "ou_synthetichuman",
+        "union_id": "on_syntheticworkflowbot" if own_bot else OWNER[0]["id"],
+    }
+    action = payload["event"]["action_list"][0]
+    action["before_value"] = [{"field_id": "f0", "field_value": json.dumps("草稿")}]
+    action["after_value"] = [{"field_id": "f0", "field_value": json.dumps("审核通过")}]
+    assert q.ingest(payload)
+    assert q.process_event() == own_bot
+    with q.db.connection() as c:
+        result = c.execute("SELECT state,error FROM base_workflow_events").fetchone()
+    assert result["state"] == ("succeeded" if own_bot else "queued")
+    assert (result["error"] or "").startswith("PermissionError") == (not own_bot)
+    assert not q.run_one() and not q.notify_one()
 
 
 def test_human_self_review_and_unverified_actor_are_rejected(coordinator):

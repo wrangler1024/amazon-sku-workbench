@@ -53,6 +53,7 @@ class WorkflowGateway(FeishuGateway):
     def __init__(self, s, config, client=None):
         super().__init__(s, client if client is not None else httpx.Client())
         self.config = config
+        self._bot_open_id = None
         if (
             config["base_id"] != s.base_id
             or next(t["id"] for t in config["tables"] if t["name"] == config["record_table"]) != s.sku_table_id
@@ -145,6 +146,23 @@ class WorkflowGateway(FeishuGateway):
         if len(rows) != 1 or rows[0]["record_id"] != record_id:
             raise RuntimeError("Workflow record response mismatch")
         return {"record_id": record_id, **rows[0]["fields"]}
+
+    def is_workflow_actor(self, identity):
+        if not identity.get("open_id"):
+            return False
+        if self._bot_open_id is None:
+            response = self.client.get(
+                "https://open.feishu.cn/open-apis/bot/v3/info/",
+                headers={"Authorization": "Bearer " + self.access_token()},
+                timeout=20,
+            )
+            response.raise_for_status()
+            data = response.json()
+            bot_id = data.get("bot", {}).get("open_id")
+            if data.get("code") != 0 or not bot_id:
+                raise RuntimeError("Workflow application identity unavailable")
+            self._bot_open_id = bot_id
+        return identity["open_id"] == self._bot_open_id
 
     def workflow_update(self, record_id, fields):
         if not re.fullmatch(r"rec[A-Za-z0-9]{6,60}", record_id):
@@ -394,10 +412,13 @@ class Coordinator:
                                 row[f["name"]] = current.get(f["name"])
                     with self.db.connection() as c:
                         echo = False
-                        if not actor:
+                        operator = event["payload"]["operator_id"]
+                        if not operator or self.gateway.is_workflow_actor(operator):
                             ops = c.execute(
-                                "SELECT patch FROM base_workflow_operations WHERE record_id=%s AND state='applied' AND created_at>now()-interval '5 minutes'",
-                                (rid,),
+                                "SELECT o.patch FROM base_workflow_operations o JOIN base_workflow_runs r USING(run_key) "
+                                "WHERE o.record_id=%s AND o.state='applied' AND r.submission_id=%s "
+                                "AND o.created_at>now()-interval '5 minutes'",
+                                (rid, value(row.get("插件提交ID"))),
                             ).fetchall()
                             system_fields = {
                                 f["name"]
