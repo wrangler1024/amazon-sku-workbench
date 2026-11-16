@@ -122,7 +122,7 @@ class Gateway:
         return copy.deepcopy(self.row)
 
     def is_workflow_actor(self, identity):
-        return identity.get("open_id") == "ou_syntheticworkflowbot"
+        return identity.get("open_id") == "ou_syntheticbot"
 
     def workflow_update(self, rid, patch):
         self.writes.append(copy.deepcopy(patch))
@@ -439,8 +439,8 @@ def test_only_the_application_actor_can_echo_an_applied_approval(coordinator, ow
         )
     payload = event(q)
     payload["event"]["operator_id"] = {
-        "open_id": "ou_syntheticworkflowbot" if own_bot else "ou_synthetichuman",
-        "union_id": "on_syntheticworkflowbot" if own_bot else OWNER[0]["id"],
+        "open_id": "ou_syntheticbot" if own_bot else "ou_synthetichuman",
+        "union_id": "on_syntheticbot" if own_bot else OWNER[0]["id"],
     }
     action = payload["event"]["action_list"][0]
     action["before_value"] = [{"field_id": "f0", "field_value": json.dumps("草稿")}]
