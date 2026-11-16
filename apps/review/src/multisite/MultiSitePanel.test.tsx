@@ -1,17 +1,16 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import MultiSitePanel from "./MultiSitePanel";
-import { newSiteDraft, type FinanceProfile, type SiteDraft, type TaxProfile } from "./domain";
+import { newSiteDraft, type FinanceProfile, type Marketplace, type SiteDraft, type TaxProfile } from "./domain";
 import type { UserAccess } from "../domain/types";
 import type { SiteDashboard, SiteReview } from "./repository";
 import type { FbaCard } from "./rateCards";
-import cardData from "../../data/fba-rate-cards-2026.json";
 
 const { mockPreferenceLoad, mockPreferenceSave } = vi.hoisted(() => ({
   mockPreferenceLoad: vi.fn(), mockPreferenceSave: vi.fn(async () => "cloud"),
 }));
 vi.mock("./sitePreference", () => ({ loadSitePreference: mockPreferenceLoad, saveSitePreference: mockPreferenceSave }));
-const remembered = (site: "CA" | "AU" | "UK" | "AE" | null, userId = "operator-1") => ({
+const remembered = (site: Marketplace | null, userId = "operator-1") => ({
   scope: { baseId: "base-1", userId }, storage: "cloud",
   preference: site ? { version: 1, baseId: "base-1", userId, site, savedAt: 1 } : null,
 });
@@ -51,7 +50,10 @@ const access = {
   tableEditable: true,
 };
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-beforeEach(() => { mockCards.mockReset().mockResolvedValue([]); });
+beforeEach(() => {
+  mockCards.mockReset().mockResolvedValue([]);
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("No live service in UI tests")));
+});
 
 function fillCompleteCaDraft(container: HTMLElement, productName: string, sku = "") {
   if (sku) fireEvent.change(screen.getByLabelText("选品SKU"), { target: { value: sku } });
@@ -78,6 +80,40 @@ function fillCompleteCaDraft(container: HTMLElement, productName: string, sku = 
 }
 
 describe("多站点草稿入口", () => {
+  it.each([
+    ["CA", "CAD", 4.90, "envelope"], ["MX", "MXN", 27, "envelope"],
+    ["UK", "GBP", 1.93, "light-envelope"], ["US", "USD", 3.63, "small-standard"],
+    ["AU", "AUD", 4.55, "small-envelope"], ["SA", "SAR", 7.5, "small-envelope"],
+    ["JP", "JPY", 288, "jp-small"],
+  ] as const)("%s 后端预估不覆盖手填费用，保存仍使用人工值且不读取旧费率表", async (site, currency, total, tier) => {
+    mockPreferenceLoad.mockResolvedValueOnce(remembered(site));
+    const fetch = vi.fn(async (_url: string, options: RequestInit) => {
+      const input = JSON.parse(options.body as string).items[0];
+      return { ok: true, json: async () => ({ results: [{ ok: true, result: {
+        marketplace: site, currency, saleDate: input.saleDate, program: "domestic",
+        status: "estimated", rateVersion: "2026-11-16.1",
+        fee: { total, totalMinorUnits: Math.round(total * (site === "JP" ? 1 : 100)), includesTax: ["MX", "JP"].includes(site) },
+        classification: { tier, plan: "regular", shippingWeight: .05, weightUnit: site === "US" ? "lb" : "kg" },
+        assumptions: { lowPriceEligibility: "conservative" },
+      } }] }) };
+    });
+    vi.stubGlobal("fetch", fetch);
+    render(<MultiSitePanel access={access} />);
+    await screen.findByLabelText(`售价（${currency}） *`);
+    for (const [label, value] of [[`售价（${currency}） *`, site === "JP" ? "2000" : "30"],
+      ["包装长（cm） *", "20"], ["包装宽（cm） *", "15"], ["包装高（cm） *", "1"],
+      ["包装重量（g） *", "50"], [`FBA 费用（${currency}） *`, "999"]])
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    const before = document.querySelector(".site-result-hero")!.textContent;
+    await waitFor(() => expect(document.querySelector(".site-fba-preview")!.textContent).toContain(`${currency} ${total.toFixed(2)}`));
+    expect(screen.getByLabelText(`FBA 费用（${currency}） *`)).toHaveValue(999);
+    expect(document.querySelector(".site-result-hero")!.textContent).toBe(before);
+    fireEvent.click(screen.getByRole("button", { name: "保存草稿" }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledOnce());
+    expect(mockSave.mock.calls[0][0]).toMatchObject({ site, fbaFeeLocal: 999 });
+    expect(mockCards).not.toHaveBeenCalled();
+    expect(mockSubmit).not.toHaveBeenCalled();
+  });
   it("AE异步预估返回不改变手填成本、利润或保存内容，修改售价重新预估", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AE"));
     const tax = { site: "AE", currency: "AED", roughConfigured: true, priceIncludesTax: true,
@@ -139,12 +175,15 @@ describe("多站点草稿入口", () => {
   });
   it("FBA参考价出现或重新计算时不自动填写或覆盖手填费用，保存仍使用手填值", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AU"));
-    mockCards.mockResolvedValueOnce(cardData.rows.filter(row => row.site === "AU").map(row => ({
-      ...row, site: "AU", maxDimsCm: row.maxDimsCm as [number, number, number],
-      shippingMethod: row.shippingMethod as FbaCard["shippingMethod"],
-      effectiveFrom: Date.parse(row.effectiveFrom),
-      effectiveUntil: row.effectiveUntil ? Date.parse(row.effectiveUntil) : null,
-    })));
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, options: RequestInit) => {
+      const input = JSON.parse(options.body as string).items[0];
+      const total = input.price.amount < 13 ? 6.33 : 7.24;
+      return { ok: true, json: async () => ({ results: [{ ok: true, result: {
+        marketplace: "AU", currency: "AUD", saleDate: input.saleDate, rateVersion: "2026-11-16.1", status: "estimated",
+        fee: { total, totalMinorUnits: Math.round(total * 100), includesTax: false },
+        classification: { tier: "parcel", plan: total === 6.33 ? "low_price" : "regular", shippingWeight: .75, weightUnit: "kg" },
+      } }] }) };
+    }));
     render(<MultiSitePanel access={access} />);
     await screen.findByLabelText("售价（AUD） *");
     for (const [label, value] of [["售价（AUD） *", "25"], ["包装长（cm） *", "20"],
@@ -161,6 +200,7 @@ describe("多站点草稿入口", () => {
     await waitFor(() => expect(mockSave).toHaveBeenCalledOnce());
     expect(mockSave.mock.calls[0][0].fbaFeeLocal).toBe(17.77);
     expect(mockSubmit).not.toHaveBeenCalled();
+    expect(mockCards).not.toHaveBeenCalled();
   });
   it("记住阿联酋站点并以 AED 带入、保存草稿", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AE"));
