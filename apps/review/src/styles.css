@@ -613,7 +613,7 @@ legend { font-size: 13px; font-weight: 700; color: var(--accent-text); }
 .site-cost-grid > * { min-width: 0; }
 .site-fba-preview { display: flex; flex-direction: column; gap: 5px; color: var(--ink-muted); font-size: 13px; }
 .site-fba-preview > div { display: flex; align-items: center; width: 100%; height: 36px; padding: 7px 9px; border: 1px solid var(--line-input); border-radius: 8px; color: var(--accent-text); background: var(--surface-tint); font-weight: 750; }
-.site-form-note { margin: 8px 0 0; font-size: 11px; }
+.site-form-note { margin: 6px 0 0; color: var(--ink-muted); font-size: 11px; font-weight: 400; line-height: 1.5; }
 .site-drafts { padding: 9px 12px; border: 1px solid var(--line); border-radius: 9px; }
 .site-drafts summary { cursor: pointer; color: var(--accent-text); font-weight: 750; font-size: 13px; }
 .site-drafts .candidate-card { margin-top: 9px; }

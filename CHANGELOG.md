@@ -1,7 +1,8 @@
 # Changelog
 
-## Review 0.72.0 / FBACC 0.3.1
+## Review 0.72.1 / FBACC 0.3.1
 
+- Render German reference guidance in the same compact muted style as adjacent form help.
 - Add DE/EUR review entry, Amazon.de references and date-aware domestic FBA estimates through FBACC; manual FBA costs stay authoritative. Preserve the released draft identity confirmation when changing products.
 - Apply the official European 2% fuel surcharge from 2026-11-02 while retaining earlier rates, German CEP/peak distinctions, and existing non-European tables.
 - Validate DE financial calculations, proxy integration, response assumptions and cross-market async cancellation with synthetic fixtures.
