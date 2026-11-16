@@ -143,6 +143,12 @@ class Coordinator:
         )
         self.config_hash = stable_key(config)
         self._last_poll = 0.0
+        with db.connection() as c:
+            namespace = c.execute("SELECT current_schema() AS namespace").fetchone()["namespace"]
+        self.lock_keys = {
+            purpose: int(stable_key(config["base_id"], gateway.s.sku_table_id, namespace, purpose)[:15], 16)
+            for purpose in ("seed", "events", "runs")
+        }
 
     def enabled(self):
         with self.db.connection() as c:
@@ -153,7 +159,7 @@ class Coordinator:
         """Take a baseline only. Never replay historical approvals or notifications."""
         rows = self.gateway.records(self.gateway.s.sku_table_id)
         with self.db.connection() as c:
-            c.execute("SELECT pg_advisory_xact_lock(58017020)")
+            c.execute("SELECT pg_advisory_xact_lock(%s)", (self.lock_keys["seed"],))
             control = c.execute("SELECT * FROM base_workflow_control WHERE singleton=true FOR UPDATE").fetchone()
             if control["enabled"] or control["seeded_at"]:
                 raise ValueError("An existing workflow baseline cannot be overwritten")
@@ -274,7 +280,9 @@ class Coordinator:
 
     def process_event(self):
         with self.db.connection() as lock:
-            if not lock.execute("SELECT pg_try_advisory_lock(58017021) AS locked").fetchone()["locked"]:
+            if not lock.execute("SELECT pg_try_advisory_lock(%s) AS locked", (self.lock_keys["events"],)).fetchone()[
+                "locked"
+            ]:
                 return False
             event = None
             try:
@@ -364,7 +372,7 @@ class Coordinator:
                         )
                 return False
             finally:
-                lock.execute("SELECT pg_advisory_unlock(58017021)")
+                lock.execute("SELECT pg_advisory_unlock(%s)", (self.lock_keys["events"],))
 
     def authorize_decision(self, row, actor_id):
         """Human decisions retain the current server-side role/group boundary."""
@@ -386,7 +394,9 @@ class Coordinator:
 
     def run_one(self):
         with self.db.connection() as lock:
-            if not lock.execute("SELECT pg_try_advisory_lock(58017022) AS locked").fetchone()["locked"]:
+            if not lock.execute("SELECT pg_try_advisory_lock(%s) AS locked", (self.lock_keys["runs"],)).fetchone()[
+                "locked"
+            ]:
                 return False
             try:
                 with self.db.connection() as c:
@@ -425,7 +435,7 @@ class Coordinator:
                         )
                 return True
             finally:
-                lock.execute("SELECT pg_advisory_unlock(58017022)")
+                lock.execute("SELECT pg_advisory_unlock(%s)", (self.lock_keys["runs"],))
 
     def notify_one(self):
         with self.db.connection() as c:
@@ -615,7 +625,7 @@ class WorkflowIO:
             if all(self.rules.compare(current.get(k), "is", v) for k, v in prior["patch"].items()):
                 if not self.same_version(current) and "插件提交ID" not in prior["patch"]:
                     return False
-                self.complete(operation, current, current, prior["patch"], prior["created_at"])
+                self.complete(operation, prior["before_snapshot"], current, prior["patch"], prior["created_at"])
                 return True
         if not self.same_version(current) or not predicate(current) or not self.trigger_current(current, context):
             return False
@@ -638,8 +648,8 @@ class WorkflowIO:
                 patch["最近提交审核时间"] = millis(attempt)
         with self.q.db.connection() as c:
             prepared = c.execute(
-                "INSERT INTO base_workflow_operations(operation_key,run_key,record_id,patch) VALUES(%s,%s,%s,%s) ON CONFLICT(operation_key) DO UPDATE SET patch=base_workflow_operations.patch RETURNING created_at",
-                (operation, self.run["run_key"], self.run["record_id"], Jsonb(patch)),
+                "INSERT INTO base_workflow_operations(operation_key,run_key,record_id,patch,before_snapshot) VALUES(%s,%s,%s,%s,%s) ON CONFLICT(operation_key) DO UPDATE SET patch=base_workflow_operations.patch RETURNING created_at",
+                (operation, self.run["run_key"], self.run["record_id"], Jsonb(patch), Jsonb(current)),
             ).fetchone()
         # Recheck after journaling, immediately before the external mutation.
         latest = self.gateway.record(self.run["record_id"])

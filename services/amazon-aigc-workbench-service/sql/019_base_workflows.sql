@@ -37,6 +37,7 @@ CREATE TABLE base_workflow_operations (
     run_key text NOT NULL REFERENCES base_workflow_runs(run_key),
     record_id text NOT NULL,
     patch jsonb NOT NULL,
+    before_snapshot jsonb NOT NULL,
     state text NOT NULL DEFAULT 'prepared',
     created_at timestamptz NOT NULL DEFAULT now(),
     finished_at timestamptz

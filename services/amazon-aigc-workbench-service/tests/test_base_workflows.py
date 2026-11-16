@@ -381,3 +381,21 @@ def test_verified_supervisor_group_and_self_review(coordinator):
     q.gateway.row["提交运营"] = [{"id": subject}]
     with pytest.raises(PermissionError):
         q.authorize_decision(q.gateway.row, subject)
+
+
+def test_timeout_recovery_preserves_cascade_event(coordinator):
+    q = coordinator
+    cfg = config()
+    downstream = config("approval")["workflows"][0]
+    downstream["workflow_id"] = "syntheticDownstream"
+    downstream["steps"][0]["data"]["field_watch_info"] = [cond("审核状态", "待审核")]
+    cfg["workflows"].append(downstream)
+    q = Coordinator(q.db, q.gateway, cfg, now=q.now)
+    enqueue(q)
+    q.gateway.after_write_error = True
+    drain(q)
+    with q.db.connection() as c:
+        c.execute("UPDATE base_workflow_runs SET next_attempt_at=now()")
+    drain(q)
+    assert q.gateway.row["ERP录入状态"] == "待录入"
+    assert len(q.gateway.writes) == 2
