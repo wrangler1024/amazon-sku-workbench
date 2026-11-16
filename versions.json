@@ -1,5 +1,5 @@
 {
-  "bundle": "0.6.0",
+  "bundle": "0.7.0",
   "components": {
     "review": {
       "version": "0.74.0",
@@ -7,14 +7,14 @@
       "tag": "review/v0.74.0"
     },
     "editor": {
-      "version": "0.23.0",
+      "version": "0.24.0",
       "path": "apps/editor",
-      "tag": "editor/v0.23.0"
+      "tag": "editor/v0.24.0"
     },
     "api": {
-      "version": "0.25.0",
+      "version": "0.26.0",
       "path": "services/amazon-aigc-workbench-service",
-      "tag": "api/v0.25.0"
+      "tag": "api/v0.26.0"
     },
     "fbacc": {
       "version": "0.3.1",
@@ -30,8 +30,8 @@
     }
   },
   "compatibility": {
-    "editor": "0.23.0",
-    "api": "0.25.0",
-    "database_migration": "019_base_workflows.sql"
+    "editor": "0.24.0",
+    "api": "0.26.0",
+    "database_migration": "020_market_editor.sql"
   }
 }

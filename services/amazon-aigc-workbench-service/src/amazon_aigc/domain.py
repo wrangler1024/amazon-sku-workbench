@@ -198,7 +198,7 @@ def detail(c, user, item_id, compact=False):
         (doc["id"],),
     ).fetchall()
     receipts = c.execute(
-        "SELECT r.*,u.name AS created_by_name,w.name AS withdrawn_by_name,d.version,d.asset_ids,t.batch "
+        "SELECT r.*,u.name AS created_by_name,w.name AS withdrawn_by_name,d.version,d.asset_ids,d.marketplace,d.market_version,t.batch "
         "FROM image_receipts r "
         "JOIN artwork_deliveries d ON d.id=r.delivery_id JOIN artwork_tasks t ON t.id=d.task_id "
         "LEFT JOIN users u ON u.id=r.created_by LEFT JOIN users w ON w.id=r.withdrawn_by "
@@ -247,8 +247,16 @@ def detail(c, user, item_id, compact=False):
     brief_rules = item_policy(c, item_id, sources)
     brief_rules["checks"].extend(identifiers["checks"])
 
+    from .market_editor import editing as market_editing
+    from .market_editor import plan_detail
+    markets = plan_detail(c, doc, item)
+    task_markets = c.execute("SELECT m.* FROM artwork_task_markets m JOIN artwork_tasks t ON t.id=m.task_id WHERE t.document_id=%s ORDER BY t.batch DESC,m.site", (doc["id"],)).fetchall()
     return serial(
         {
+            "market_plan": markets,
+            "publication_targets": c.execute("SELECT * FROM publication_targets WHERE document_id=%s", (doc["id"],)).fetchall(),
+            "market_editing": market_editing(doc, item, markets),
+            "task_markets": task_markets,
             "compact": compact,
             "brief_policy": brief_rules,
             "source_identity": identifiers,
@@ -278,7 +286,9 @@ def detail(c, user, item_id, compact=False):
 
 
 def write_document(c, user, item_id, write, *, allow_pairing=False):
-    get_item(c, user, item_id, True)
+    item = get_item(c, user, item_id, True)
+    if item["editor_mode"] == "pan_eu" and write.section in ("listing", "brief"):
+        fail("当前商品已启用欧洲多站计划，请在多站编辑区保存或刷新工作台")
     doc = get_doc(c, item_id, write.revision)
     active = c.execute(
         "SELECT 1 FROM artwork_tasks WHERE document_id=%s AND state NOT IN ('accepted','withdrawn')", (doc["id"],)
@@ -521,7 +531,9 @@ def reopen_edit(c, user, item_id, revision, data):
 
 
 def publish_brief(c, user, item_id, revision, data):
-    get_item(c, user, item_id, True)
+    item = get_item(c, user, item_id, True)
+    if item["editor_mode"] == "pan_eu":
+        fail("请统一确认共用图需及所选站点语言")
     doc = get_doc(c, item_id, revision)
     if not doc["brief_version"]:
         fail("请先确认图需")
@@ -560,6 +572,11 @@ def task_command(c, user, task_id, action, revision, data):
     if not t:
         fail("任务不存在", 404)
     item = get_item(c, user, t["work_item_id"])
+    if t["market_sites"]:
+        from .market_artwork import CHILD_ACTIONS
+        from .market_artwork import command as market_command
+        if action in CHILD_ACTIONS:
+            return market_command(c, user, t, item, action, revision, data)
     if t["revision"] != revision:
         fail("任务已更新，请刷新")
     owned = str(t["assignee_id"]) == str(user["id"])
@@ -717,7 +734,12 @@ def task_command(c, user, task_id, action, revision, data):
     else:
         fail("未知操作", 404)
     c.execute("UPDATE artwork_tasks SET revision=revision+1 WHERE id=%s", (task_id,))
-    event(c, item["id"], user, "artwork." + action, data)
+    if t["market_sites"] and action == "start":
+        c.execute("UPDATE artwork_task_markets SET state='working',revision=revision+1 WHERE task_id=%s AND state='waiting'", (task_id,))
+    event(c, item["id"], user, "artwork." + action, {**data, "task_id": task_id})
+    if action in ("review", "withdraw"):
+        from .market_editor import activate_pending
+        activate_pending(c, t["document_id"])
     if action != "save-review":
         project(c, item["id"])
     return detail(c, user, item["id"])

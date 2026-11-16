@@ -35,7 +35,18 @@ def item_rows(c, user):
       LEFT JOIN artwork_deliveries ad ON ad.id=t.current_delivery_id
       ORDER BY w.updated_at DESC,w.id
     """).fetchall()
-    return serial([{**public_item(r), "editing": editing_status(r, r["task"])} for r in rows if can_read(c, user, r)])
+    from .market_editor import editing, plan_detail
+
+    result = []
+    for row in rows:
+        if not can_read(c, user, row):
+            continue
+        out = {**public_item(row), "editing": editing_status(row, row["task"])}
+        if row["editor_mode"] == "pan_eu":
+            doc = c.execute("SELECT * FROM content_documents WHERE id=%s", (row["document_id"],)).fetchone()
+            out["market_editing"] = editing(doc, row, plan_detail(c, doc, row))
+        result.append(out)
+    return serial(result)
 
 
 def artist_rows(c):

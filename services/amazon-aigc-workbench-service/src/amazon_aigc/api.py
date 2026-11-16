@@ -320,7 +320,11 @@ def create_app(settings=None, db=None):
 
     @app.post("/api/items/{item_id}/{action}")
     def item_action(item_id: UUID, action: str, command: Command, request: Request):
+        from . import market_editor
         funcs = {
+            "editor-mode": market_editor.set_mode,
+            "market-save": market_editor.save,
+            "market-confirm": market_editor.confirm,
             "publish-brief": publish_brief,
             "publication": publish_listing,
             "image-receipt": image_receipt,
@@ -409,7 +413,7 @@ def create_app(settings=None, db=None):
             item = get_item(c, user, item_id)
             own = str(item["owner_id"]) == str(user["id"]) or "admin" in user["roles"]
             task = c.execute(
-                "SELECT 1 FROM artwork_tasks t JOIN content_documents d ON d.id=t.document_id WHERE d.work_item_id=%s AND t.assignee_id=%s AND t.state IN ('working','revision')",
+                "SELECT 1 FROM artwork_tasks t JOIN content_documents d ON d.id=t.document_id WHERE d.work_item_id=%s AND t.assignee_id=%s AND (t.state IN ('working','revision') OR (cardinality(t.market_sites)>0 AND t.state='pending' AND EXISTS(SELECT 1 FROM artwork_task_markets m WHERE m.task_id=t.id AND m.state IN ('working','revision'))))",
                 (item_id, user["id"]),
             ).fetchone()
             if not own and not (task and active_artist(user)):

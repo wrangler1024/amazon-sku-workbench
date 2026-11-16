@@ -6,7 +6,7 @@ import httpx
 
 from .schemas import Brief, Facts, Listing
 
-PROMPT_VERSION = "amazon-content-20261114-v14"
+PROMPT_VERSION = "amazon-content-20261116-v15"
 # DeepSeek documents 384K (393216) output tokens, including reasoning.
 # Explicitly use the provider ceiling: omitting the field falls back to a smaller default.
 # https://api-docs.deepseek.com/api/create-chat-completion/
@@ -139,6 +139,10 @@ def output_schema(task):
 
 
 def listing_locale_rules(task, context):
+    from .market_generation import rules
+
+    if context.get("editor_market_targets"):
+        return rules(task, context)
     if task != "listing":
         return ""
     if context.get("site") == "MX":
@@ -170,7 +174,7 @@ class OpenAIProvider:
             "instructions": instructions(task, bool(images)) + listing_locale_rules(task, context),
             "input": [{"role": "user", "content": content}] if images else text,
             "store": False,
-            "max_output_tokens": 16000 if images or task == "brief" else 8000,
+            "max_output_tokens": 16000 if images or task == "brief" or context.get("editor_market_targets") else 8000,
             "text": {"format": {"type": "json_schema", "name": "amazon_" + task, "schema": schema, "strict": True}},
         }
 
@@ -207,6 +211,11 @@ def generate(settings, provider, task, context):
     if not key or not model:
         raise RuntimeError("所选供应商未配置服务端密钥和模型")
     cls, schema = output_schema(task)
+    selected = context.get("editor_market_targets")
+    if selected:
+        from .market_generation import batch_schema
+
+        schema = batch_schema(task, schema, selected)
     marks = []
     identity = None
     if task in ("listing", "brief"):
@@ -310,11 +319,11 @@ def generate(settings, provider, task, context):
 
             identity = identity_policy(merge_identifiers(identity["marks"], raw.pop("source_identifier_observations", []), protected=identity["protected"]), identity["protected"])
             diagnostic["source_identity"] = identity
-        if task == "listing":
+        if task == "listing" and not selected:
             from .listing_quality import assemble_bullets
 
             assemble_bullets(raw)
-        if task == "brief" and (len(raw.get("plans") or []) != 7 or raw.get("image_count") != 7):
+        if task == "brief" and not selected and (len(raw.get("plans") or []) != 7 or raw.get("image_count") != 7):
             raise ValueError("生成图需须包含7张完整套图策划建议")
         if image_ids:
             from .vision import apply_observations
@@ -340,19 +349,25 @@ def generate(settings, provider, task, context):
             from .brief_policy import merge_marks
 
             marks = merge_marks(marks, raw.pop("source_mark_observations", []))
-        candidate = cls.model_validate(raw).model_dump()
-        if task == "listing":
-            candidate.pop("translations", None)
+        if selected:
+            from .market_generation import validate
+
+            candidate, batch_review = validate(task, raw, selected, context, identity, marks)
+            diagnostic.update(batch_review)
+        else:
+            candidate = cls.model_validate(raw).model_dump()
+            if task == "listing":
+                candidate.pop("translations", None)
     except (ValueError, TypeError) as e:
         diagnostic["error_code"] = "output_validation_failed"
         raise GenerationError("模型输出未通过字段与长度校验，请重新生成", diagnostic) from e
-    if task == "brief":
+    if task == "brief" and not selected:
         from .brief_policy import policy, review
 
         rules = policy(marks)
         rules["checks"].extend(identity["checks"])
         diagnostic["brief_review"] = review(candidate, rules)
-    if task == "listing":
+    if task == "listing" and not selected:
         from .listing_quality import policy as listing_policy
         from .listing_quality import review as review_listing
 

@@ -269,9 +269,10 @@ def import_records(db, gateway):
                 )
             elif owner_changed:
                 c.execute(
-                    "UPDATE work_items SET name=%s,code=%s,site=%s,review_status=%s,source_revision=%s,"
+                    "UPDATE work_items SET editor_mode=CASE WHEN %s IN ('DE','FR','ES') THEN editor_mode ELSE 'single' END,name=%s,code=%s,site=%s,review_status=%s,source_revision=%s,"
                     "review_snapshot=%s,updated_at=now() WHERE id=%s",
                     (
+                        site,
                         name,
                         value(row.get("选品SKU")),
                         site,
@@ -283,8 +284,9 @@ def import_records(db, gateway):
                 )
             else:
                 c.execute(
-                    "UPDATE work_items SET name=%s,code=%s,site=%s,owner_id=%s,group_name=%s,review_status=%s,source_revision=%s,review_snapshot=%s,updated_at=now() WHERE id=%s",
+                    "UPDATE work_items SET editor_mode=CASE WHEN %s IN ('DE','FR','ES') THEN editor_mode ELSE 'single' END,name=%s,code=%s,site=%s,owner_id=%s,group_name=%s,review_status=%s,source_revision=%s,review_snapshot=%s,updated_at=now() WHERE id=%s",
                     (
+                        site,
                         name,
                         value(row.get("选品SKU")),
                         site,

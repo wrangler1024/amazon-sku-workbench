@@ -55,10 +55,10 @@ def delivery_download_context(c, user, delivery_id, short_name=None):
     chosen = safe_segment(short_name) if short_name is not None else suggested
     task_number = value((item.get("review_snapshot") or {}).get("记录序号")).strip()
     number = safe_segment(task_number, 32, "未编号-" + str(item["id"])[:8])
-    site = safe_segment(item["site"], 8, "未设站点")
+    site = safe_segment(delivery.get("marketplace") or item["site"], 8, "未设站点")
     artist = safe_segment(delivery["artist_name"], 12, "未记录美工")
     prefix = f"{number}_{site}_{artist}_"
-    suffix = f"_{delivery['batch']}_{delivery['version']}"
+    suffix = f"_{delivery['batch']}_{delivery.get('market_version') or delivery['version']}"
     info = {"product_name": product_name, "suggested_short_name": suggested, "short_name": chosen,
             "prefix": prefix, "suffix": suffix, "folder": prefix + chosen + suffix}
     return delivery, item, info

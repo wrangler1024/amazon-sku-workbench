@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 — 2026-11-16
+
+Editor 0.24.0 and API 0.26.0 add explicit European multi-market plans for DE/FR/ES review sources, targeting DE/FR/ES/IT/NL. One model call produces selected-market listings or a shared image design and localized text table. Operators review and confirm each batch once; one SKU task carries complete, independently versioned market deliveries, reviews, downloads and publication registrations. Existing single-market drafts, versions, permissions and artwork remain compatible. SQL 020 adds side tables without migrating existing products into a plan.
+
+
 ## Review 0.74.0
 
 - Add France and Spain review entry with EUR, marketplace-correct ASIN links and FBACC domestic reference estimates; all eleven review marketplaces share the backend.

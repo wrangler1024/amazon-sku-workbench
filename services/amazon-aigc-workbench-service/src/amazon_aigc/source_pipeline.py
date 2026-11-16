@@ -49,6 +49,7 @@ def input_stamp(doc, *, include_manual=True):
     from .model_gateway import PROMPT_VERSION
 
     basis = {
+        "market_revision": body.get("_market_revision", 0),
         "brief_policy_version": POLICY_VERSION,
         "prompt_version": PROMPT_VERSION,
         "facts_version": str(doc["facts_version"]),
@@ -288,6 +289,7 @@ def public_job(c, job):
     job.update(
         {
             "task": payload.get("task"),
+            "market_targets": payload.get("market_targets"),
             "vision_enabled": payload.get("vision_enabled", False),
             "source_id": payload.get("source_id"),
             "source_url": payload.get("url"),
