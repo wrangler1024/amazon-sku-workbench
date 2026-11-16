@@ -148,6 +148,10 @@ def row_json(r):
 
 def workbench_page(c, user, *, tab='facts', scope='pending', q='', days=7, date_from=None, date_to=None,
                    page=1, state='', task_range='assigned', site='', owner='', group='', person='', urgent=False):
+    # These short interactive queries expand several permission and market CTEs.
+    # PostgreSQL's estimated cost can trigger expensive JIT compilation even when
+    # actual execution is small. Keep this setting local to the read transaction.
+    c.execute("SET LOCAL jit = off")
     cte,args=model(user,tab)
     if tab in ('copyPublication','imagePublication') and state=='update': state='ready'
     if tab=='imagePublication' and state=='unlisted': state='ready'
@@ -216,6 +220,7 @@ def workbench_page(c, user, *, tab='facts', scope='pending', q='', days=7, date_
 
 
 def workbench_summary(c,user):
+    c.execute("SET LOCAL jit = off")
     cte,args=model(user)
     expr=[]
     for tab in TABS:

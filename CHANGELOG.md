@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1 — 2026-11-16
+
+API 0.26.1 disables PostgreSQL JIT only inside workbench list and summary read transactions. This avoids compilation delays from the expanded multi-market permission queries while preserving filters, counts, database-wide settings and worker behavior. Editor 0.24.0 and SQL 020 remain unchanged.
+
 ## 0.7.0 — 2026-11-16
 
 Editor 0.24.0 and API 0.26.0 add explicit European multi-market plans for DE/FR/ES review sources, targeting DE/FR/ES/IT/NL. One model call produces selected-market listings or a shared image design and localized text table. Operators review and confirm each batch once; one SKU task carries complete, independently versioned market deliveries, reviews, downloads and publication registrations. Existing single-market drafts, versions, permissions and artwork remain compatible. SQL 020 adds side tables without migrating existing products into a plan.
