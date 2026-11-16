@@ -88,33 +88,47 @@ class WorkflowGateway(FeishuGateway):
                 for f in schema["fields"]
                 if (f["name"] in names or f["id"] in names) and f["type"] not in ("formula", "lookup")
             ]
-        rows, page = [], None
+        rows, page, seen_pages, seen_records = [], None, set(), set()
         while True:
             params = {
                 "page_size": 100,
                 "user_id_type": "union_id",
-                "field_names": json.dumps(fields, ensure_ascii=False),
             }
             if page:
                 params["page_token"] = page
             for attempt in range(3):
                 try:
                     data = self.request(
-                        "GET", f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records", params=params, timeout=60
+                        "POST",
+                        f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records/search",
+                        params=params,
+                        json={"field_names": fields, "automatic_fields": False},
+                        timeout=60,
                     )
                     break
                 except (httpx.TimeoutException, httpx.HTTPStatusError) as e:
-                    if (
-                        attempt == 2
-                        or isinstance(e, httpx.HTTPStatusError)
-                        and e.response.status_code not in (429, 500, 502, 503, 504)
-                    ):
+                    retry = isinstance(e, httpx.TimeoutException)
+                    if isinstance(e, httpx.HTTPStatusError):
+                        retry = e.response.status_code in (429, 500, 502, 503, 504)
+                        if e.response.status_code == 400:
+                            try:
+                                retry = e.response.json().get("code") == 1254607
+                            except ValueError:
+                                pass
+                    if attempt == 2 or not retry:
                         raise
                     time.sleep(attempt + 1)
+            ids = [r["record_id"] for r in data["items"]]
+            if len(set(ids)) != len(ids) or seen_records.intersection(ids):
+                raise RuntimeError("Workflow source pagination repeated records")
+            seen_records.update(ids)
             rows.extend({"record_id": r["record_id"], **r["fields"]} for r in data["items"])
             if not data.get("has_more"):
                 return rows
-            page = data["page_token"]
+            page = data.get("page_token")
+            if not page or page in seen_pages:
+                raise RuntimeError("Workflow source pagination did not advance")
+            seen_pages.add(page)
 
     def workflow_update(self, record_id, fields):
         if not re.fullmatch(r"rec[A-Za-z0-9]{6,60}", record_id):

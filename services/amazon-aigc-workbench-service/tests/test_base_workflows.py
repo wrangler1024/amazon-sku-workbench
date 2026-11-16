@@ -431,7 +431,8 @@ def test_paused_provider_skips_reminders_but_keeps_selection(coordinator):
     assert q.gateway.row["审核状态"] == "待审核"
 
 
-def test_bulk_gateway_skips_formulas_and_retries_read_failures(monkeypatch):
+@pytest.mark.parametrize("failure", [503, 1254607])
+def test_bulk_gateway_skips_formulas_and_retries_each_page(monkeypatch, failure):
     import httpx
 
     from amazon_aigc.base_workflows import WorkflowGateway
@@ -446,16 +447,26 @@ def test_bulk_gateway_skips_formulas_and_retries_read_failures(monkeypatch):
         import json
 
         calls.append(request)
-        fields = json.loads(request.url.params["field_names"])
+        assert request.method == "POST"
+        assert request.url.path.endswith("/records/search")
+        body = json.loads(request.content)
+        fields = body["field_names"]
+        assert body["automatic_fields"] is False
         assert "提审公式核对" not in fields
         assert "审核状态" in fields
-        if len(calls) == 1:
-            return httpx.Response(503)
+        page = request.url.params.get("page_token")
+        if len(calls) == 2:
+            assert page == "synthetic-next-page"
+            return httpx.Response(503) if failure == 503 else httpx.Response(400, json={"code": 1254607})
         return httpx.Response(
             200,
             json={
                 "code": 0,
-                "data": {"items": [{"record_id": RID, "fields": {"审核状态": "草稿"}}], "has_more": False},
+                "data": {
+                    "items": [{"record_id": RID + ("2" if page else ""), "fields": {"审核状态": "草稿"}}],
+                    "has_more": not page,
+                    "page_token": "synthetic-next-page" if not page else None,
+                },
             },
         )
 
@@ -464,5 +475,34 @@ def test_bulk_gateway_skips_formulas_and_retries_read_failures(monkeypatch):
     g.token = "synthetic-token"
     g.expires = 9999999999
     monkeypatch.setattr("amazon_aigc.base_workflows.time.sleep", lambda _: None)
-    assert g.records(TEST_TABLE) == [{"record_id": RID, "审核状态": "草稿"}]
+    assert g.records(TEST_TABLE) == [
+        {"record_id": RID, "审核状态": "草稿"},
+        {"record_id": RID + "2", "审核状态": "草稿"},
+    ]
+    assert len(calls) == 3
+
+
+@pytest.mark.parametrize("repeated_records", [True, False])
+def test_bulk_gateway_rejects_nonadvancing_pages(repeated_records):
+    from amazon_aigc.base_workflows import WorkflowGateway
+    from amazon_aigc.config import TEST_BASE, TEST_TABLE
+
+    cfg = config()
+    cfg["base_id"] = TEST_BASE
+    cfg["tables"][0]["id"] = TEST_TABLE
+    s = SimpleNamespace(environment="integration", base_id=TEST_BASE, sku_table_id=TEST_TABLE, feishu_mode="openapi")
+    g = WorkflowGateway(s, cfg)
+    calls = []
+
+    def request(*args, **kwargs):
+        calls.append(kwargs)
+        return {
+            "items": [{"record_id": RID if repeated_records else RID + str(len(calls)), "fields": {}}],
+            "has_more": True,
+            "page_token": "synthetic-repeated-token",
+        }
+
+    g.request = request
+    with pytest.raises(RuntimeError, match="pagination"):
+        g.records(TEST_TABLE)
     assert len(calls) == 2
