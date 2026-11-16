@@ -51,7 +51,7 @@ class WorkflowGateway(FeishuGateway):
     """Separate write surface: existing artwork projection permissions stay intact."""
 
     def __init__(self, s, config, client=None):
-        super().__init__(s, client)
+        super().__init__(s, client if client is not None else httpx.Client())
         self.config = config
         if (
             config["base_id"] != s.base_id
@@ -80,17 +80,37 @@ class WorkflowGateway(FeishuGateway):
 
             collect(self.config["workflows"])
             schema = next(t for t in self.config["tables"] if t["id"] == table_id)
-            fields = [f["name"] for f in schema["fields"] if f["name"] in names or f["id"] in names]
+            # Historical formulas can be expensive across hundreds of rows.
+            # Pending submissions and withdrawals fetch their current formulas
+            # through the per-record path instead of recalculating the full Base.
+            fields = [
+                f["name"]
+                for f in schema["fields"]
+                if (f["name"] in names or f["id"] in names) and f["type"] not in ("formula", "lookup")
+            ]
         rows, page = [], None
         while True:
             params = {
-                "page_size": 200,
+                "page_size": 100,
                 "user_id_type": "union_id",
                 "field_names": json.dumps(fields, ensure_ascii=False),
             }
             if page:
                 params["page_token"] = page
-            data = self.request("GET", f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records", params=params)
+            for attempt in range(3):
+                try:
+                    data = self.request(
+                        "GET", f"/bitable/v1/apps/{self.s.base_id}/tables/{table_id}/records", params=params, timeout=60
+                    )
+                    break
+                except (httpx.TimeoutException, httpx.HTTPStatusError) as e:
+                    if (
+                        attempt == 2
+                        or isinstance(e, httpx.HTTPStatusError)
+                        and e.response.status_code not in (429, 500, 502, 503, 504)
+                    ):
+                        raise
+                    time.sleep(attempt + 1)
             rows.extend({"record_id": r["record_id"], **r["fields"]} for r in data["items"])
             if not data.get("has_more"):
                 return rows
@@ -245,7 +265,7 @@ class Coordinator:
             name = self.rules.field_names.get(f["field_id"])
             if not name:
                 continue
-            identities = f.get("field_identity_value", {}).get("users")
+            identities = (f.get("field_identity_value") or {}).get("users")
             if identities is not None:
                 v = [
                     {"id": u["user_id"]["union_id"], "name": u.get("name", "")}
@@ -265,6 +285,8 @@ class Coordinator:
 
     def dispatch(self, c, row, before, actor, at, cause, changed, added=False, timer=False):
         for w in self.rules.workflows.values():
+            if self.provider_paused(row, w):
+                continue
             if w["trigger"]["type"] == "ReminderTrigger" and not timer:
                 continue
             context = self.rules.initial(w, row, actor, millis(at), self.link)["context"]
@@ -277,6 +299,13 @@ class Coordinator:
                 if self.routing(w) and not value(row.get("插件提交ID")):
                     continue
                 self.queue(c, w, row, actor, at, cause)
+
+    def provider_paused(self, row, workflow):
+        trigger = workflow["trigger"]
+        watched = {x["field_name"] for x in trigger["data"].get("field_watch_info", [])}
+        return value(row.get("制图承接方")) in self.config.get("paused_artwork_providers", []) and (
+            trigger["type"] == "ReminderTrigger" or bool(watched & {"寄样状态", "寄样进度留存"})
+        )
 
     def process_event(self):
         with self.db.connection() as lock:
@@ -333,10 +362,26 @@ class Coordinator:
                                 "SELECT patch FROM base_workflow_operations WHERE record_id=%s AND state='applied' AND created_at>now()-interval '5 minutes'",
                                 (rid,),
                             ).fetchall()
-                            echo = bool(changes) and any(
+                            system_fields = {
+                                f["name"]
+                                for t in self.rules.tables.values()
+                                for f in t["fields"]
+                                if f["type"]
+                                in (
+                                    "created_at",
+                                    "updated_at",
+                                    "created_by",
+                                    "updated_by",
+                                    "formula",
+                                    "lookup",
+                                    "auto_number",
+                                )
+                            }
+                            echo_changes = {k: v for k, v in changes.items() if k not in system_fields}
+                            echo = bool(echo_changes) and any(
                                 all(
                                     k in o["patch"] and self.rules.compare(v, "is", o["patch"][k])
-                                    for k, v in changes.items()
+                                    for k, v in echo_changes.items()
                                 )
                                 for o in ops
                             )
@@ -505,7 +550,7 @@ class Coordinator:
             row = entry["snapshot"]
             for w in self.rules.workflows.values():
                 tr = w["trigger"]
-                if tr["type"] != "ReminderTrigger":
+                if tr["type"] != "ReminderTrigger" or self.provider_paused(row, w):
                     continue
                 d = tr["data"]
                 due = row.get(d["field_name"])

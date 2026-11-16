@@ -4,7 +4,7 @@
 
 ## 配置与边界
 
-设置 `AIGC_WORKFLOW_CONFIG_FILE`，将自己的规则导出文件只读挂载到容器。文件包含 `base_id`、`base_origin`、`record_table`、`timezone`、`tables` 字段 schema、`workflows`、`writable_fields` 和 `identities`。应用凭证沿用服务环境；规则中不存放凭证。真实租户定义、员工映射和生产证据不进入公开仓库。
+设置 `AIGC_WORKFLOW_CONFIG_FILE`，将自己的规则导出文件只读挂载到容器。文件包含 `base_id`、`base_origin`、`record_table`、`timezone`、`tables` 字段 schema、`workflows`、`writable_fields` 和 `identities`。应用凭证沿用服务环境；规则中不存放凭证。真实租户定义、员工映射和生产证据不进入公开仓库。`paused_artwork_providers` 可按承接方暂停寄样校验、寄样通知和制图提醒；选品提审、审核及 ERP 处理继续执行。
 
 运行器只支持新增/修改/条件/日期触发、读取、受限字段更新、分支和个人消息。拒绝 HTTP、任意代码、广播、跨表写入和不在允许列表中的字段。用 `identities` 把导出定义内的旧应用 open_id 映射为经验证的 union_id；不能靠显示姓名猜收件人。
 

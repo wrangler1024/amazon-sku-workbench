@@ -349,7 +349,9 @@ def test_event_option_ids_are_normalized(coordinator):
     q.rules.option_names["syntheticOption"] = "校验中"
     decoded = q.decode_fields([{"field_id": "f1", "field_value": '"syntheticOption"'}])
     assert decoded == {"提交校验状态": "校验中"}
-    assert q.decode_fields([{"field_id": "f1", "field_value": None}]) == {"提交校验状态": None}
+    assert q.decode_fields([{"field_id": "f1", "field_value": None, "field_identity_value": None}]) == {
+        "提交校验状态": None
+    }
 
 
 def test_human_self_review_and_unverified_actor_are_rejected(coordinator):
@@ -408,3 +410,59 @@ def test_handover_invalidates_old_pending_work(coordinator):
     drain(q)
     assert not q.gateway.writes
     assert not q.notify_one()
+
+
+def test_paused_provider_skips_reminders_but_keeps_selection(coordinator):
+    q = coordinator
+    cfg = config("reminder")
+    cfg["paused_artwork_providers"] = ["Synthetic paused provider"]
+    q = Coordinator(q.db, q.gateway, cfg, now=lambda: AT)
+    q.gateway.row["制图承接方"] = "Synthetic paused provider"
+    q.gateway.row["制图截止日期"] = int((AT + timedelta(days=1)).timestamp() * 1000)
+    with q.db.connection() as c:
+        c.execute("INSERT INTO base_workflow_records(record_id,snapshot) VALUES(%s,%s)", (RID, Jsonb(q.gateway.row)))
+    q.reminders()
+    assert not q.run_one()
+    selection = Coordinator(
+        q.db, q.gateway, {**config(), "paused_artwork_providers": ["Synthetic paused provider"]}, now=q.now
+    )
+    enqueue(selection)
+    drain(selection)
+    assert q.gateway.row["审核状态"] == "待审核"
+
+
+def test_bulk_gateway_skips_formulas_and_retries_read_failures(monkeypatch):
+    import httpx
+
+    from amazon_aigc.base_workflows import WorkflowGateway
+    from amazon_aigc.config import TEST_BASE, TEST_TABLE
+
+    cfg = config()
+    cfg["base_id"] = TEST_BASE
+    cfg["tables"][0]["id"] = TEST_TABLE
+    calls = []
+
+    def handle(request):
+        import json
+
+        calls.append(request)
+        fields = json.loads(request.url.params["field_names"])
+        assert "提审公式核对" not in fields
+        assert "审核状态" in fields
+        if len(calls) == 1:
+            return httpx.Response(503)
+        return httpx.Response(
+            200,
+            json={
+                "code": 0,
+                "data": {"items": [{"record_id": RID, "fields": {"审核状态": "草稿"}}], "has_more": False},
+            },
+        )
+
+    s = SimpleNamespace(environment="integration", base_id=TEST_BASE, sku_table_id=TEST_TABLE, feishu_mode="openapi")
+    g = WorkflowGateway(s, cfg, client=httpx.Client(transport=httpx.MockTransport(handle)))
+    g.token = "synthetic-token"
+    g.expires = 9999999999
+    monkeypatch.setattr("amazon_aigc.base_workflows.time.sleep", lambda _: None)
+    assert g.records(TEST_TABLE) == [{"record_id": RID, "审核状态": "草稿"}]
+    assert len(calls) == 2
