@@ -17,11 +17,11 @@
       "tag": "api/v0.25.0"
     },
     "fbacc": {
-      "version": "0.3.0",
+      "version": "0.3.1",
       "path": "services/amazon-fbacc",
-      "tag": "fbacc/v0.3.0",
+      "tag": "fbacc/v0.3.1",
       "monitor_version": "0.2.0",
-      "rate_snapshot": "2026-10-31.2"
+      "rate_snapshot": "2026-11-16.1"
     },
     "mail": {
       "version": "0.13.1",

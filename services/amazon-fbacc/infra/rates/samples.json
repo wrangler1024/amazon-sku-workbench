@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-10-31",
+  "reviewedAt": "2026-11-16",
   "samples": [
     {
       "id": "AU-50g-reference",
@@ -921,6 +921,210 @@
         "description": "Independent published non-frozen/ordinary-goods worked example checked 2026-10-31."
       },
       "boundary": false
+    },
+    {
+      "id": "DE-fuel-2026-11-01",
+      "request": {
+        "marketplace": "DE",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-01",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 243
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
+    },
+    {
+      "id": "DE-fuel-2026-11-02",
+      "request": {
+        "marketplace": "DE",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-02",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 244
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
+    },
+    {
+      "id": "FR-fuel-2026-11-01",
+      "request": {
+        "marketplace": "FR",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-01",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 282
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
+    },
+    {
+      "id": "FR-fuel-2026-11-02",
+      "request": {
+        "marketplace": "FR",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-02",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 284
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
+    },
+    {
+      "id": "ES-fuel-2026-11-01",
+      "request": {
+        "marketplace": "ES",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-01",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 291
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
+    },
+    {
+      "id": "ES-fuel-2026-11-02",
+      "request": {
+        "marketplace": "ES",
+        "price": {
+          "amount": 25,
+          "currency": "EUR"
+        },
+        "package": {
+          "dimensions": {
+            "length": 20,
+            "width": 15,
+            "height": 1,
+            "unit": "cm"
+          },
+          "weight": {
+            "value": 50,
+            "unit": "g"
+          }
+        },
+        "saleDate": "2026-11-02",
+        "category": "general"
+      },
+      "expected": {
+        "status": "estimated",
+        "totalMinorUnits": 293
+      },
+      "reference": {
+        "kind": "official_table",
+        "url": "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+        "description": "Official July rate card p6 50g envelope base plus dated 1.5%/2% surcharge from the official November 2 help notice; rounded once to cents."
+      },
+      "boundary": true
     }
   ]
 }

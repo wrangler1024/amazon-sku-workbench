@@ -1,6 +1,6 @@
 # FBACC 独立模块
 
-`services/amazon-fbacc`将计算器、HTTP API、网页和费率核验工具放在同一模块内，独立于编辑后台的Python进程、数据库、飞书身份和商品数据。当前应用版本0.3.0、核验工具0.2.0、费率快照2026-10-31.2；来源为原公开仓库的确定提交，详见[来源记录](../services/amazon-fbacc/UPSTREAM.md)。
+`services/amazon-fbacc`将计算器、HTTP API、网页和费率核验工具放在同一模块内，独立于编辑后台的Python进程、数据库、飞书身份和商品数据。当前应用版本0.3.1、核验工具0.2.0、费率快照2026-11-16.1；来源为原公开仓库的确定提交，详见[来源记录](../services/amazon-fbacc/UPSTREAM.md)。
 
 ## 本地使用
 
@@ -40,7 +40,7 @@ node infra/rates/verify-samples.mjs . infra/rates/samples.json
 
 ```sh
 # 必须先提交需要发布的代码，再打包指定提交或标签
-npm run package:fbacc -- fbacc/v0.3.0
+npm run package:fbacc -- fbacc/v0.3.1
 ```
 
 输出在`dist/packages`，包含模块根目录结构的`.tar.gz`、SHA-256及来源commit清单。只导出指定Git提交，不夹带工作区私有配置，也不包含未提交修改。可在全新目录解压后独立测试、启动；不要将monorepo整体归档交给模块安装器。

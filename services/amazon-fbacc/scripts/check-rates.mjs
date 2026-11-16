@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import book from '../rates/2026-10-31.2.json' with {type:'json'};
+import book from '../rates/2026-11-16.1.json' with {type:'json'};
 
 const expected = ['AU','US','CA','MX','UK','DE','FR','IT','ES','NL','SE','PL','BE','IE','AE','SA','JP'];
 assert.deepEqual(Object.keys(book.markets).sort(),expected.sort());
@@ -9,10 +9,17 @@ for (const [code,m] of Object.entries(book.markets)) {
   assert.ok(m.version && m.effectiveFrom && m.verifiedAt,code);
   assert.ok(['AUD','USD','CAD','MXN','GBP','EUR','SEK','PLN','AED','SAR','JPY'].includes(m.currency),code);
   assert.ok(Number.isFinite(m.dimensionalDivisor) && m.dimensionalDivisor > 0,code);
+  let previousFuelDate = '';
+  for (const period of m.fuel ? [m.fuel, ...(m.fuel.changes ?? [])] : []) {
+    assert.match(period.from, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(period.from > previousFuelDate, `${code} ascending fuel effective dates`);
+    assert.ok(Number.isSafeInteger(period.basisPoints) && period.basisPoints >= 0 && period.basisPoints <= 10000);
+    previousFuelDate = period.from;
+  }
   for (const s of m.sources) {
     const url = new URL(s.url);
     assert.equal(url.protocol,'https:');
-    assert.match(url.hostname,/(?:^|\.)(?:amazon\.(?:com(?:\.au|\.mx)?|ca|co\.uk|ae|sa|co\.jp)|media-amazon\.com)$/);
+    assert.match(url.hostname,/(?:^|\.)(?:amazon\.(?:com(?:\.au|\.mx)?|ca|co\.uk|de|fr|es|ae|sa|co\.jp)|media-amazon\.com)$/);
   }
   assert.equal(new Set(m.tiers.map(t=>t.id)).size,m.tiers.length,code);
   for (const t of m.tiers) {

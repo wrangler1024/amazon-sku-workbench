@@ -102,7 +102,7 @@ test("request IDs are unique; structured logs omit bodies, query strings and aut
     first.headers.get("x-request-id"),
     second.headers.get("x-request-id"),
   );
-  assert.equal(second.headers.get("x-fba-rate-version"), "2026-10-31.2");
+  assert.equal(second.headers.get("x-fba-rate-version"), "2026-11-16.1");
   assert.equal(logs.length, 2);
   assert.equal(logs[0].route, "unknown");
   assert.doesNotMatch(JSON.stringify(logs), /PRIVATE_|secret|authorization/);

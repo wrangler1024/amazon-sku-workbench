@@ -29,3 +29,21 @@
 - JP: [current non-frozen fees](https://sellercentral.amazon.co.jp/help/hub/reference/external/201112670), [size-tier limits](https://sellercentral.amazon.co.jp/help/hub/reference/external/G201105770), [dated2026-04-01 changes](https://sellercentral.amazon.co.jp/help/hub/reference/external/GRH54FUTD3C5LWWW), [public pricing](https://sell.amazon.co.jp/pricing). All22 fee rows match the dated change table. The dated/current help tables take priority over old marketing examples. Standard individual-side limits and three-side sums are both enforced; supersize supports the officially listed400cm/50kg band, with250cm longest-side limit. Frozen fees are excluded. Charges include10% consumption tax. JPY uses exponent0 and totalMinorUnits is whole yen.
 
 The publisher stores raw help responses/pricing pages locally outside Git. `scripts/build-ae-sa-jp.py` rebuilds the additional numeric data from reviewed extracted tables and cross-checks the Japanese change table. The original14 market definitions are preserved byte-for-byte as JSON values. Existing business registries are not migrated or written.
+
+## Europe surcharge review (2026-11-16.1)
+
+The July 2026 official PDF remains the base domestic rate source. Its April fuel
+footnote is superseded from 2026-11-02 by the [current official fulfilment help
+notice](https://sellercentral.amazon.de/help/hub/reference/external/G200209150?locale=en-GB):
+the surcharge increases from 1.5% to 2% in all ten European stores. The new snapshot
+retains the original base tables and adds the dated surcharge change, including
+low-price and DE/UK peak fees. Earlier dates still use 1.5%. DE defaults to
+Germany-only pricing; CEP requires explicit selection. FR and ES do not inherit
+German peak fees. EUR prices include only domestic FBA fulfilment plus the applicable
+fuel surcharge; VAT, EFN/Pan-EU and other charges are outside this estimate.
+
+The DE/FR/ES regression cases independently use the official PDF pages 5–7,
+including 11/12 EUR conservative low-price boundaries and separate DE CEP columns.
+Non-European market data and all base fee tables are unchanged. The source monitor
+now tracks the dated surcharge notice in addition to the PDF. Monitoring remains
+manual unless separately enabled by an operator.
