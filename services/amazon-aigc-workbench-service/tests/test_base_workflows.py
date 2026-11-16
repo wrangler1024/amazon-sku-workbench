@@ -354,6 +354,53 @@ def test_event_option_ids_are_normalized(coordinator):
     }
 
 
+@pytest.mark.parametrize("real_decision", [False, True])
+def test_full_snapshot_only_authorizes_changed_review_decisions(coordinator, real_decision):
+    import json
+
+    q = Coordinator(coordinator.db, coordinator.gateway, config("approval"), now=coordinator.now)
+    q.gateway.row["审核状态"] = "审核通过"
+    q.seed()
+    payload = event(q)
+    action = payload["event"]["action_list"][0]
+    action["before_value"] = [
+        {"field_id": "f0", "field_value": json.dumps("草稿" if real_decision else "审核通过")},
+        {"field_id": "f7", "field_value": json.dumps("制图中")},
+    ]
+    action["after_value"] = [
+        {"field_id": "f0", "field_value": json.dumps("审核通过")},
+        {"field_id": "f7", "field_value": json.dumps("待验收")},
+    ]
+    q.gateway.row["制图状态"] = "待验收"
+    authorized = []
+    q.authorize_decision = lambda row, actor: authorized.append(actor)
+    assert q.ingest(payload) and q.process_event()
+    assert authorized == ([OWNER[0]["id"]] if real_decision else [])
+    drain(q)
+    assert q.gateway.row.get("ERP录入状态") == ("待录入" if real_decision else None)
+    assert q.notify_one() == real_decision
+
+
+def test_null_event_serial_does_not_block_current_submission(coordinator):
+    cfg = config()
+    cfg["tables"][0]["fields"].append({"id": "synthetic_serial", "name": "记录序号", "type": "auto_number"})
+    cfg["workflows"][0]["steps"][1]["data"]["filter_info"] = {
+        "conditions": [{"field_name": "记录序号", "operator": "is", "value": [
+            {"value_type": "ref", "value": "$.tr.synthetic_serial"},
+        ]}],
+    }
+    q = Coordinator(coordinator.db, coordinator.gateway, cfg, now=coordinator.now)
+    q.gateway.row["记录序号"] = "SYN-001"
+    payload = event(q)
+    payload["event"]["action_list"][0]["after_value"].append(
+        {"field_id": "synthetic_serial", "field_value": "null"}
+    )
+    assert q.ingest(payload) and q.process_event()
+    drain(q)
+    assert q.gateway.row["审核状态"] == "待审核"
+    assert q.notify_one()
+
+
 def test_human_self_review_and_unverified_actor_are_rejected(coordinator):
     with pytest.raises(PermissionError):
         coordinator.authorize_decision(coordinator.gateway.row, OWNER[0]["id"])

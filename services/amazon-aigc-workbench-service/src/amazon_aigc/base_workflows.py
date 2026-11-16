@@ -370,7 +370,13 @@ class Coordinator:
                     before = saved["snapshot"] if saved else {"record_id": rid}
                     before = {**before, **self.decode_fields(action.get("before_value", []))}
                     after = {**before, **self.decode_fields(action.get("after_value", [])), "record_id": rid}
-                    changes = self.decode_fields(action.get("after_value", []))
+                    # OpenAPI updates can include full before/after snapshots.
+                    # Only changed cells represent a new decision or watched edit.
+                    changes = {
+                        k: v
+                        for k, v in self.decode_fields(action.get("after_value", [])).items()
+                        if not self.rules.compare(before.get(k), "is", v)
+                    }
                     # Read formulas and values omitted from the event, but retain the
                     # event's historical version for guards against a newer submit.
                     current = self.gateway.record(rid)
@@ -380,10 +386,11 @@ class Coordinator:
                     if value(row.get("提交校验状态")) == "校验中" and "提交校验状态" in changes:
                         row["__submission_at"] = event["occurred_at"].isoformat()
                         row["__submission_actor"] = actor
-                    # Derived formula fields are never present in change payloads.
+                    # Derived fields and immutable serials may be null in full
+                    # event snapshots; read them from the authoritative record.
                     for t in self.rules.tables.values():
                         for f in t["fields"]:
-                            if f["type"] in ("formula", "lookup"):
+                            if f["type"] in ("formula", "lookup", "auto_number"):
                                 row[f["name"]] = current.get(f["name"])
                     with self.db.connection() as c:
                         echo = False
