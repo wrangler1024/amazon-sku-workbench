@@ -11,6 +11,8 @@ const sources: Record<string, string> = {
   AU: "https://sell.amazon.com.au/pricing", AE: "https://sell.amazon.ae/pricing",
   SA: "https://sell.amazon.sa/pricing", JP: "https://sell.amazon.co.jp/pricing",
   DE: "https://sell.amazon.de/preisgestaltung",
+  FR: "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
+  ES: "https://m.media-amazon.com/images/G/02/sell/images/260630-FBA-Rate-Card-EN1.pdf",
 };
 
 export const FBA_ENDPOINT = import.meta.env.DEV ? "/__ae-fba/v1/fba/calculate-batch"
@@ -58,7 +60,7 @@ export function fbaRequest(request: CardRequest, date: string) {
     package: { dimensions: { length, width, height, unit: "cm" },
       weight: { value: request.unitWeightG, unit: "g" } },
     saleDate: date, category: "general", program: "domestic",
-    ...(["UK", "DE"].includes(request.site) ? { options: { lowPriceEligibility: "conservative",
+    ...(["UK", "DE", "FR", "ES"].includes(request.site) ? { options: { lowPriceEligibility: "conservative",
       ...(request.site === "DE" ? { centralEuropeProgram: false } : {}) } } : {}) };
 }
 
@@ -91,7 +93,7 @@ function parseResult(value: unknown, date: string, request: CardRequest): CardEs
     !["regular", "low_price", ...(["CA", "US", "UK", "DE"].includes(request.site) ? ["peak"] : [])].includes(String(classification.plan)) ||
     typeof result.rateVersion !== "string" || !result.rateVersion)
     throw new Error("预估服务返回的金额或计重格式异常");
-  if (["UK", "DE"].includes(request.site)) {
+  if (["UK", "DE", "FR", "ES"].includes(request.site)) {
     const assumptions = object(result.assumptions);
     if ((request.site === "DE" && assumptions.centralEuropeProgram !== false) ||
       assumptions.lowPriceEligibility !== "conservative" || result.program !== "domestic")

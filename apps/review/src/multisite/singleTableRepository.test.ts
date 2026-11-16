@@ -22,7 +22,7 @@ const main = {
   getFieldMetaList: async () => schemaFields.map((name) => ({ name, id: name })),
   getRecords: async () => ({ records: store.rows, hasMore: false }),
   getFieldById: async () => ({ getOptions: async () =>
-    ["CA", "AU", "AE", "SA", "JP", "DE", "标准", "未排查", "无风险", "草稿", "未提交", "一部一组", "高"]
+    ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE", "FR", "ES", "标准", "未排查", "无风险", "草稿", "未提交", "一部一组", "高"]
       .map((name) => ({ name, id: name })) }),
   addRecord: async ({ fields }: { fields: Record<string, unknown> }) => {
     const recordId = `record-${store.rows.length + 1}`;
@@ -45,7 +45,7 @@ vi.mock("@lark-opdev/block-bitable-api", () => ({
       getFieldMetaList: async () => ["站点", "档位名称", "最长边上限(cm)",
         "中间边上限(cm)", "最短边上限(cm)", "实重上限(g)", "规则来源",
         "排序", "启用"].map((field) => ({ name: field, id: field })),
-      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE"]
+      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE", "FR", "ES"]
         .map((site) => ({ recordId: `size-${site}`, fields: {
           "站点": { id: site, text: site }, "档位名称": "信封档",
           "最长边上限(cm)": 38, "中间边上限(cm)": 27,
@@ -82,7 +82,7 @@ beforeEach(() => {
 });
 
 describe("单表选品评审", () => {
-  it.each([["SA", "SAR"], ["JP", "JPY"], ["DE", "EUR"]] as const)("%s 草稿在财务缺失时仍以本币保存并回读", async (site, currency) => {
+  it.each([["SA", "SAR"], ["JP", "JPY"], ["DE", "EUR"], ["FR", "EUR"], ["ES", "EUR"]] as const)("%s 草稿在财务缺失时仍以本币保存并回读", async (site, currency) => {
     const id = await saveSiteDraft({ ...newSiteDraft(site), productName: "扩站验收草稿",
       referenceAsins: "B0TEST0005", listedPrice: 1200, fbaFeeLocal: 252 }, access, null);
     const loaded = await loadSiteDashboard();

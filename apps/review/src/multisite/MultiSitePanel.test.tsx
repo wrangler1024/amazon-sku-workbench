@@ -85,6 +85,7 @@ describe("多站点草稿入口", () => {
     ["UK", "GBP", 1.93, "light-envelope"], ["US", "USD", 3.63, "small-standard"],
     ["AU", "AUD", 4.55, "small-envelope"], ["SA", "SAR", 7.5, "small-envelope"],
     ["JP", "JPY", 288, "jp-small"],
+    ["FR", "EUR", 2.84, "light-envelope"], ["ES", "EUR", 2.93, "light-envelope"],
   ] as const)("%s 后端预估不覆盖手填费用，保存仍使用人工值且不读取旧费率表", async (site, currency, total, tier) => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered(site));
     const fetch = vi.fn(async (_url: string, options: RequestInit) => {

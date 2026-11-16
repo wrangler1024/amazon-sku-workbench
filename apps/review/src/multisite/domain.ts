@@ -9,6 +9,8 @@ export const MARKETPLACES = {
   SA: { label: "沙特", currency: "SAR" },
   JP: { label: "日本", currency: "JPY" },
   DE: { label: "德国", currency: "EUR" },
+  FR: { label: "法国", currency: "EUR" },
+  ES: { label: "西班牙", currency: "EUR" },
 } as const;
 
 export type Marketplace = keyof typeof MARKETPLACES;

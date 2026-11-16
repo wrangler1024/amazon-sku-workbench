@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseReferenceAsins } from "./referenceAsins";
 
 describe("参考 ASIN 跳转", () => {
-  it.each([['CA','amazon.ca'],['MX','amazon.com.mx'],['UK','amazon.co.uk'],['US','amazon.com'],['AU','amazon.com.au'],['AE','amazon.ae'],['SA','amazon.sa'],['JP','amazon.co.jp'],['DE','amazon.de']] as const)("纯 ASIN 使用 %s 目标站点", (site, domain) => {
+  it.each([['CA','amazon.ca'],['MX','amazon.com.mx'],['UK','amazon.co.uk'],['US','amazon.com'],['AU','amazon.com.au'],['AE','amazon.ae'],['SA','amazon.sa'],['JP','amazon.co.jp'],['DE','amazon.de'],['FR','amazon.fr'],['ES','amazon.es']] as const)("纯 ASIN 使用 %s 目标站点", (site, domain) => {
     expect(parseReferenceAsins('b0test0005', site).links[0].href).toBe(`https://www.${domain}/dp/B0TEST0005`);
   });
   it("兼容中英文分隔符并按站点和 ASIN 去重", () => {
