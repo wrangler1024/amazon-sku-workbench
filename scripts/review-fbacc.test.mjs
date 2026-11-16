@@ -65,7 +65,7 @@ test('review adapter calculates through FBACC proxy and preserves manual-quote r
   assert.equal(results[3].reference.plan, '旺季');
   assert.deepEqual(inputs, before, 'The calculator must not overwrite manual costs');
 
-  const sites = ['CA', 'MX', 'UK', 'US', 'AU', 'AE', 'SA', 'JP', 'DE'];
+  const sites = ['CA', 'MX', 'UK', 'US', 'AU', 'AE', 'SA', 'JP', 'DE', 'FR', 'ES'];
   for (const site of sites) assert.equal(usesRemoteFba(site), true);
   const reviewInput = request => ({ site: request.marketplace, category: '普通商品',
     price: request.price.amount, unitWeightG: request.package.weight.value,

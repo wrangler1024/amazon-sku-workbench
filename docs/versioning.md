@@ -2,7 +2,7 @@
 
 ## 单仓库、独立组件、组合发布
 
-- 评审前端：`apps/review/package.json`，tag `review/v0.73.0`。
+- 评审前端：`apps/review/package.json`，tag `review/v0.74.0`。
 - 编辑前端：`apps/editor/package.json`，tag `editor/v0.23.0`。
 - 后台服务：`pyproject.toml`与`amazon_aigc.__version__`，tag `api/v0.25.0`。
 - FBACC：`services/amazon-fbacc/package.json`与`src/index.mjs`，tag `fbacc/v0.3.1`。核验工具版本单独记录于`infra/rates/VERSION`（0.2.0），费率快照为2026-11-16.1；三个版本各自描述代码、工具和规则，不能混用。

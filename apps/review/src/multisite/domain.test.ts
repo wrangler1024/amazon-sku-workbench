@@ -51,22 +51,22 @@ const draft = {
 };
 
 describe("site tax and contribution", () => {
-  it("德国含税售价以19%拆税，EUR成本、买家标价佣金和6000头程独立计算", () => {
-    const input = { ...draft, site: "DE" as const, listedPrice: 119, fbaFeeLocal: 3.68,
+  it.each([["DE", .19, 119], ["FR", .20, 120], ["ES", .21, 121]] as const)("%s 按本站标准税率拆含税售价，EUR成本、买家标价佣金和6000头程独立计算", (site, salesTaxRate, listedPrice) => {
+    const input = { ...draft, site, listedPrice, fbaFeeLocal: 3.68,
       purchaseCny: 14.9098, lengthCm: 20, widthCm: 15, heightCm: 10, unitWeightG: 200 };
-    const deTax = { ...tax, site: "DE" as const, currency: "EUR", salesTaxRate: .19,
+    const deTax = { ...tax, site, currency: "EUR", salesTaxRate,
       priceIncludesTax: true, incomeTaxWithholdingRate: 0, feeTaxRate: 0 };
-    const deFinance = { ...finance, site: "DE" as const, currency: "EUR", cnyPerCurrency: 7.4549,
+    const deFinance = { ...finance, site, currency: "EUR", cnyPerCurrency: 7.4549,
       headhaulCnyPerKg: 45, volumeDivisorCm3PerKg: 6000, referralRate: .15,
       referralBasis: "买家标价" as const, adRate: .1, returnLossRate: .03, storageLossRate: .015,
       promotionRate: .01, settlementLossRate: .005, targetContributionRate: .25 };
     const result = calculateSite(input, deTax, deFinance, [])!;
     expect(result.netRevenueLocal).toBeCloseTo(100);
-    expect(result.salesTaxLocal).toBeCloseTo(19);
+    expect(result.salesTaxLocal).toBeCloseTo(listedPrice - 100);
     expect(result.shippingWeightG).toBe(500);
     expect(result.headhaulLocal).toBeCloseTo(22.5 / 7.4549);
-    expect(result.referralFeeEconomicLocal).toBeCloseTo(17.85);
-    expect(result.contributionLocal).toBeCloseTo(84 - 17.85 - 2 - 22.5 / 7.4549 - 3.68);
+    expect(result.referralFeeEconomicLocal).toBeCloseTo(listedPrice * .15);
+    expect(result.contributionLocal).toBeCloseTo(84 - listedPrice * .15 - 2 - 22.5 / 7.4549 - 3.68);
     expect(submissionProblems(input, deTax, deFinance, result)).toEqual([]);
     expect(calculateSite(input, deTax, { ...deFinance, approved: false }, [])).toBeNull();
   });

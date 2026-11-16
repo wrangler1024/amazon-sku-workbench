@@ -1,5 +1,11 @@
 # Changelog
 
+## Review 0.74.0
+
+- Add France and Spain review entry with EUR, marketplace-correct ASIN links and FBACC domestic reference estimates; all eleven review marketplaces share the backend.
+- Preserve conservative €12 eligibility, explicit quote results and the separation between manual costs and reference fees. France/Spain do not inherit Germany-only CEP or peak assumptions.
+- Validate site-specific VAT calculations, EUR response isolation, draft persistence, manual cost protection and reviewed fee references.
+
 ## Review 0.73.0
 
 - Route all nine review marketplaces, quick size references and packaging comparisons through FBACC. Stop loading legacy FBA rate tables; unavailable or conflicting estimates stay explicit and retryable.
