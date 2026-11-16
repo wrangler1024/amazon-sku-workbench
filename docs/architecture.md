@@ -19,7 +19,7 @@
 ```mermaid
 flowchart LR
   Review[选品评审前端] --> Base[飞书选品表/公式/自动化]
-  Review -->|AE参考预估| FBACC[独立FBACC API]
+  Review -->|AE/DE参考预估| FBACC[独立FBACC API]
   FBACC --> Rates[已核验费率快照]
   Editor[编辑与制图前端] --> API[后台业务API]
   API --> DB[(PostgreSQL)]
@@ -34,7 +34,7 @@ flowchart LR
   Mail --> MailIdentity[独立飞书认证及授权通知]
 ```
 
-FBACC 位于 `services/amazon-fbacc`，保留纯函数、网页和独立 HTTP 服务三种使用方式。当前评审适配器只将 AE 参考预估接入该 API；17站计算能力不等于评审台已接入全部17站。人工填写的费用和历史利润不由预估结果覆盖。日后评审服务化可以复用这个稳定接口，无需把计算逻辑并入业务数据库。费率监测只产生待审核资料，不能自动批准新费率。
+FBACC 位于 `services/amazon-fbacc`，保留纯函数、网页和独立 HTTP 服务三种使用方式。当前评审适配器将 AE 和 DE 参考预估接入该 API；17站计算能力不等于评审台已接入全部17站。人工填写的费用和历史利润不由预估结果覆盖。日后评审服务化可以复用这个稳定接口，无需把计算逻辑并入业务数据库。费率监测只产生待审核资料，不能自动批准新费率。
 
 云邮箱位于`services/store-mail-web`，前端静态资源和后端同包发布；没有新增`apps/mail`或重写为React。它使用自己的账号、整邮箱授权、SQLite、通知队列和加密主密钥，不继承编辑台会话或岗位权限。本次只集成代码与版本管理，统一入口、身份映射和数据库迁移均为后续事项，见[云邮箱集成边界](cloud-mail.md)。
 

@@ -5,7 +5,7 @@ import type { CardEstimate, CardRequest } from "./rateCards";
 
 const fetchEstimates = vi.hoisted(() => vi.fn());
 vi.mock("./aeFbaService", async importOriginal => ({
-  ...await importOriginal<typeof import("./aeFbaService")>(), fetchAeEstimates: fetchEstimates,
+  ...await importOriginal<typeof import("./aeFbaService")>(), fetchFbaEstimates: fetchEstimates,
 }));
 const request: CardRequest = { site: "AE", category: "普通商品", price: 12,
   dimensionsCm: [12, 5, 1], unitWeightG: 33, saleDate: 0 };
@@ -16,6 +16,19 @@ beforeEach(() => { vi.useFakeTimers(); fetchEstimates.mockReset().mockResolvedVa
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe("异步FBA参考测算", () => {
+  it("切换德国时取消阿联酋旧响应，用德国包装和日期请求服务", async () => {
+    const resolvers: Array<(value: CardEstimate[]) => void> = [];
+    fetchEstimates.mockImplementation(() => new Promise(resolve => resolvers.push(resolve)));
+    const { result, rerender } = renderHook(({ input }) => useFbaReference([], input, "2026-11-16"),
+      { initialProps: { input: request } });
+    await advance();
+    rerender({ input: { ...request, site: "DE", price: 25 } });
+    expect(fetchEstimates.mock.calls[0][2].aborted).toBe(true);
+    await advance();
+    expect(fetchEstimates.mock.calls[1][0][0].site).toBe("DE");
+    await act(async () => { resolvers[1]([matched(2.44)]); resolvers[0]([matched(5.5)]); });
+    expect(result.current.estimate.fee).toBe(2.44);
+  });
   it("350ms防抖；缺少输入和其他站点不请求AE服务", async () => {
     const { result, rerender } = renderHook(({ input }) => useFbaReference([], input, "2026-11-02"),
       { initialProps: { input: { ...request, price: 0 } } });

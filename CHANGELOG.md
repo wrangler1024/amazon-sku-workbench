@@ -1,5 +1,12 @@
 # Changelog
 
+## Review 0.72.0 / FBACC 0.3.1
+
+- Add DE/EUR review entry, Amazon.de references and date-aware domestic FBA estimates through FBACC; manual FBA costs stay authoritative. Preserve the released draft identity confirmation when changing products.
+- Apply the official European 2% fuel surcharge from 2026-11-02 while retaining earlier rates, German CEP/peak distinctions, and existing non-European tables.
+- Validate DE financial calculations, proxy integration, response assumptions and cross-market async cancellation with synthetic fixtures.
+
+
 ## 0.6.0
 
 - API 0.25.0：新增可独立启用的 Base 事件处理进程，接管经过审核的提审、结果处理、时间、撤回、寄样、ERP 校验与截止提醒规则。

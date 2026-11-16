@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  calculateSite, EMPTY_SITE_DRAFT, MARKETPLACES, submissionProblems,
+  calculateSite, draftProductIdentityChanged, EMPTY_SITE_DRAFT, MARKETPLACES, submissionProblems,
   type FbaRateRule, type FinanceProfile, type TaxProfile,
 } from "./domain";
 
@@ -51,6 +51,39 @@ const draft = {
 };
 
 describe("site tax and contribution", () => {
+  it("德国含税售价以19%拆税，EUR成本、买家标价佣金和6000头程独立计算", () => {
+    const input = { ...draft, site: "DE" as const, listedPrice: 119, fbaFeeLocal: 3.68,
+      purchaseCny: 14.9098, lengthCm: 20, widthCm: 15, heightCm: 10, unitWeightG: 200 };
+    const deTax = { ...tax, site: "DE" as const, currency: "EUR", salesTaxRate: .19,
+      priceIncludesTax: true, incomeTaxWithholdingRate: 0, feeTaxRate: 0 };
+    const deFinance = { ...finance, site: "DE" as const, currency: "EUR", cnyPerCurrency: 7.4549,
+      headhaulCnyPerKg: 45, volumeDivisorCm3PerKg: 6000, referralRate: .15,
+      referralBasis: "买家标价" as const, adRate: .1, returnLossRate: .03, storageLossRate: .015,
+      promotionRate: .01, settlementLossRate: .005, targetContributionRate: .25 };
+    const result = calculateSite(input, deTax, deFinance, [])!;
+    expect(result.netRevenueLocal).toBeCloseTo(100);
+    expect(result.salesTaxLocal).toBeCloseTo(19);
+    expect(result.shippingWeightG).toBe(500);
+    expect(result.headhaulLocal).toBeCloseTo(22.5 / 7.4549);
+    expect(result.referralFeeEconomicLocal).toBeCloseTo(17.85);
+    expect(result.contributionLocal).toBeCloseTo(84 - 17.85 - 2 - 22.5 / 7.4549 - 3.68);
+    expect(submissionProblems(input, deTax, deFinance, result)).toEqual([]);
+    expect(calculateSite(input, deTax, { ...deFinance, approved: false }, [])).toBeNull();
+  });
+  it("detects a different product only when a completed identity field changes", () => {
+    const current = { entitySku: "NEW-SKU", productName: "产品 B", sourceUrl: "https://example.com/b" };
+    const repriced = { ...draft, listedPrice: 200 };
+    const replaced = { ...draft, ...current };
+    expect(draftProductIdentityChanged(draft, { ...draft, productName: "产品 B" })).toBe(true);
+    expect(draftProductIdentityChanged(draft, { ...draft, entitySku: "NEW-SKU" })).toBe(true);
+    expect(draftProductIdentityChanged(draft, { ...draft, sourceUrl: "https://example.com/b" })).toBe(true);
+    expect(draftProductIdentityChanged({ ...draft, entitySku: "" },
+      { ...draft, entitySku: "NEW-SKU" })).toBe(false);
+    expect(draftProductIdentityChanged(draft, { ...draft, entitySku: " demo-item-005 " })).toBe(false);
+    expect(draftProductIdentityChanged(draft, repriced)).toBe(false);
+    expect(draftProductIdentityChanged(draft, replaced)).toBe(true);
+  });
+
   it.each(["SA", "JP"] as const)("%s 已填完整但未确认的财务参数不计算也不提审", (site) => {
     const input = { ...draft, site, fbaFeeLocal: 5 };
     const terms = { ...finance, site, headhaulCnyPerKg: 45, approved: false };

@@ -10,7 +10,7 @@ vi.mock("@lark-opdev/block-bitable-api", () => ({
       getFieldMetaList: async () => ["站点", "启用", "排序", "档位名称", "最长边上限(cm)",
         "中间边上限(cm)", "最短边上限(cm)", "实重上限(g)", "规则来源"]
         .map((id) => ({ id, name: id })),
-      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP"]
+      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE"]
         .map((site) => ({ recordId: site, fields: { "站点": site, "启用": true,
           "档位名称": "参考档", "最长边上限(cm)": 38, "中间边上限(cm)": 27,
           "最短边上限(cm)": 2, "实重上限(g)": 500 } })) }),

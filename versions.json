@@ -2,9 +2,9 @@
   "bundle": "0.6.0",
   "components": {
     "review": {
-      "version": "0.70.2",
+      "version": "0.72.0",
       "path": "apps/review",
-      "tag": "review/v0.70.2"
+      "tag": "review/v0.72.0"
     },
     "editor": {
       "version": "0.23.0",

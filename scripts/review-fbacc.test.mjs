@@ -28,6 +28,9 @@ test('review adapter calculates through FBACC proxy and preserves manual-quote r
     configFile: fileURLToPath(new URL('../apps/review/vite.config.ts', import.meta.url)),
     server: { host: '127.0.0.1', port: 0, open: false },
     logLevel: 'error',
+    // SSR adapter tests do not need the browser dependency scanner; letting it
+    // run here races test teardown and emits a spurious closed-server error.
+    optimizeDeps: { noDiscovery: true, include: [] },
   });
   t.after(() => vite.close());
   await vite.listen();
@@ -43,6 +46,8 @@ test('review adapter calculates through FBACC proxy and preserves manual-quote r
   const inputs = [
     { site: 'AE', category: '普通商品', price: 12, unitWeightG: 33, dimensionsCm: [12, 5, 1], fbaFeeLocal: 6.25 },
     { site: 'AE', category: '普通商品', price: 25.01, unitWeightG: 200, dimensionsCm: [30, 20, 5], fbaFeeLocal: 9 },
+    { site: 'DE', category: '普通商品', price: 25, unitWeightG: 50, dimensionsCm: [20, 15, 1], fbaFeeLocal: 4.99 },
+    { site: 'DE', category: '普通商品', price: 25, unitWeightG: 900, dimensionsCm: [20, 10, 7], fbaFeeLocal: 5.99 },
   ];
   const before = structuredClone(inputs);
   const results = await fetchAeEstimates(inputs, '2026-11-02', new AbortController().signal);
@@ -53,5 +58,9 @@ test('review adapter calculates through FBACC proxy and preserves manual-quote r
   assert.equal(results[1].status, 'quote_required');
   assert.match(results[1].reason, /官方费率存在差异/);
   assert.equal(results[1].fee, undefined);
+  assert.equal(results[2].fee, 2.44);
+  assert.equal(results[2].reference.version, RATE_VERSION);
+  assert.equal(results[3].fee, 3.68);
+  assert.equal(results[3].reference.plan, '旺季');
   assert.deepEqual(inputs, before, 'The calculator must not overwrite manual costs');
 });
