@@ -251,7 +251,12 @@ class Coordinator:
         return (
             w["trigger"]["type"] == "ChangeRecordTrigger"
             and any(
-                s["type"] == "SetRecordAction" and any(v["field_name"] == "审核状态" for v in s["data"]["field_values"])
+                s["type"] == "SetRecordAction"
+                and any(
+                    v["field_name"] == "审核状态"
+                    and any(value(x.get("value")) in ("待审核", "审核通过") for x in v["value"])
+                    for v in s["data"]["field_values"]
+                )
                 for s in w["steps"]
             )
             and any(
@@ -339,7 +344,7 @@ class Coordinator:
                 continue
             context = self.rules.initial(w, row, actor, millis(at), self.link)["context"]
             if self.rules.eligible(w, row, context, millis(at), changed, added, timer):
-                if w["trigger"]["type"] == "ChangeRecordTrigger" and before:
+                if w["trigger"]["type"] == "ChangeRecordTrigger" and before and not added:
                     prior = self.rules.initial(w, before, actor, millis(at), self.link)["context"]
                     if self.rules.eligible(w, before, prior, millis(at), changed, added, timer):
                         continue
@@ -642,6 +647,16 @@ class Coordinator:
             rid = row["record_id"]
             old = saved.get(rid, {})
             version = value(row.get("插件提交ID"))
+            # A creation event can arrive after a full refresh has already saved
+            # its row. Safely compensate the empty, unsubmitted draft state.
+            if not version and not value(row.get("审核状态")) and value(row.get("提交校验状态")) == "未提交":
+                for w in self.rules.workflows.values():
+                    if w["trigger"]["type"] != "ChangeRecordTrigger" or self.routing(w):
+                        continue
+                    ctx = self.rules.initial(w, row, [], millis(self.now()), self.link)["context"]
+                    if self.rules.eligible(w, row, ctx, millis(self.now())):
+                        with self.db.connection() as c:
+                            self.queue(c, w, row, [], self.now(), "reconcile:unsubmitted-draft")
             match = re.search(r"-(\d{13})$", version)
             if (
                 control["seeded_at"]

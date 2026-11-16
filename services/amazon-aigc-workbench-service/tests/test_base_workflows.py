@@ -60,6 +60,14 @@ def config(kind="route"):
         trigger = {"field_watch_info": [{"field_name": "撤回请求ID"}]}
         tr_type = "SetRecordTrigger"
         patch = [{"field_name": "审核状态", "value": [text("草稿")]}, {"field_name": "插件提交ID", "value": []}]
+    elif kind == "draft":
+        trigger = {"condition_list": [{"conditions": [
+            {"field_name": "审核状态", "operator": "isEmpty", "value": []},
+            cond("提交校验状态", "未提交"),
+            {"field_name": "插件提交ID", "operator": "isEmpty", "value": []},
+        ]}]}
+        tr_type = "ChangeRecordTrigger"
+        patch = [{"field_name": "审核状态", "value": [text("草稿")]}]
     else:
         trigger = {"field_name": "制图截止日期", "offset": -1, "hour": 9, "minute": 0}
         tr_type = "ReminderTrigger"
@@ -71,7 +79,7 @@ def config(kind="route"):
             {
                 "id": "write",
                 "type": "SetRecordAction",
-                "next": "notice",
+                "next": None if kind == "draft" else "notice",
                 "data": {"table_name": "Records", "ref_info": {"step_id": "tr"}, "field_values": patch},
             }
         )
@@ -86,6 +94,8 @@ def config(kind="route"):
             },
         }
     )
+    if kind == "draft":
+        steps.pop()
     return {
         "base_id": "syntheticBase",
         "record_table": "Records",
@@ -328,6 +338,32 @@ def test_seed_never_replays_historical_records(coordinator):
     assert not q.gateway.sent
     with pytest.raises(ValueError):
         q.seed()
+
+
+@pytest.mark.parametrize("creation_event", [True, False])
+def test_new_unsubmitted_draft_survives_refresh_before_event(coordinator, creation_event):
+    import json
+
+    q = Coordinator(coordinator.db, coordinator.gateway, config("draft"), now=coordinator.now)
+    q.gateway.row.update({"审核状态": None, "提交校验状态": "未提交", "插件提交ID": None})
+    q.seed()
+    assert not q.routing(q.rules.workflows["syntheticWorkflow"])
+    if creation_event:
+        payload = event(q)
+        action = payload["event"]["action_list"][0]
+        action["action"] = "record_added"
+        action["after_value"] = [{"field_id": "f1", "field_value": json.dumps("未提交")}]
+        assert q.ingest(payload) and q.process_event()
+    else:
+        q.reconcile()
+    drain(q)
+    q.reconcile()
+    drain(q)
+    assert q.gateway.row["审核状态"] == "草稿"
+    assert q.gateway.row["插件提交ID"] is None
+    assert q.gateway.row.get("最近提交审核时间") is None
+    assert q.gateway.writes == [{"审核状态": "草稿"}]
+    assert not q.notify_one()
 
 
 def test_reminder_dedup_and_fresh_deadline_guard(coordinator):
