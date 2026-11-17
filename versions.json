@@ -1,27 +1,27 @@
 {
-  "bundle": "0.3.1",
+  "bundle": "0.8.0",
   "components": {
     "review": {
-      "version": "0.70.2",
+      "version": "0.74.0",
       "path": "apps/review",
-      "tag": "review/v0.70.2"
+      "tag": "review/v0.74.0"
     },
     "editor": {
-      "version": "0.21.1",
+      "version": "0.24.0",
       "path": "apps/editor",
-      "tag": "editor/v0.21.1"
+      "tag": "editor/v0.24.0"
     },
     "api": {
-      "version": "0.21.0",
+      "version": "0.27.0",
       "path": "services/amazon-aigc-workbench-service",
-      "tag": "api/v0.21.0"
+      "tag": "api/v0.27.0"
     },
     "fbacc": {
-      "version": "0.3.0",
+      "version": "0.3.1",
       "path": "services/amazon-fbacc",
-      "tag": "fbacc/v0.3.0",
+      "tag": "fbacc/v0.3.1",
       "monitor_version": "0.2.0",
-      "rate_snapshot": "2026-10-31.2"
+      "rate_snapshot": "2026-11-16.1"
     },
     "mail": {
       "version": "0.13.1",
@@ -30,8 +30,8 @@
     }
   },
   "compatibility": {
-    "editor": "0.21.1",
-    "api": "0.21.0",
-    "database_migration": "017_independent_image_publication.sql"
+    "editor": "0.24.0",
+    "api": "0.27.0",
+    "database_migration": "020_market_editor.sql"
   }
 }

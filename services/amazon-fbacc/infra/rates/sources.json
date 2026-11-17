@@ -471,6 +471,37 @@
         "FBA",
         "1,000|1000"
       ]
+    },
+    {
+      "id": "eu-fuel-surcharge",
+      "url": "https://sellercentral.amazon.de/help/hub/reference/external/G200209150?locale=en-GB",
+      "markets": [
+        "UK",
+        "DE",
+        "FR",
+        "IT",
+        "ES",
+        "NL",
+        "SE",
+        "PL",
+        "BE",
+        "IE"
+      ],
+      "title": "Europe FBA fuel and logistics surcharge changes",
+      "kind": "help_json",
+      "minChars": 600,
+      "requiredPatterns": [
+        "FBA",
+        "surcharge"
+      ],
+      "fetchUrl": "https://sellercentral.amazon.de/help/hub/mons-api/GetHelpTopic",
+      "requestBody": {
+        "guid": "G200209150",
+        "locale": "en_GB",
+        "statuses": [
+          "Live"
+        ]
+      }
     }
   ],
   "verifyCandidates": true

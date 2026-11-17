@@ -14,6 +14,31 @@ import httpx
 
 from .config import valid_target
 
+OWNER_PROJECTION_FIELDS = {"提交运营ID", "运营小组", "审批小组"}
+HANDOVER_LOG_FIELDS = {
+    "日志ID",
+    "交接批次",
+    "交接时间",
+    "完成时间",
+    "记录序号",
+    "选品SKU",
+    "目标站点",
+    "原提交运营",
+    "新提交运营",
+    "原提交运营ID",
+    "新提交运营ID",
+    "原运营小组",
+    "新运营小组",
+    "原审批小组",
+    "新审批小组",
+    "Base字段同步",
+    "工作台同步",
+    "交接状态",
+    "失败原因",
+    "操作来源",
+    "重试次数",
+}
+
 
 class FeishuGateway:
     def __init__(self, settings, client=None):
@@ -160,6 +185,7 @@ class FeishuGateway:
             "美工留存",
             "制图承接方",
             "成品图",
+            *OWNER_PROJECTION_FIELDS,
         }
         if set(fields) - allowed:
             raise ValueError("Projection field not allowed")
@@ -183,6 +209,71 @@ class FeishuGateway:
             "PUT",
             f"/bitable/v1/apps/{self.s.base_id}/tables/{self.s.sku_table_id}/records/{record_id}",
             json={"fields": converted},
+            params={"user_id_type": "union_id"},
+        )
+
+    @staticmethod
+    def _record_fields(fields):
+        return {
+            key: (item[0] if isinstance(item, list) and len(item) == 1 and isinstance(item[0], str) else item)
+            for key, item in fields.items()
+        }
+
+    def create_handover_log(self, fields):
+        if not self.s.handover_log_table_id:
+            raise RuntimeError("Handover log table not configured")
+        if set(fields) - HANDOVER_LOG_FIELDS:
+            raise ValueError("Handover log field not allowed")
+        if self.s.feishu_mode == "cli":
+            self.cli(
+                [
+                    "base",
+                    "+record-batch-create",
+                    "--base-token",
+                    self.s.base_id,
+                    "--table-id",
+                    self.s.handover_log_table_id,
+                    "--json",
+                    json.dumps({"create_records": [fields]}, ensure_ascii=False),
+                ]
+            )
+            row = next(
+                (r for r in self.records(self.s.handover_log_table_id) if value(r.get("日志ID")) == fields["日志ID"]),
+                None,
+            )
+            if not row:
+                raise RuntimeError("Handover log readback missing")
+            return row["record_id"]
+        data = self.request(
+            "POST",
+            f"/bitable/v1/apps/{self.s.base_id}/tables/{self.s.handover_log_table_id}/records",
+            json={"fields": self._record_fields(fields)},
+            params={"user_id_type": "union_id"},
+        )
+        return data["record"]["record_id"]
+
+    def update_handover_log(self, record_id, fields):
+        if not self.s.handover_log_table_id:
+            raise RuntimeError("Handover log table not configured")
+        if set(fields) - HANDOVER_LOG_FIELDS:
+            raise ValueError("Handover log field not allowed")
+        if self.s.feishu_mode == "cli":
+            return self.cli(
+                [
+                    "base",
+                    "+record-batch-update",
+                    "--base-token",
+                    self.s.base_id,
+                    "--table-id",
+                    self.s.handover_log_table_id,
+                    "--json",
+                    json.dumps({"update_records": {record_id: fields}}, ensure_ascii=False),
+                ]
+            )
+        return self.request(
+            "PUT",
+            f"/bitable/v1/apps/{self.s.base_id}/tables/{self.s.handover_log_table_id}/records/{record_id}",
+            json={"fields": self._record_fields(fields)},
             params={"user_id_type": "union_id"},
         )
 
@@ -255,7 +346,8 @@ def user_profile(gateway, union_id):
 
 
 def upload_asset(gateway, asset, storage_root):
-    path = storage_root / asset["object_key"]
+    from .asset_storage import asset_path
+    path = asset_path(storage_root, asset)
     with path.open("rb") as stream:
         r = httpx.post(
             "https://open.feishu.cn/open-apis/drive/v1/medias/upload_all",

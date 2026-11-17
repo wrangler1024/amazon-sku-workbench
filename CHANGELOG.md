@@ -1,5 +1,85 @@
 # Changelog
 
+## 0.8.0 — 2026-11-17
+
+API 0.27.0 adds bounded temporary ZIP downloads with cleanup on disconnect and supports private COS originals with pinned object versions, full SHA-256 publication/read-back checks and a recoverable local cache. Asset identities, authorization and historical delivery ZIP contents remain stable. COS configuration is optional and external to the repository; existing local deployments remain supported. SQL 020 and both frontends are unchanged.
+
+## 0.7.1 — 2026-11-16
+
+API 0.26.1 disables PostgreSQL JIT only inside workbench list and summary read transactions. This avoids compilation delays from the expanded multi-market permission queries while preserving filters, counts, database-wide settings and worker behavior. Editor 0.24.0 and SQL 020 remain unchanged.
+
+## 0.7.0 — 2026-11-16
+
+Editor 0.24.0 and API 0.26.0 add explicit European multi-market plans for DE/FR/ES review sources, targeting DE/FR/ES/IT/NL. One model call produces selected-market listings or a shared image design and localized text table. Operators review and confirm each batch once; one SKU task carries complete, independently versioned market deliveries, reviews, downloads and publication registrations. Existing single-market drafts, versions, permissions and artwork remain compatible. SQL 020 adds side tables without migrating existing products into a plan.
+
+
+## Review 0.74.0
+
+- Add France and Spain review entry with EUR, marketplace-correct ASIN links and FBACC domestic reference estimates; all eleven review marketplaces share the backend.
+- Preserve conservative €12 eligibility, explicit quote results and the separation between manual costs and reference fees. France/Spain do not inherit Germany-only CEP or peak assumptions.
+- Validate site-specific VAT calculations, EUR response isolation, draft persistence, manual cost protection and reviewed fee references.
+
+## Review 0.73.0
+
+- Route all nine review marketplaces, quick size references and packaging comparisons through FBACC. Stop loading legacy FBA rate tables; unavailable or conflicting estimates stay explicit and retryable.
+- Validate whole-yen amounts, MX/JP tax-inclusive fees, US pound-based weights, and UK/DE conservative domestic assumptions. Keep manual costs, existing financial snapshots and review workflows authoritative.
+- Cover all nine marketplaces with independently reviewed fee samples, mixed-currency boundaries, extended Japanese tiers and async/manual-cost protection checks.
+
+## Review 0.72.2
+
+- Apply the shared compact form-help style to all marketplace-specific FBA guidance and quote-required messages. Calculation and submission behavior are unchanged.
+
+## Review 0.72.1 / FBACC 0.3.1
+
+- Render German reference guidance in the same compact muted style as adjacent form help.
+- Add DE/EUR review entry, Amazon.de references and date-aware domestic FBA estimates through FBACC; manual FBA costs stay authoritative. Preserve the released draft identity confirmation when changing products.
+- Apply the official European 2% fuel surcharge from 2026-11-02 while retaining earlier rates, German CEP/peak distinctions, and existing non-European tables.
+- Validate DE financial calculations, proxy integration, response assumptions and cross-market async cancellation with synthetic fixtures.
+
+
+## 0.6.0
+
+- API 0.25.0：新增可独立启用的 Base 事件处理进程，接管经过审核的提审、结果处理、时间、撤回、寄样、ERP 校验与截止提醒规则。
+- 新增持久事件、操作日志和通知队列；按提交版本去重，拒绝过期写入，通知失败独立重试。
+- SQL 019 为新增表；历史记录只建立基线，保留原有 ERP/制图进度，迁移须按部署说明逐步切换。
+
+## 0.5.0
+
+- API 0.24.0 / editor 0.23.0：运营核对说明与面向买家的Listing正文分开返回和展示，已确认尺寸正常保留，未确认参数先省略。
+- 复制前检查内部核对语句和明确待确认数值，覆盖单字段、纯文本、HTML、历史及刊登文案；保留人工采用、编辑、保存和确认。
+- 提示词v14与listing-quality-2；不改写历史内容、不增加自动纠正调用或数据库迁移。
+
+## 0.4.1
+
+- API 0.23.1：补齐英文及西语未确认适配措辞，防止将未确认的来源型号列入保留名单。编辑前端、提示词和数据库结构保持兼容。
+
+## 0.4.0
+
+- API 0.23.0 / editor 0.22.0：文案与图需共同隔离来源型号、货号，保留有效规格和已确认适配型号；原始采集与规格绑定不改写。
+- 五点通过小标题和说明分别生成后组合成 SOP 格式，保留英文 Title Case 与西语习惯。
+- 文案候选和编辑页提示事实覆盖、未确认数值及无依据“另售”等疑点；复制来源编号前须人工处理，保存与确认保持原流程。
+- 提示词 v13；无新增纠正用模型调用或数据库迁移。
+
+## 0.3.4
+
+- API 0.22.2：英文 Listing 标题和 Item Highlights 整条采用 Title Case，明确小词首尾、标准缩写、型号、单位及尺寸连接符的例外；墨西哥西语和其他非英语遵循当地大小写习惯。
+- OpenAI 与 DeepSeek 共用提示词 v12；不新增自动改写或纠正用模型调用，已保存文案及历史版本保留。
+- 编辑前端与数据库结构不变；部署时同时更新 API 和 model worker，核对等待任务的输入版本兼容性。
+
+## 0.3.3
+
+- api 0.22.1：将白牌图需与既有负责人交接功能整合，保留 SQL 018、人员映射及交接日志。
+- editor 保持已验证的 0.21.2，生成、人工核对和复制规则不变。
+
+
+## 0.3.2
+
+- editor 0.21.2 / api 0.21.1：图需默认白牌，隔离来源标识与旧图需要求；包装不明确时不策划包装图。
+- 候选与编辑稿提示疑似品牌、平台及链接；不自动修改内容、不追加模型调用，仍可采用、编辑和确认。
+- 默认制作复制文本移除独立来源附录，复制前检查未处理标识；原始资料及历史版本保留。
+- 本组合基于已提交的 0.3.1，用于隔离联调；不包含其他工作区尚未提交的负责人交接改动。
+
+
 ## Unreleased — Editor 0.21.1
 
 - Add consistent product-thumbnail hover previews to all editor headers, product

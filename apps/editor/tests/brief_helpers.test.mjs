@@ -15,13 +15,13 @@ test('candidate preview and copy include every plan and target-language text',()
  assert(!briefText({product:'旧版',image_count:7}).includes('套图策划建议'));
 });
 
-test('artwork packet includes competitor notes and links once, preserving legacy briefs',async()=>{
+test('artwork packet keeps source links and notes outside both modern and legacy production text',async()=>{
  const {artworkPacket}=await import('../src/briefHelpers.ts');
  const url='https://www.amazon.ca/dp/B0TEST0007';const sources=[{kind:'supplier',url:'https://detail.1688.com/offer/123.html'},{kind:'competitor',url,manual_text:'参考白底构图、排版和五点表达'}];
  for(const legacy of ['', '旧批次原始图需']){
   const text=artworkPacket('本品',{...emptyBrief,references:[url]},sources,legacy,{task_number:'R-1046',code:'DEMO-ITEM-003'});
   assert(text.includes('任务编号：R-1046'));assert(text.includes('SKU：DEMO-ITEM-003'));
-  assert.equal(text.split(url).length,2);assert(text.includes('竞品参考链接：'));assert(text.includes('参考重点：\n参考白底构图、排版和五点表达'));assert(text.includes('1688货源链接：'));assert(text.includes(legacy||'【套图策划建议】'));
+  assert(!text.includes(url));assert(!text.includes('参考重点：'));assert(!text.includes('1688'));assert(!text.includes('参考白底构图'));assert(text.includes(legacy||'【套图策划建议】'));
  }
 });
 

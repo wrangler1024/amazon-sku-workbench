@@ -14,7 +14,7 @@ import {
   noticeText,
   resultText,
   comparisonCsv,
-} from "./model.mjs?v=0.3.0";
+} from "./model.mjs?v=0.3.1";
 
 const $ = (id) => document.getElementById(id);
 let mode = "single",

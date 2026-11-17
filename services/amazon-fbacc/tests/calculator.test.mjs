@@ -77,7 +77,7 @@ test('UK conservative low-price threshold and regular fallback',()=>{
 });
 
 test('UK peak applies only in published dates; no automatic next-year peak',()=>{
-  for(const [date,expected] of [['2026-10-14',2.76],['2026-10-15',2.83],['2027-01-14',2.83],['2027-01-15',2.76],['2027-10-31',2.76]]) {
+  for(const [date,expected] of [['2026-10-14',2.76],['2026-10-15',2.83],['2027-01-14',2.85],['2027-01-15',2.77],['2027-10-31',2.77]]) {
     const r=total(input('UK',25,[30,20,3],500,date),expected);
     if(date>='2027-01-15') assert.ok(r.warnings.some(x=>x.code==='NEW_YEAR_RATE_REVIEW'));
   }

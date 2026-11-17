@@ -6,14 +6,14 @@ import type { UserAccess } from "../domain/types";
 import { intellectualPropertyPreview } from "../domain/riskPreview";
 import { reviewPathForSubmission } from "../domain/permissions";
 import { cachedImageUrl, resolveImageUrl } from "../domain/imageUrlCache";
-import { calculateSite, currentShanghaiDate, forecastTimestamp, MARKETPLACES, newSiteDraft,
-  submissionProblems, type Marketplace, type SiteDraft, type TaxClass } from "./domain";
+import { calculateSite, currentShanghaiDate, draftProductIdentity, draftProductIdentityChanged,
+  forecastTimestamp, MARKETPLACES, newSiteDraft, submissionProblems,
+  type DraftProductIdentity, type Marketplace, type SiteDraft, type TaxClass } from "./domain";
 import type { OfficialFbaQuoteInput, SiteDashboard, SiteReview } from "./repository";
 import QuickOpportunity, { type QuickCarryValues } from "./QuickOpportunity";
 import SiteReviewThumb from "./SiteReviewThumb";
 import ReviewDetail from "./ReviewDetail";
 import { storedReviewQuote, reviewAttention, reviewDate } from "./reviewPresentation";
-import type { FbaCard } from "./rateCards";
 import { useFbaReference } from "./useFbaReference";
 import { summarizePendingReviews, type NumberRange } from "./reviewSummary";
 import { smallSizeAdvice } from "./sizing";
@@ -21,6 +21,13 @@ import { smallSizeAdvice } from "./sizing";
 import { loadSitePreference, saveSitePreference, type SitePreferenceScope } from "./sitePreference";
 
 type View = "multisite" | "submitted" | "returned" | "review";
+type DraftAction = "save" | "submit";
+type DraftWriteChoice = "normal" | "new" | "overwrite";
+interface DraftIdentityPrompt {
+  action: DraftAction;
+  originalName: string;
+  currentName: string;
+}
 export interface QueueEntry { id: string; search: string; node: ReactNode;
   submitterId?: string; submitterName?: string; site?: Marketplace;
   listedPrice?: number; purchaseCny?: number; contributionRate?: number | null }
@@ -52,10 +59,10 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const preferenceScope = useRef<SitePreferenceScope | null>(null);
   const preferredSite = useRef<Marketplace | null>(null);
   const siteTouched = useRef(false);
-  const [cards, setCards] = useState<FbaCard[]>([]);
-  const [cardError, setCardError] = useState("");
   const [quickPurchaseCny, setQuickPurchaseCny] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const editingIdentity = useRef<DraftProductIdentity | null>(null);
+  const [draftIdentityPrompt, setDraftIdentityPrompt] = useState<DraftIdentityPrompt | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [existingImageUrl, setExistingImageUrl] = useState("");
@@ -105,6 +112,7 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const startNew = () => {
     siteTouched.current = true;
     setEditingId(null); setDraft(newSiteDraft(preferredSite.current ?? "CA"));
+    editingIdentity.current = null; setDraftIdentityPrompt(null);
     setSiteSelected(Boolean(preferredSite.current)); setImage(null); setExistingImageUrl("");
     setQuickPurchaseCny(null); setSubmitAttempted(false); setValidationOpen(false);
     setMessage(""); setActionError("");
@@ -113,13 +121,11 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const reload = useCallback(async () => {
     if (demo) {
       const loaded: SiteDashboard = { reviews: [], taxes: [], finances: [], rules: [], problems: ["本地演示仅展示合成评审任务；多站点录入需配置自己的飞书表格。"] };
-      setData(loaded); setCards([]); return loaded;
+      setData(loaded); return loaded;
     }
-    const { loadSiteDashboard, loadFbaRateCards } = await import("./repository");
+    const { loadSiteDashboard } = await import("./repository");
     const loaded = await loadSiteDashboard();
     setData(loaded);
-    try { setCards(await loadFbaRateCards()); setCardError(""); }
-    catch (error) { setCards([]); setCardError(error instanceof Error ? error.message : String(error)); }
     return loaded;
   }, [demo]);
   useEffect(() => { void reload().catch((error) => setMessage(String(error))); }, [reload]);
@@ -253,7 +259,7 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
     price: draft.listedPrice,
     dimensionsCm: [draft.lengthCm, draft.widthCm, draft.heightCm] as [number, number, number],
     unitWeightG: draft.unitWeightG, saleDate: forecast };
-  const fbaReference = useFbaReference(cards, cardRequest, draft.expectedSaleDate, data?.sizeRules ?? {});
+  const fbaReference = useFbaReference(cardRequest, draft.expectedSaleDate, data?.sizeRules ?? {});
   const { estimate: cardEstimate, packing } = fbaReference;
   const referenceInfo = cardEstimate.reference ?? cardEstimate.card;
   const previewReady = [draft.listedPrice, draft.lengthCm, draft.widthCm,
@@ -278,62 +284,110 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
         aria-invalid={fieldInvalid(key)}
         onChange={(event) => update(key, (event.target.value === "" ? 0 : Number(event.target.value)) as never)} />
     </label>;
+  const hasDraftIdentityChange = () => Boolean(editingId && editingIdentity.current &&
+    draftProductIdentityChanged(editingIdentity.current, draft));
+  const showDraftIdentityPrompt = (action: DraftAction, originalName?: string) => {
+    setDraftIdentityPrompt({
+      action,
+      originalName: originalName ?? editingIdentity.current?.productName ?? "",
+      currentName: draft.productName.trim(),
+    });
+    setMessage("商品识别信息已变化：如为另一个产品，请另建新产品，避免覆盖原草稿。");
+    setActionError("");
+    setValidationOpen(false);
+  };
   const act = async (operation: () => Promise<void>) => {
     setBusy(true); setMessage(""); setActionError("");
     try { await operation(); await reload(); }
     catch (error) {
+      const { DraftIdentityChangedError } = await import("./repository");
+      if (error instanceof DraftIdentityChangedError) {
+        showDraftIdentityPrompt("save", error.existing.productName);
+        return;
+      }
       const reason = error instanceof Error ? error.message : String(error);
       setMessage(reason); setActionError(reason);
     }
     finally { setBusy(false); }
   };
-  const save = () => void act(async () => {
-    if (!siteSelected || !preferenceLoaded) return;
-    const { saveSiteDraft } = await import("./repository");
-    const id = await saveSiteDraft(draft, access, editingId, image);
-    setEditingId(id); setImage(null); setMessage("草稿已保存，可在下方「我的草稿」继续编辑");
-    if (!editingId) await rememberNewSite(draft.site);
-  });
-  const submit = () => void (async () => {
-    setBusy(true); setMessage(""); setActionError("");
-    let savedId = editingId;
-    try {
-      const { saveSiteDraft, submitSiteReview } = await import("./repository");
-      const id = await saveSiteDraft(draft, access, editingId, image);
-      savedId = id;
-      setEditingId(id);
-      if (!editingId) await rememberNewSite(draft.site);
-      await submitSiteReview(id, access);
-      startNew();
-      setMessage(selfExempt
-        ? "主管自提已免审核通过，后续制图和 ERP 任务将按流程处理"
-        : "已提交审核，可在「我的提交」查看待审批记录");
-      try { await reload(); }
-      catch { setMessage("已提交审核；列表暂未刷新，请重新打开评审台查看"); }
-    } catch (error) {
-      const { SubmissionPendingError } = await import("./repository");
-      if (error instanceof SubmissionPendingError) {
-        setMessage(error.message); setActionError(""); setValidationOpen(false);
-        try { await reload(); } catch { /* The Base workflow continues independently. */ }
-        return;
-      }
-      const reason = error instanceof Error ? error.message : String(error);
-      setMessage(reason); setActionError(reason); setValidationOpen(true);
+  const save = (choice: DraftWriteChoice = "normal") => {
+    if (choice === "normal" && hasDraftIdentityChange()) {
+      showDraftIdentityPrompt("save");
+      return;
+    }
+    void act(async () => {
+      if (!siteSelected || !preferenceLoaded) return;
+      const { saveSiteDraft } = await import("./repository");
+      const targetId = choice === "new" ? null : editingId;
+      const id = await saveSiteDraft(draft, access, targetId, image, choice === "overwrite");
+      setEditingId(id); editingIdentity.current = draftProductIdentity(draft);
+      setDraftIdentityPrompt(null); setImage(null);
+      setMessage(choice === "new"
+        ? "已另存为新草稿，原草稿保持不变"
+        : "草稿已保存，可在下方「我的草稿」继续编辑");
+      if (!targetId) await rememberNewSite(draft.site);
+    });
+  };
+  const submit = (choice: DraftWriteChoice = "normal") => {
+    if (choice === "normal" && hasDraftIdentityChange()) {
+      showDraftIdentityPrompt("submit");
+      return;
+    }
+    void (async () => {
+      setBusy(true); setMessage(""); setActionError("");
+      const targetId = choice === "new" ? null : editingId;
+      let savedId = targetId;
       try {
-        const loaded = await reload();
-        const editable = loaded.reviews.filter((item) => item.submitterId === access.userId &&
-          (item.status === "草稿" || item.status === "打回修改"));
-        const saved = savedId
-          ? editable.find((item) => item.id === savedId)
-          : (() => {
-            const matches = editable.filter((item) => item.draft.productName === draft.productName &&
-              item.draft.site === draft.site);
-            return matches.length === 1 ? matches[0] : undefined;
-          })();
-        if (saved) setEditingId(saved.id);
-      } catch { /* Keep the current form and uploaded image for retry. */ }
-    } finally { setBusy(false); }
-  })();
+        const { saveSiteDraft, submitSiteReview } = await import("./repository");
+        const id = await saveSiteDraft(draft, access, targetId, image, choice === "overwrite");
+        savedId = id;
+        setEditingId(id); editingIdentity.current = draftProductIdentity(draft);
+        setDraftIdentityPrompt(null);
+        if (!targetId) await rememberNewSite(draft.site);
+        await submitSiteReview(id, access);
+        startNew();
+        setMessage(selfExempt
+          ? "主管自提已免审核通过，后续制图和 ERP 任务将按流程处理"
+          : "已提交审核，可在「我的提交」查看待审批记录");
+        try { await reload(); }
+        catch { setMessage("已提交审核；列表暂未刷新，请重新打开评审台查看"); }
+      } catch (error) {
+        const { DraftIdentityChangedError, SubmissionPendingError } = await import("./repository");
+        if (error instanceof DraftIdentityChangedError) {
+          showDraftIdentityPrompt("submit", error.existing.productName);
+          return;
+        }
+        if (error instanceof SubmissionPendingError) {
+          setMessage(error.message); setActionError(""); setValidationOpen(false);
+          try { await reload(); } catch { /* The Base workflow continues independently. */ }
+          return;
+        }
+        const reason = error instanceof Error ? error.message : String(error);
+        setMessage(reason); setActionError(reason); setValidationOpen(true);
+        try {
+          const loaded = await reload();
+          const editable = loaded.reviews.filter((item) => item.submitterId === access.userId &&
+            (item.status === "草稿" || item.status === "打回修改"));
+          const saved = savedId
+            ? editable.find((item) => item.id === savedId)
+            : (() => {
+              const matches = editable.filter((item) => item.draft.productName === draft.productName &&
+                item.draft.site === draft.site);
+              return matches.length === 1 ? matches[0] : undefined;
+            })();
+          if (saved) setEditingId(saved.id);
+        } catch { /* Keep the current form and uploaded image for retry. */ }
+      } finally { setBusy(false); }
+    })();
+  };
+  const resolveDraftIdentityPrompt = (choice: "new" | "overwrite") => {
+    const prompt = draftIdentityPrompt;
+    if (!prompt) return;
+    setDraftIdentityPrompt(null);
+    setMessage("");
+    if (prompt.action === "save") save(choice);
+    else submit(choice);
+  };
   const requestSubmit = () => {
     if (!siteSelected || !preferenceLoaded) return;
     setSubmitAttempted(true); setActionError("");
@@ -343,6 +397,8 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
   const open = (record: SiteReview) => {
     siteTouched.current = true; setSiteSelected(true);
     setDraft(record.draft); setEditingId(record.id); setImage(null);
+    editingIdentity.current = draftProductIdentity(record.draft);
+    setDraftIdentityPrompt(null);
     setSubmitAttempted(false); setValidationOpen(false);
     setMessage(""); setActionError("");
     onNavigate?.("multisite"); window.scrollTo({ top: 0, behavior: "smooth" });
@@ -430,6 +486,15 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
     document.getElementById("site-validation-close")?.focus();
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [validationOpen]);
+  useEffect(() => {
+    if (!draftIdentityPrompt) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDraftIdentityPrompt(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    document.getElementById("draft-identity-close")?.focus();
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [draftIdentityPrompt]);
   const entryFeedback = <>
     {actionError ? <p role="alert" className="alert error site-action-feedback">
       <strong>操作未完成</strong><span>{actionError}</span>
@@ -509,14 +574,13 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
       </section> : <>
       <QuickOpportunity key={draft.site} site={draft.site} sitePicker={sitePicker}
         onCarry={carryQuick} tax={tax} finance={roughFinance}
-        cards={cards}
         purchaseCny={quickPurchaseCny} onPurchaseChange={setQuickPurchaseCny}
         disabled={Boolean(editingId)} />
       <div className="multisite-grid" id="site-review-form">
         <div className="form-panel site-form-panel">
           <div className="panel-heading"><div className="panel-heading-title"><span className="panel-number">02</span>
             <h2>候选产品录入</h2></div>
-            {editingId && <span className="site-editing-context">编辑中 · {MARKETPLACES[draft.site].label} · {currency}</span>}
+            {editingId && <span className="site-editing-context">编辑中 · {MARKETPLACES[draft.site].label} · {currency}{draft.productName ? ` · ${draft.productName}` : ""}</span>}
           </div>
           <fieldset><legend>商品识别</legend><div className="field-grid two">
             <label>选品SKU<input value={draft.entitySku} aria-invalid={fieldInvalid("entitySku")}
@@ -589,22 +653,22 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
             {numberField(`FBA 费用（${currency}）`, "fbaFeeLocal", true)}
             <div className="site-fba-preview"><strong>FBA 预估（仅参考）</strong>
               <div role="status" title={cardEstimate.status === "matched"
-                ? `${referenceInfo?.tier} · ${referenceInfo?.plan} · ${referenceInfo?.version}${draft.site === "AE" ? " · 未含适用 VAT" : ""}` : cardEstimate.reason}>
+                ? `${referenceInfo?.tier} · ${referenceInfo?.plan} · ${referenceInfo?.version} · ${referenceInfo?.feeIncludesTax ? "已含本站适用税费" : "未另加适用税费"}` : cardEstimate.reason}>
                 {!previewReady ? "待填售价与包装信息"
                   : cardEstimate.status === "matched" ? money(currency, cardEstimate.fee ?? 0)
-                    : draft.site === "AE" ? fbaReference.loading ? "预估计算中…"
-                      : fbaReference.unavailable ? "预估暂不可用" : "需人工核价"
-                      : ["MX", "SA"].includes(draft.site) ? "计费重待确认" : "需逐 SKU 报价"}
-              </div>{draft.site === "AE" && fbaReference.unavailable &&
+                    : fbaReference.loading ? "预估计算中…"
+                      : fbaReference.unavailable ? "预估暂不可用" : "需人工核价"}
+              </div>{fbaReference.unavailable &&
                 <button type="button" className="text-button" onClick={fbaReference.retry}>重试预估</button>}</div>
           </div><p className="hint site-form-note">预估按普通商品基准费率计算，不匹配类目专属优惠；手填 FBA 费用用于利润，预估不会自动带入。无匹配档位、特殊商品或危险品需逐 SKU 核价。</p>
-            {draft.site === "UK" && <p className="hint">英国低价费率仅用于售价不超过 £10 且符合尺寸重量条件的商品；售价超过 £10 按常规费率预估，旺季按适用日期计费。</p>}
-            {draft.site === "AE" && <p className="hint">阿联酋 FBA 按完整销售包装的尺寸、实重、售价和预计开售日期自动预估，参考金额未含适用 VAT。利润仍以运营手填的 FBA 金额为准，预估不会自动带入；如需进一步确认，可核对亚马逊后台费用。</p>}
-            {draft.site === "AE" && previewReady && !fbaReference.loading && cardEstimate.status !== "matched" &&
-              <p className="hint" role="status">{cardEstimate.reason}</p>}
-            {draft.site === "SA" && <p className="hint">沙特 FBA 按官方出库计费重核价，公开参考费不含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
-            {draft.site === "JP" && <p className="hint">日本 FBA 仅预估小型与标准薄件；参考费已含 10% 消费税，不再重复加税。其他尺寸档逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
-            {cardError && draft.site !== "AE" && <p role="alert" className="alert warning">分档预估暂不可用：{cardError}</p>}
+            {draft.site === "UK" && <p className="hint site-form-note">英国低价费率仅用于售价不超过 £10 且符合尺寸重量条件的商品；售价超过 £10 按常规费率预估，旺季按适用日期计费。</p>}
+            {draft.site === "AE" && <p className="hint site-form-note">阿联酋 FBA 按完整销售包装的尺寸、实重、售价和预计开售日期自动预估，参考金额未含适用 VAT。利润仍以运营手填的 FBA 金额为准，预估不会自动带入；如需进一步确认，可核对亚马逊后台费用。</p>}
+            {previewReady && !fbaReference.loading && cardEstimate.status !== "matched" &&
+              <p className="hint site-form-note" role="status">{cardEstimate.reason}</p>}
+            {draft.site === "DE" && <p className="hint site-form-note">德国参考费按本土配送、未参加中欧计划计算，含适用燃油附加费并按日期匹配旺季；未含 VAT。售价不超过 €11 才默认按低价条件判断。若使用波兰等境外库存配送，请核对账号实际配送计划及报价后手填 FBA 费用。</p>}
+            {["FR", "ES"].includes(draft.site) && <p className="hint site-form-note">{MARKETPLACES[draft.site].label}参考费按本土普通商品配送计算，含适用燃油附加费，未含 VAT；售价不超过 €12 才默认按低价条件判断。境外库存、跨境配送或特殊商品需核对账号实际配送计划及报价后手填 FBA 费用。</p>}
+            {draft.site === "SA" && <p className="hint site-form-note">沙特 FBA 按完整销售包装实重自动预估，参考费未含适用 VAT；售价恰好 25 SAR 时需人工核对低价资格。制图需明确英文或阿拉伯语文案、校对人；阿语检查从右向左排版。</p>}
+            {draft.site === "JP" && <p className="hint site-form-note">日本 FBA 按完整销售包装尺寸与实重自动预估，售价按整数日元填写；参考费已含 10% 消费税，不再重复加税。超出支持规格需逐 SKU 核价。制图使用日语文案，核对单位、适配规格与警示内容。</p>}
           </fieldset>
           <fieldset><legend>供应商可行性（可后补）</legend><div className="field-grid three">
             <label>供应商名称<input value={draft.supplierName} onChange={(event) => update("supplierName", event.target.value)} /></label>
@@ -674,10 +738,10 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
             ? "Base 公式回算中，结果就绪后自动完成提审。"
             : "公式回算等待超时，可检查数据后再次提交；已填写内容仍保留。"}</p>}
           {entryFeedback}
-          <div className="site-submit-actions"><button className="secondary-button" disabled={busy || !preferenceLoaded || freshPending || !access.canSubmit || Boolean(data?.problems.length)} onClick={save}>保存草稿</button>
+          <div className="site-submit-actions"><button className="secondary-button" disabled={busy || !preferenceLoaded || freshPending || !access.canSubmit || Boolean(data?.problems.length)} onClick={() => save()}>保存草稿</button>
             <button className="primary-button" disabled={busy || !preferenceLoaded || freshPending || !access.canSubmit || Boolean(data?.problems.length)} onClick={requestSubmit}>{selfExempt ? "提交选品（免审核）" : "提交审核"}</button></div>
-          {editingId && <button className="text-button" disabled={busy} onClick={startNew}>新建另一站点</button>}
-          <p className="hint">草稿从「我的草稿」继续编辑；小件尺寸仅供优选参考，不是提审门槛。</p>
+          {editingId && <button className="text-button" disabled={busy} onClick={startNew}>新建选品</button>}
+          <p className="hint">草稿从「我的草稿」继续编辑；录入另一产品请先点「新建选品」。小件尺寸仅供优选参考，不是提审门槛。</p>
         </aside>
       </div></>}
     </section>}
@@ -691,6 +755,31 @@ function SitePanel({ demo = false, access, view = "multisite", hiddenEntry = fal
       <ul>{(actionError ? [actionError] : problems).map((problem) => <li key={problem}>{problem}</li>)}</ul>
       <div className="site-validation-actions"><button className="primary-button" type="button"
         onClick={() => setValidationOpen(false)}>返回填写</button></div>
+    </div></div>}
+    {draftIdentityPrompt && view === "multisite" && <div className="site-validation-backdrop" onMouseDown={(event) => {
+      if (event.target === event.currentTarget) setDraftIdentityPrompt(null);
+    }}><div className="site-validation-dialog site-identity-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="draft-identity-title">
+      <div className="site-validation-heading"><h2 id="draft-identity-title">草稿商品已变更</h2>
+        <button id="draft-identity-close" type="button" className="text-button" aria-label="关闭草稿变更确认"
+          onClick={() => setDraftIdentityPrompt(null)}>×</button></div>
+      <p>当前正在编辑的草稿与这次填写的商品识别信息不一致。继续保存到原记录会覆盖原草稿。</p>
+      <div className="site-identity-comparison">
+        <span>原草稿</span><b>{draftIdentityPrompt.originalName || "未命名草稿"}</b>
+        <span>当前输入</span><b>{draftIdentityPrompt.currentName || "未命名产品"}</b>
+      </div>
+      <p>如为另一个产品，请选择「另建新产品」；如只是修改原草稿的名称、SKU 或采购链接，可明确覆盖原草稿。</p>
+      <div className="site-validation-actions site-identity-actions">
+        <button type="button" className="text-button" onClick={() => setDraftIdentityPrompt(null)}>返回修改</button>
+        <button type="button" className="secondary-button"
+          onClick={() => resolveDraftIdentityPrompt("overwrite")}>
+          覆盖原草稿{draftIdentityPrompt.action === "submit" ? "并提交" : ""}
+        </button>
+        <button type="button" className="primary-button"
+          onClick={() => resolveDraftIdentityPrompt("new")}>
+          另建新产品{draftIdentityPrompt.action === "submit" ? "并提交" : ""}
+        </button>
+      </div>
     </div></div>}
     {view === "submitted" && <section className="queue-panel site-work-queue"><div className="mine-heading"><div>
       <p className="section-kicker">MY SUBMISSIONS</p><h2>我的提交</h2>

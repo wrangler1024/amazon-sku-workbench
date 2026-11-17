@@ -22,7 +22,7 @@ const main = {
   getFieldMetaList: async () => schemaFields.map((name) => ({ name, id: name })),
   getRecords: async () => ({ records: store.rows, hasMore: false }),
   getFieldById: async () => ({ getOptions: async () =>
-    ["CA", "AU", "AE", "SA", "JP", "标准", "未排查", "无风险", "草稿", "未提交", "一部一组", "高"]
+    ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE", "FR", "ES", "标准", "未排查", "无风险", "草稿", "未提交", "一部一组", "高"]
       .map((name) => ({ name, id: name })) }),
   addRecord: async ({ fields }: { fields: Record<string, unknown> }) => {
     const recordId = `record-${store.rows.length + 1}`;
@@ -45,7 +45,7 @@ vi.mock("@lark-opdev/block-bitable-api", () => ({
       getFieldMetaList: async () => ["站点", "档位名称", "最长边上限(cm)",
         "中间边上限(cm)", "最短边上限(cm)", "实重上限(g)", "规则来源",
         "排序", "启用"].map((field) => ({ name: field, id: field })),
-      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP"]
+      getRecords: async () => ({ hasMore: false, records: ["CA", "MX", "UK", "US", "AU", "AE", "SA", "JP", "DE", "FR", "ES"]
         .map((site) => ({ recordId: `size-${site}`, fields: {
           "站点": { id: site, text: site }, "档位名称": "信封档",
           "最长边上限(cm)": 38, "中间边上限(cm)": 27,
@@ -60,7 +60,7 @@ vi.mock("@lark-opdev/block-bitable-api", () => ({
   } } },
 }));
 
-import { loadSiteDashboard, saveSiteDraft } from "./repository";
+import { DraftIdentityChangedError, loadSiteDashboard, saveSiteDraft } from "./repository";
 
 const rich = (value: string) => [{ type: 1, text: value }];
 const selected = (value: string) => ({ id: value, text: value });
@@ -82,7 +82,7 @@ beforeEach(() => {
 });
 
 describe("单表选品评审", () => {
-  it.each([["SA", "SAR"], ["JP", "JPY"]] as const)("%s 草稿在财务缺失时仍以本币保存并回读", async (site, currency) => {
+  it.each([["SA", "SAR"], ["JP", "JPY"], ["DE", "EUR"], ["FR", "EUR"], ["ES", "EUR"]] as const)("%s 草稿在财务缺失时仍以本币保存并回读", async (site, currency) => {
     const id = await saveSiteDraft({ ...newSiteDraft(site), productName: "扩站验收草稿",
       referenceAsins: "B0TEST0005", listedPrice: 1200, fbaFeeLocal: 252 }, access, null);
     const loaded = await loadSiteDashboard();
@@ -129,6 +129,19 @@ describe("单表选品评审", () => {
     const review = (await loadSiteDashboard()).reviews.find((item) => item.id === id);
     expect(review?.draft.entitySku).toBe("");
     expect(review?.number).toBe(id);
+  });
+  it("编辑草稿时商品身份变化必须显式确认，未确认不写入", async () => {
+    const original = { ...newSiteDraft("CA"), entitySku: "IDENT-A",
+      productName: "产品 A", sourceUrl: "https://example.com/a" };
+    const id = await saveSiteDraft(original, access, null);
+    const before = structuredClone(store.rows);
+    const incoming = { ...original, productName: "产品 B" };
+    await expect(saveSiteDraft(incoming, access, id))
+      .rejects.toBeInstanceOf(DraftIdentityChangedError);
+    expect(store.rows).toEqual(before);
+    await saveSiteDraft(incoming, access, id, null, true);
+    expect((await loadSiteDashboard()).reviews.find((item) => item.id === id)?.draft.productName)
+      .toBe("产品 B");
   });
   it("新草稿持久化运营姓名，后续读不到人员配置时仍可显示姓名", async () => {
     store.memberRows.unshift({ recordId: "other-member", fields: {

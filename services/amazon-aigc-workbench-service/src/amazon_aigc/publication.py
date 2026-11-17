@@ -32,9 +32,11 @@ def confirmation_note(data, default):
 
 
 def publish_listing(c, user, item_id, revision, data):
-    get_item(c, user, item_id, True)
+    item = get_item(c, user, item_id, True)
     doc = get_doc(c, item_id, revision)
-    if not doc["listing_version"]:
+    market = _market(c, item, doc, data)
+    listing_version = market["listing_version"] if market else doc["listing_version"]
+    if not listing_version:
         fail("请先确认Listing文案")
     for key, maximum in [("msku", 200)]:
         if not isinstance(data.get(key), str) or not data[key].strip() or len(data[key]) > maximum:
@@ -46,16 +48,16 @@ def publish_listing(c, user, item_id, revision, data):
     receipt = confirmation_note(data, "运营确认已在亚马逊后台完成文案保存或上架")
     asin = str(data.get("asin", "")).strip()[:100]
     target = c.execute(
-        "INSERT INTO publication_targets(id,document_id,store,msku,asin) VALUES(%s,%s,%s,%s,%s) "
-        "ON CONFLICT(document_id,store,msku) DO UPDATE SET asin=EXCLUDED.asin RETURNING *",
-        (uuid4(), doc["id"], store, msku, asin),
+        "INSERT INTO publication_targets(id,document_id,store,msku,asin,marketplace) VALUES(%s,%s,%s,%s,%s,%s) "
+        "ON CONFLICT(document_id,store,msku,marketplace) DO UPDATE SET asin=EXCLUDED.asin RETURNING *",
+        (uuid4(), doc["id"], store, msku, asin, market["site"] if market else ""),
     ).fetchone()
     previous = c.execute(
         "SELECT * FROM publication_records WHERE target_id=%s AND withdrawn_at IS NULL "
         "ORDER BY created_at DESC,id DESC LIMIT 1",
         (target["id"],),
     ).fetchone()
-    if previous and previous["listing_version"] == doc["listing_version"]:
+    if previous and previous["listing_version"] == listing_version:
         fail("当前确认版文案已登记，请勿重复确认")
     c.execute(
         "INSERT INTO publication_records(id,document_id,target_id,listing_version,store,msku,asin,receipt,created_by) "
@@ -64,7 +66,7 @@ def publish_listing(c, user, item_id, revision, data):
             uuid4(),
             doc["id"],
             target["id"],
-            doc["listing_version"],
+            listing_version,
             store,
             msku,
             asin,
@@ -72,27 +74,33 @@ def publish_listing(c, user, item_id, revision, data):
             user["id"],
         ),
     )
-    c.execute(
-        "UPDATE content_documents SET publication_target_id=%s,revision=revision+1 WHERE id=%s",
-        (target["id"], doc["id"]),
-    )
+    if market:
+        c.execute("UPDATE market_contents SET publication_target_id=%s WHERE document_id=%s AND site=%s", (target["id"], doc["id"], market["site"]))
+        c.execute("UPDATE content_documents SET revision=revision+1 WHERE id=%s", (doc["id"],))
+    else:
+        c.execute("UPDATE content_documents SET publication_target_id=%s,revision=revision+1 WHERE id=%s", (target["id"], doc["id"]))
     event(
-        c, item_id, user, "publication.register", {"listing_version": doc["listing_version"], "target_id": target["id"]}
+        c, item_id, user, "publication.register", {"listing_version": listing_version, "target_id": target["id"]}
     )
     project(c, item_id)
     return detail(c, user, item_id)
 
 
 def image_receipt(c, user, item_id, revision, data):
-    get_item(c, user, item_id, True)
+    item = get_item(c, user, item_id, True)
     doc = get_doc(c, item_id, revision)
+    market = _market(c, item, doc, data)
     t = c.execute(
         "SELECT * FROM artwork_tasks WHERE document_id=%s ORDER BY batch DESC LIMIT 1", (doc["id"],)
     ).fetchone()
     d = c.execute("SELECT * FROM artwork_deliveries WHERE id=%s", (t["current_delivery_id"],)).fetchone() if t else None
+    if market and t and t["market_sites"]:
+        child = c.execute("SELECT * FROM artwork_task_markets WHERE task_id=%s AND site=%s", (t["id"], market["site"])).fetchone()
+        d = c.execute("SELECT * FROM artwork_deliveries WHERE id=%s", (child["current_delivery_id"],)).fetchone() if child else None
     if (
         not d
-        or t["state"] != "accepted"
+        or (not market and bool(t["market_sites"]))
+        or (not market and t["state"] != "accepted")
         or d["result"] != "accepted"
         or str(data.get("delivery_id")) != str(d["id"])
     ):
@@ -116,8 +124,9 @@ def image_receipt(c, user, item_id, revision, data):
 
 
 def withdraw_registration(c, user, item_id, revision, data):
-    get_item(c, user, item_id, True)
+    item = get_item(c, user, item_id, True)
     doc = get_doc(c, item_id, revision)
+    market = _market(c, item, doc, data)
     kind, reason = data.get("kind"), data.get("reason", "")
     if kind not in ("copy", "images") or not isinstance(reason, str) or not reason.strip() or len(reason) > 2000:
         fail("请选择有效的登记类型与撤回原因", 422)
@@ -126,6 +135,11 @@ def withdraw_registration(c, user, item_id, revision, data):
         if kind == "copy"
         else current_image_registration(c, doc["id"])
     )
+    if market:
+        if kind == "copy":
+            current = c.execute("SELECT * FROM publication_records WHERE target_id=%s AND withdrawn_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 1", (market["publication_target_id"],)).fetchone()
+        else:
+            current = c.execute("SELECT r.* FROM image_receipts r JOIN artwork_deliveries d ON d.id=r.delivery_id JOIN artwork_tasks t ON t.id=d.task_id WHERE t.document_id=%s AND d.marketplace=%s AND r.withdrawn_at IS NULL AND r.invalidated_at IS NULL ORDER BY r.created_at DESC,r.id DESC LIMIT 1", (doc["id"], market["site"])).fetchone()
     if not current or str(current["id"]) != str(data.get("registration_id")):
         fail("当前有效登记已变化，请刷新后重试")
     table = "publication_records" if kind == "copy" else "image_receipts"
@@ -143,3 +157,14 @@ def withdraw_registration(c, user, item_id, revision, data):
     )
     project(c, item_id)
     return detail(c, user, item_id)
+
+
+def _market(c, item, doc, data):
+    if item["editor_mode"] != "pan_eu":
+        if data.get("site"):
+            fail("普通商品只支持评审来源站点", 422)
+        return None
+    site = data.get("site")
+    if site not in item["editor_targets"]:
+        fail("请选择当前计划的刊登站点", 422)
+    return c.execute("SELECT * FROM market_contents WHERE document_id=%s AND site=%s", (doc["id"], site)).fetchone()

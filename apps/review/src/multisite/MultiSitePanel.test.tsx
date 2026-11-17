@@ -1,17 +1,16 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import MultiSitePanel from "./MultiSitePanel";
-import { newSiteDraft, type FinanceProfile, type SiteDraft, type TaxProfile } from "./domain";
+import { newSiteDraft, type FinanceProfile, type Marketplace, type SiteDraft, type TaxProfile } from "./domain";
 import type { UserAccess } from "../domain/types";
 import type { SiteDashboard, SiteReview } from "./repository";
 import type { FbaCard } from "./rateCards";
-import cardData from "../../data/fba-rate-cards-2026.json";
 
 const { mockPreferenceLoad, mockPreferenceSave } = vi.hoisted(() => ({
   mockPreferenceLoad: vi.fn(), mockPreferenceSave: vi.fn(async () => "cloud"),
 }));
 vi.mock("./sitePreference", () => ({ loadSitePreference: mockPreferenceLoad, saveSitePreference: mockPreferenceSave }));
-const remembered = (site: "CA" | "AU" | "UK" | "AE" | null, userId = "operator-1") => ({
+const remembered = (site: Marketplace | null, userId = "operator-1") => ({
   scope: { baseId: "base-1", userId }, storage: "cloud",
   preference: site ? { version: 1, baseId: "base-1", userId, site, savedAt: 1 } : null,
 });
@@ -23,13 +22,16 @@ const mockLoad = vi.fn(async (): Promise<SiteDashboard> => ({
     { name: "信封档", dimensions: [38, 27, 2], weightG: 500 }] } }, problems: [],
 }));
 const mockSave = vi.fn(async (_draft: SiteDraft, _access: UserAccess,
-  _id: string | null, _image?: File | null) => "rec-draft");
+  _id: string | null, _image?: File | null, _allowProductIdentityChange = false) => "rec-draft");
 const mockSubmit = vi.fn(async () => {});
 const mockDecide = vi.fn(async () => {});
 const mockOpenRecord = vi.fn(async () => {});
 const mockCards = vi.fn(async (): Promise<FbaCard[]> => []);
 vi.mock("./repository", () => ({
   SubmissionPendingError: class SubmissionPendingError extends Error {},
+  DraftIdentityChangedError: class DraftIdentityChangedError extends Error {
+    constructor(readonly existing: SiteDraft, readonly incoming: SiteDraft) { super("商品已变化"); }
+  },
   ApprovalOverrideRequiredError: class ApprovalOverrideRequiredError extends Error {
     constructor(readonly reasons: string[]) { super(reasons.join("；")); }
   },
@@ -48,9 +50,71 @@ const access = {
   tableEditable: true,
 };
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-beforeEach(() => { mockCards.mockReset().mockResolvedValue([]); });
+beforeEach(() => {
+  mockCards.mockReset().mockResolvedValue([]);
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("No live service in UI tests")));
+});
+
+function fillCompleteCaDraft(container: HTMLElement, productName: string, sku = "") {
+  if (sku) fireEvent.change(screen.getByLabelText("选品SKU"), { target: { value: sku } });
+  fireEvent.change(screen.getByLabelText("选品说明"), {
+    target: { value: "选品依据：测试需求。\n销售策略：小批量测试。" },
+  });
+  fireEvent.change(screen.getByLabelText("产品中文名称 *"), { target: { value: productName } });
+  fireEvent.change(screen.getByLabelText("品类 *"), { target: { value: "家居" } });
+  fireEvent.change(screen.getByLabelText("1688链接 *"), {
+    target: { value: `https://example.com/${encodeURIComponent(productName)}` },
+  });
+  for (const [label, value] of [
+    ["售价（CAD） *", "25"], ["采购单价（¥） *", "2"],
+    ["包装长（cm） *", "17.5"], ["包装宽（cm） *", "14"],
+    ["包装高（cm） *", "0.5"], ["包装重量（g） *", "20"],
+    ["FBA 费用（CAD） *", "4.55"],
+  ]) fireEvent.change(screen.getByLabelText(label), { target: { value } });
+  for (const label of ["商标排查 *", "专利排查 *", "版权排查 *"])
+    fireEvent.change(screen.getByLabelText(label), { target: { value: "无风险" } });
+  fireEvent.change(screen.getByLabelText("排查依据 *"), { target: { value: "无" } });
+  const image = new File(["image"], "candidate.png", { type: "image/png" });
+  fireEvent.change(container.querySelector('input[type="file"]')!, { target: { files: [image] } });
+  return image;
+}
 
 describe("多站点草稿入口", () => {
+  it.each([
+    ["CA", "CAD", 4.90, "envelope"], ["MX", "MXN", 27, "envelope"],
+    ["UK", "GBP", 1.93, "light-envelope"], ["US", "USD", 3.63, "small-standard"],
+    ["AU", "AUD", 4.55, "small-envelope"], ["SA", "SAR", 7.5, "small-envelope"],
+    ["JP", "JPY", 288, "jp-small"],
+    ["FR", "EUR", 2.84, "light-envelope"], ["ES", "EUR", 2.93, "light-envelope"],
+  ] as const)("%s 后端预估不覆盖手填费用，保存仍使用人工值且不读取旧费率表", async (site, currency, total, tier) => {
+    mockPreferenceLoad.mockResolvedValueOnce(remembered(site));
+    const fetch = vi.fn(async (_url: string, options: RequestInit) => {
+      const input = JSON.parse(options.body as string).items[0];
+      return { ok: true, json: async () => ({ results: [{ ok: true, result: {
+        marketplace: site, currency, saleDate: input.saleDate, program: "domestic",
+        status: "estimated", rateVersion: "2026-11-16.1",
+        fee: { total, totalMinorUnits: Math.round(total * (site === "JP" ? 1 : 100)), includesTax: ["MX", "JP"].includes(site) },
+        classification: { tier, plan: "regular", shippingWeight: .05, weightUnit: site === "US" ? "lb" : "kg" },
+        assumptions: { lowPriceEligibility: "conservative" },
+      } }] }) };
+    });
+    vi.stubGlobal("fetch", fetch);
+    render(<MultiSitePanel access={access} />);
+    await screen.findByLabelText(`售价（${currency}） *`);
+    for (const [label, value] of [[`售价（${currency}） *`, site === "JP" ? "2000" : "30"],
+      ["包装长（cm） *", "20"], ["包装宽（cm） *", "15"], ["包装高（cm） *", "1"],
+      ["包装重量（g） *", "50"], [`FBA 费用（${currency}） *`, "999"]])
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    const before = document.querySelector(".site-result-hero")!.textContent;
+    await waitFor(() => expect(document.querySelector(".site-fba-preview")!.textContent).toContain(`${currency} ${total.toFixed(2)}`));
+    expect(screen.getByLabelText(`FBA 费用（${currency}） *`)).toHaveValue(999);
+    expect(document.querySelector(".site-result-hero")!.textContent).toBe(before);
+    fireEvent.click(screen.getByRole("button", { name: "保存草稿" }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledOnce());
+    expect(mockSave.mock.calls[0][0]).toMatchObject({ site, fbaFeeLocal: 999 });
+    expect(mockCards).not.toHaveBeenCalled();
+    expect(mockSubmit).not.toHaveBeenCalled();
+  });
   it("AE异步预估返回不改变手填成本、利润或保存内容，修改售价重新预估", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AE"));
     const tax = { site: "AE", currency: "AED", roughConfigured: true, priceIncludesTax: true,
@@ -112,12 +176,15 @@ describe("多站点草稿入口", () => {
   });
   it("FBA参考价出现或重新计算时不自动填写或覆盖手填费用，保存仍使用手填值", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AU"));
-    mockCards.mockResolvedValueOnce(cardData.rows.filter(row => row.site === "AU").map(row => ({
-      ...row, site: "AU", maxDimsCm: row.maxDimsCm as [number, number, number],
-      shippingMethod: row.shippingMethod as FbaCard["shippingMethod"],
-      effectiveFrom: Date.parse(row.effectiveFrom),
-      effectiveUntil: row.effectiveUntil ? Date.parse(row.effectiveUntil) : null,
-    })));
+    vi.stubGlobal("fetch", vi.fn(async (_url: string, options: RequestInit) => {
+      const input = JSON.parse(options.body as string).items[0];
+      const total = input.price.amount < 13 ? 6.33 : 7.24;
+      return { ok: true, json: async () => ({ results: [{ ok: true, result: {
+        marketplace: "AU", currency: "AUD", saleDate: input.saleDate, rateVersion: "2026-11-16.1", status: "estimated",
+        fee: { total, totalMinorUnits: Math.round(total * 100), includesTax: false },
+        classification: { tier: "parcel", plan: total === 6.33 ? "low_price" : "regular", shippingWeight: .75, weightUnit: "kg" },
+      } }] }) };
+    }));
     render(<MultiSitePanel access={access} />);
     await screen.findByLabelText("售价（AUD） *");
     for (const [label, value] of [["售价（AUD） *", "25"], ["包装长（cm） *", "20"],
@@ -134,6 +201,7 @@ describe("多站点草稿入口", () => {
     await waitFor(() => expect(mockSave).toHaveBeenCalledOnce());
     expect(mockSave.mock.calls[0][0].fbaFeeLocal).toBe(17.77);
     expect(mockSubmit).not.toHaveBeenCalled();
+    expect(mockCards).not.toHaveBeenCalled();
   });
   it("记住阿联酋站点并以 AED 带入、保存草稿", async () => {
     mockPreferenceLoad.mockResolvedValueOnce(remembered("AE"));
@@ -203,7 +271,7 @@ describe("多站点草稿入口", () => {
     fireEvent.click(screen.getByRole("button", { name: "带入完整表单" }));
     expect(screen.getByLabelText("FBA 费用（CAD） *")).toHaveValue(4.5);
   });
-  it("重开本人草稿后可修改 SKU 编码并保存到原记录", async () => {
+  it("重开本人草稿修改 SKU 后，需确认才覆盖原记录", async () => {
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
     const review: SiteReview = {
       id: "draft-1", number: "MS-1", draft: { ...newSiteDraft("CA"), site: "CA",
@@ -223,8 +291,11 @@ describe("多站点草稿入口", () => {
     expect(sku).not.toBeDisabled();
     fireEvent.change(sku, { target: { value: "NEW-SKU" } });
     fireEvent.click(screen.getByRole("button", { name: "保存草稿" }));
+    expect(await screen.findByRole("dialog", { name: "草稿商品已变更" })).toHaveTextContent("草稿产品");
+    expect(mockSave).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "覆盖原草稿" }));
     await waitFor(() => expect(mockSave).toHaveBeenCalledWith(
-      expect.objectContaining({ entitySku: "NEW-SKU" }), access, "draft-1", null));
+      expect.objectContaining({ entitySku: "NEW-SKU" }), access, "draft-1", null, true));
   });
   it("统一提交列表搜索同时覆盖站点评审和已存记录，且只出现一个页签卡片", async () => {
     mockLoad.mockResolvedValueOnce({ reviews: [{
@@ -521,6 +592,58 @@ describe("多站点草稿入口", () => {
     expect(mockSave.mock.calls[0][3]).toBe(image);
     expect(mockSubmit).toHaveBeenCalledOnce();
   });
+
+  it("保存草稿后录入另一产品并提交时，另建新记录且不覆盖原草稿", async () => {
+    const savedDraft = {
+      id: "draft-A", number: "DRAFT-A", draft: {
+        ...newSiteDraft("CA"), site: "CA" as const, entitySku: "DRAFT-A",
+        productName: "产品 A", category: "家居", sourceUrl: "https://example.com/A",
+        listedPrice: 25, purchaseCny: 2, fbaFeeLocal: 4.55,
+        lengthCm: 17.5, widthCm: 14, heightCm: .5, unitWeightG: 20,
+        trademarkRisk: "无风险" as const, patentRisk: "无风险" as const,
+        copyrightRisk: "无风险" as const, complianceNotes: "无",
+        selectionRationale: "选品依据：测试需求。\n销售策略：小批量测试。",
+      },
+      status: "草稿" as const, validation: "未提交", submitterId: access.userId,
+      submitterName: "测试运营", group: "一部一组", submittedAt: 0,
+      reviewCount: 0, managerComment: "", hasImage: true, imageToken: "image-A",
+      calculation: null, officialFbaFee: 0, officialFbaSource: "", officialFbaEvidence: "",
+    } satisfies SiteReview;
+    const dashboard = {
+      reviews: [savedDraft], rules: [], problems: [],
+      taxes: [{ site: "CA", currency: "CAD", priceIncludesTax: false,
+        salesTaxRate: 0, incomeTaxWithholdingRate: 0, feeTaxRate: 0,
+        effectiveFrom: 0, effectiveUntil: null, version: "test" } as TaxProfile],
+      finances: [{ site: "CA", currency: "CAD", category: "通用",
+        cnyPerCurrency: 5, headhaulCnyPerKg: 45, volumeDivisorCm3PerKg: 5000,
+        referralRate: .15, referralBasis: "买家标价", referralFeeIncludesTax: false,
+        adRate: .1, returnLossRate: .03, storageLossRate: .015,
+        promotionRate: .01, settlementLossRate: .005,
+        targetContributionRate: .25, approved: true, effectiveFrom: 0,
+        effectiveUntil: null, version: "test", source: "test" } as FinanceProfile],
+    };
+    mockLoad.mockResolvedValueOnce(dashboard).mockResolvedValueOnce(dashboard)
+      .mockResolvedValueOnce(dashboard);
+    mockSave.mockResolvedValueOnce("draft-A").mockResolvedValueOnce("draft-B");
+    const { container } = render(<MultiSitePanel access={access} />);
+    await screen.findByText("提审检查");
+    fillCompleteCaDraft(container, "产品 A", "DRAFT-A");
+    fireEvent.click(screen.getByRole("button", { name: "保存草稿" }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledOnce());
+    await screen.findByText(/编辑中 · 加拿大 · CAD · 产品 A/);
+
+    fillCompleteCaDraft(container, "产品 B", "DRAFT-B");
+    fireEvent.click(screen.getByRole("button", { name: "提交审核" }));
+    expect(await screen.findByRole("dialog", { name: "草稿商品已变更" })).toHaveTextContent("产品 A");
+    expect(mockSave).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole("button", { name: "另建新产品并提交" }));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+    expect(mockSave.mock.calls[1][0].productName).toBe("产品 B");
+    expect(mockSave.mock.calls[1][2]).toBeNull();
+    expect(mockSave.mock.calls[1][4]).toBe(false);
+    await waitFor(() => expect(mockSubmit).toHaveBeenCalledWith("draft-B", access));
+    expect(await screen.findByText(/我的草稿 · 从这里继续编辑（1）/)).toBeInTheDocument();
+  });
 });
 
 
@@ -585,10 +708,11 @@ describe("按运营账号记忆站点", () => {
     expect(screen.getByLabelText("目标站点")).toHaveValue("CA");
     expect(screen.getByLabelText("目标站点")).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "保存草稿" }));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({ site: "CA" }),access,"old-ca",null));
-    await waitFor(() => expect(screen.getByRole("button", { name: "新建另一站点" })).toBeEnabled());
+    await waitFor(() => expect(mockSave).toHaveBeenCalledWith(
+      expect.objectContaining({ site: "CA" }), access, "old-ca", null, false));
+    await waitFor(() => expect(screen.getByRole("button", { name: "新建选品" })).toBeEnabled());
     expect(mockPreferenceSave).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "新建另一站点" }));
+    fireEvent.click(screen.getByRole("button", { name: "新建选品" }));
     expect(screen.getByLabelText("目标站点")).toHaveValue("AU");
     expect(screen.getByLabelText("产品中文名称 *")).toHaveValue("");
   });

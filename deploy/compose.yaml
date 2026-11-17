@@ -1,7 +1,7 @@
 name: amazon-sku-workbench
 x-service: &service
   build: {context: .., dockerfile: deploy/Dockerfile}
-  image: amazon-sku-workbench-api:0.21.0
+  image: amazon-sku-workbench-api:0.25.0
   env_file: ../.env
   environment:
     DATABASE_URL: postgresql://workbench:${POSTGRES_PASSWORD:?set a private database password}@db:5432/workbench
@@ -46,6 +46,17 @@ services:
     <<: *service
     profiles: [feishu]
     command: [python, -m, amazon_aigc.cli, worker, --kind, images]
+  selection:
+    <<: *service
+    profiles: [workflows]
+    command: [python, -m, amazon_aigc.base_workflows, worker]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -m, amazon_aigc.base_workflows, health]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
   notify:
     <<: *service
     profiles: [notifications]

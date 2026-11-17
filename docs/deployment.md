@@ -22,6 +22,12 @@
 
 ## 模型与采集
 
+从 v10 提示词切换到白牌规则时，先让模型调用结束，再暂停 API/model 接收任务。
+用新镜像执行 `python -m amazon_aigc.policy_rollout` 预览旧队列兼容性，确认后执行
+`python -m amazon_aigc.policy_rollout --apply`，再启动新版 API/model。
+该工具仅更新仍与原输入一致的未执行任务的指纹，保留等待状态、正文和确认版本，
+不重新发送模型调用；输入已经变化的旧任务保留，由原有过期检查处理。
+
 OpenAI可直接接入受支持的API端点，或部署`amazon_aigc.openai_relay`受控中转；中转使用独立鉴权令牌、模型白名单和并发控制，不能做公开代理。DeepSeek配置在服务端管理页，具体模型名以使用方账户可用模型为准。
 
 采集实现包括TMAPI、Firecrawl和原生网页/渲染采集。配置服务商后使用自己的合法素材验证；读取失败支持手动补充。图片视觉输入仅作生成补充参考，失败不应阻塞纯文字生成。
@@ -47,3 +53,7 @@ docker compose -f deploy/fbacc.compose.yaml down
 云邮箱未加入工作台主compose，不随API部署启动。自己的[compose与systemd模板](../services/store-mail-web/deploy/linux/README.md)保留独立端口、SQLite目录、加密主密钥与飞书应用配置。新环境使用自己的私有配置；现有环境迁移、切换和登录整合需要单独实施。
 
 本地预览使用`npm run dev:mail`，仅生成临时演示数据。正式运行的`serve --no-scheduler`仅关闭IMAP调度，仍可能处理通知任务，不能用于真实数据库上的离线演示。源码包导出用`npm run package:mail -- mail/v0.13.1`；SQLite、邮件、账号和密钥不在归档内。回退代码前核验数据库兼容性，不用旧数据库覆盖新增邮件和用户操作。
+
+## 可选 Base 后端流程
+
+`selection` profile 默认关闭。先配置私有规则、事件订阅和身份映射，建立基线并完成原生流程切换后再启用。命令、验证与回退顺序见[接管说明](base-workflows.md)。

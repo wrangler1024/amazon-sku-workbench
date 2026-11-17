@@ -19,7 +19,7 @@ NATIVE_COLLECTION_SLOT = threading.BoundedSemaphore(1)
 def enqueue(c, user, item_id, request, settings):
     item = get_item(c, user, item_id, True)
     doc = get_doc(c, item_id, request.revision)
-    allowed = ("url", "kind", "source_id") if request.kind == "source" else ("provider", "task")
+    allowed = ("url", "kind", "source_id") if request.kind == "source" else ("provider", "task", "market_targets")
     payload = {k: request.payload[k] for k in allowed if k in request.payload}
     state = "queued"
     payload["revision"] = doc["revision"]
@@ -45,13 +45,22 @@ def enqueue(c, user, item_id, request, settings):
         task = payload.get("task")
         if provider not in ("openai", "deepseek") or task not in ("listing", "brief", "facts"):
             fail("未知生成类型", 422)
+        if item["editor_mode"] == "pan_eu" and task in ("listing", "brief") and "market_targets" not in payload:
+            fail("请从多站编辑区选择生成站点")
+        market_context = {}
+        if "market_targets" in payload:
+            if task not in ("listing", "brief"):
+                fail("多站生成仅支持文案或图需", 422)
+            from .market_editor import generation_context
+            market_context = generation_context(c, item, doc, payload["market_targets"])
         if task != "facts" and not doc["facts_version"]:
             fail("请先确认产品事实")
         existing = c.execute(
             "SELECT id,state FROM jobs WHERE work_item_id=%s AND kind='model' AND payload->>'task'=%s "
             "AND payload->>'provider'=%s AND payload->>'input_stamp'=%s AND coalesce(payload->>'collector','native')=%s "
+            "AND coalesce(payload->'market_targets','null'::jsonb)=%s "
             "AND state IN ('waiting_sources','waiting_input','queued','running') ORDER BY created_at DESC LIMIT 1",
-            (item_id, task, provider, input_stamp(doc), payload["collector"]),
+            (item_id, task, provider, input_stamp(doc), payload["collector"], Jsonb(payload.get("market_targets"))),
         ).fetchone()
         if existing:
             return {"job_id": str(existing["id"]), "state": existing["state"]}
@@ -73,6 +82,7 @@ def enqueue(c, user, item_id, request, settings):
         )
         payload["vision_enabled"] = provider == "openai"
         payload["context"] = {
+            **market_context,
             "site": item["site"],
             "operator_notes": (facts["body"] if facts else doc["body"].get("facts", {})).get("source_text", ""),
             "editor_requirements": {

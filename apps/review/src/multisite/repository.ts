@@ -1,6 +1,6 @@
 import { normalizeSelectionRationale, selectionRationaleProblem, rationaleSubmissionId, requiresSelectionRationale } from "../domain/selectionRationale";
 import { bitable, IOpenSegmentType, type IOpenCellValue, type IRecord, type ISingleSelectField, type ITable } from "@lark-opdev/block-bitable-api";
-import { calculateSite, forecastTimestamp, MARKETPLACES, submissionProblems,
+import { calculateSite, draftProductIdentityChanged, forecastTimestamp, MARKETPLACES, submissionProblems,
   type FbaRateRule, type FinanceProfile, type Marketplace, type SiteCalculation,
   type SiteDraft, type TaxClass, type TaxProfile } from "./domain";
 import type { UserAccess } from "../domain/types";
@@ -65,6 +65,11 @@ export class ApprovalOverrideRequiredError extends Error {
   }
 }
 export class SubmissionPendingError extends Error {}
+export class DraftIdentityChangedError extends Error {
+  constructor(readonly existing: SiteDraft, readonly incoming: SiteDraft) {
+    super("检测到商品识别信息已变化；请确认是另建新产品还是覆盖原草稿");
+  }
+}
 
 function text(value: IOpenCellValue): string {
   if (typeof value === "string") return value.trim();
@@ -519,6 +524,7 @@ async function draftValues(target: ITable, f: Fields, draft: SiteDraft): Promise
 
 export async function saveSiteDraft(
   draft: SiteDraft, access: UserAccess, existingId: string | null, imageFile?: File | null,
+  allowProductIdentityChange = false,
 ): Promise<string> {
   if (!access.canSubmit || !access.submitGroup) throw new Error("当前账号没有提交选品评审的运营小组权限");
   const target = await table("SKU选品库");
@@ -530,6 +536,8 @@ export async function saveSiteDraft(
     if (!review || review.submitterId !== access.userId ||
         !["草稿", "打回修改"].includes(review.status))
       throw new Error("仅可修改本人草稿或打回记录");
+    if (!allowProductIdentityChange && draftProductIdentityChanged(review.draft, draft))
+      throw new DraftIdentityChangedError(review.draft, draft);
   }
   const rationaleProblem = selectionRationaleProblem(draft.selectionRationale, false);
   if (rationaleProblem) throw new Error(rationaleProblem);

@@ -12,3 +12,5 @@
 - [ ] Maintain source adapters when official content or layouts change.
 
 - [x] Extend calculator, web UI, source monitoring and reference samples to AE/SA/JP (17 markets).
+
+- [x] Review dated European surcharge change and add current DE/FR/ES boundary reference cases (2026-11-16).

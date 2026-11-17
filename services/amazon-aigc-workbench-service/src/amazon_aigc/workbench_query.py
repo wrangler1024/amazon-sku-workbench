@@ -46,51 +46,65 @@ def permission(user):
     return clause, args
 
 
-def model(user):
+def model(user, tab=""):
     allowed, args = permission(user)
+    market_art = "true" if tab in ("review", "imagePublication") else "false"
+    market_copy = "true" if tab == "copyPublication" else "false"
     return f"""WITH base AS (
-      SELECT w.id,w.environment,w.site,w.code,w.name,w.owner_id,w.group_name,w.review_status,w.created_at,w.updated_at,
+      SELECT w.id,w.environment,coalesce(am.site,mc.site,w.site) AS site,w.site AS review_site,coalesce(am.site,mc.site) AS marketplace,w.code,w.name,w.owner_id,w.group_name,w.review_status,w.created_at,w.updated_at,
+        w.editor_mode,w.editor_targets,mp.shared_version AS market_brief_version,t.market_sites,
+        coalesce((SELECT jsonb_agg(jsonb_build_object('site',m.site,'state',m.state,'current_delivery_id',m.current_delivery_id)) FROM artwork_task_markets m WHERE m.task_id=t.id),'[]'::jsonb) AS task_markets,
+        (cardinality(w.editor_targets)=0 OR EXISTS(SELECT 1 FROM unnest(w.editor_targets) s LEFT JOIN market_contents m ON m.document_id=d.id AND m.site=s LEFT JOIN content_versions v ON v.id=m.listing_version WHERE v.id IS NULL OR v.facts_version IS DISTINCT FROM d.facts_version OR v.body IS DISTINCT FROM m.listing)) AS market_pending_listing,
+        (NOT EXISTS(SELECT 1 FROM market_submissions ms LEFT JOIN artwork_tasks mt ON mt.id=ms.task_id WHERE ms.brief_version=mp.shared_version AND (ms.state='queued' OR mt.state<>'withdrawn')) OR cardinality(w.editor_targets)=0 OR mv.id IS NULL OR mv.facts_version IS DISTINCT FROM d.facts_version OR (mv.body-'market_texts'-'market_sites'-'shared_design') IS DISTINCT FROM mp.shared_brief OR EXISTS(SELECT 1 FROM unnest(w.editor_targets) s LEFT JOIN market_contents m ON m.document_id=d.id AND m.site=s WHERE NOT (mv.body->'market_sites' ? s) OR m.image_texts IS DISTINCT FROM mv.body->'market_texts'->s)) AS market_pending_brief,
+        EXISTS(SELECT 1 FROM market_contents m WHERE m.document_id=d.id AND m.site=ANY(w.editor_targets) AND m.listing_version IS NOT NULL) AS market_has_copy,
+        EXISTS(SELECT 1 FROM market_contents m WHERE m.document_id=d.id AND m.site=ANY(w.editor_targets) AND m.listing_version IS NOT NULL AND NOT EXISTS(SELECT 1 FROM publication_records p WHERE p.target_id=m.publication_target_id AND p.listing_version=m.listing_version AND p.withdrawn_at IS NULL)) AS market_copy_ready,
+        EXISTS(SELECT 1 FROM artwork_task_markets m WHERE m.task_id=t.id AND m.state='accepted') AS market_has_images,
+        EXISTS(SELECT 1 FROM artwork_task_markets m WHERE m.task_id=t.id AND m.state='accepted' AND NOT EXISTS(SELECT 1 FROM image_receipts r WHERE r.delivery_id=m.current_delivery_id AND r.invalidated_at IS NULL AND r.withdrawn_at IS NULL)) AS market_images_ready,
         u.name AS owner_name,CASE jsonb_typeof(w.review_snapshot->'记录序号')
           WHEN 'array' THEN (SELECT string_agg(coalesce(v->>'text',''),'') FROM jsonb_array_elements(w.review_snapshot->'记录序号') v)
           ELSE coalesce(w.review_snapshot->>'记录序号','') END AS task_number,
         coalesce(w.review_snapshot->'产品图片'->0->>'file_token','') AS thumbnail_token,
-        d.id AS document_id,d.revision,d.facts_version,d.listing_version,d.brief_version,
+        d.id AS document_id,d.revision,d.facts_version,CASE WHEN mc.site IS NOT NULL THEN mc.listing_version ELSE d.listing_version END AS listing_version,d.brief_version,
         coalesce(d.body->'legacy_edit_request','{{}}'::jsonb) AS legacy_edit_request,
-        t.id AS task_id,t.state AS task_state,t.assignee_id,t.urgent,t.due_date,t.batch,
+        t.id AS task_id,coalesce(am.state,t.state) AS task_state,t.assignee_id,t.urgent,t.due_date,t.batch,
         t.revision AS task_revision,t.brief_version AS task_brief_version,t.legacy_takeover,
-        t.current_delivery_id,t.created_at AS submitted_at,
+        CASE WHEN am.site IS NOT NULL THEN am.current_delivery_id ELSE t.current_delivery_id END AS current_delivery_id,t.created_at AS submitted_at,
         ad.id AS delivery_id,ad.result AS delivery_result,ad.delivered_at,ad.version AS delivery_version,
         CASE WHEN ad.result IN ('accepted','rejected') THEN ad.reviewed_at END AS reviewed_at,
         p.id AS publication_id,p.listing_version AS published_version,p.created_at AS copy_published_at,
         ir.created_at AS image_published_at,pt.id AS target_id,pt.store,pt.msku,
-        EXISTS(SELECT 1 FROM publication_records x WHERE x.document_id=d.id) AS copy_history,
-        EXISTS(SELECT 1 FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id) AS image_history,
-        EXISTS(SELECT 1 FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id AND x.withdrawn_at IS NULL) AS image_previous,
-        coalesce(ir.delivery_id=ad.id AND ad.result='accepted' AND t.state='accepted',false) AS images_uploaded
+        EXISTS(SELECT 1 FROM publication_records x WHERE x.document_id=d.id AND (mc.site IS NULL OR x.target_id=mc.publication_target_id)) AS copy_history,
+        EXISTS(SELECT 1 FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id AND (am.site IS NULL OR xd.marketplace=am.site)) AS image_history,
+        EXISTS(SELECT 1 FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id AND (am.site IS NULL OR xd.marketplace=am.site) AND x.withdrawn_at IS NULL) AS image_previous,
+        coalesce(ir.delivery_id=ad.id AND ad.result='accepted' AND coalesce(am.state,t.state)='accepted',false) AS images_uploaded
       FROM work_items w JOIN content_documents d ON d.work_item_id=w.id
       LEFT JOIN users u ON u.id=w.owner_id
+      LEFT JOIN market_plans mp ON mp.document_id=d.id
+      LEFT JOIN content_versions mv ON mv.id=mp.shared_version
       LEFT JOIN LATERAL(SELECT * FROM artwork_tasks x WHERE x.document_id=d.id ORDER BY batch DESC LIMIT 1)t ON true
-      LEFT JOIN artwork_deliveries ad ON ad.id=t.current_delivery_id
-      LEFT JOIN publication_targets pt ON pt.id=d.publication_target_id
+      LEFT JOIN LATERAL(SELECT m.* FROM artwork_task_markets m WHERE m.task_id=t.id AND {market_art})am ON true
+      LEFT JOIN LATERAL(SELECT m.* FROM market_contents m WHERE m.document_id=d.id AND m.site=ANY(w.editor_targets) AND w.editor_mode='pan_eu' AND {market_copy})mc ON true
+      LEFT JOIN artwork_deliveries ad ON ad.id=CASE WHEN am.site IS NOT NULL THEN am.current_delivery_id ELSE t.current_delivery_id END
+      LEFT JOIN publication_targets pt ON pt.id=CASE WHEN mc.site IS NOT NULL THEN mc.publication_target_id ELSE d.publication_target_id END
       LEFT JOIN LATERAL(SELECT id,listing_version,created_at FROM publication_records x WHERE x.document_id=d.id AND x.target_id=pt.id AND x.withdrawn_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 1)p ON true
-      LEFT JOIN LATERAL(SELECT x.delivery_id,x.created_at FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id AND x.invalidated_at IS NULL AND x.withdrawn_at IS NULL ORDER BY x.created_at DESC,x.id DESC LIMIT 1)ir ON true
+      LEFT JOIN LATERAL(SELECT x.delivery_id,x.created_at FROM image_receipts x JOIN artwork_deliveries xd ON xd.id=x.delivery_id JOIN artwork_tasks xt ON xt.id=xd.task_id WHERE xt.document_id=d.id AND (am.site IS NULL OR xd.marketplace=am.site) AND x.invalidated_at IS NULL AND x.withdrawn_at IS NULL ORDER BY x.created_at DESC,x.id DESC LIMIT 1)ir ON true
       WHERE {allowed}
     ), flags AS (
-      SELECT *,coalesce(listing_version IS NOT NULL AND brief_version IS NOT NULL
-        AND listing_version=published_version AND task_brief_version=brief_version AND images_uploaded,false) AS completed,
+      SELECT *,CASE WHEN editor_mode='pan_eu' THEN cardinality(editor_targets)>0 AND NOT market_pending_listing AND NOT market_pending_brief AND NOT market_copy_ready AND task_state='accepted' AND task_brief_version=market_brief_version AND market_sites @> editor_targets AND NOT market_images_ready ELSE coalesce(listing_version IS NOT NULL AND brief_version IS NOT NULL
+        AND listing_version=published_version AND task_brief_version=brief_version AND images_uploaded,false) END AS completed,
         coalesce(legacy_takeover AND task_state IN ('working','pending','revision'),false) AS legacy_inflight,
-        CASE WHEN publication_id IS NULL THEN 'ready' WHEN listing_version IS NULL OR listing_version<>published_version THEN 'ready' ELSE 'published' END AS copy_state,
-        CASE WHEN task_state IS DISTINCT FROM 'accepted' OR delivery_result IS DISTINCT FROM 'accepted' THEN 'blocked'
+        CASE WHEN editor_mode='pan_eu' AND marketplace IS NULL THEN CASE WHEN market_copy_ready THEN 'ready' ELSE 'published' END WHEN publication_id IS NULL THEN 'ready' WHEN listing_version IS NULL OR listing_version<>published_version THEN 'ready' ELSE 'published' END AS copy_state,
+        CASE WHEN editor_mode='pan_eu' AND marketplace IS NULL THEN CASE WHEN market_images_ready THEN 'ready' WHEN market_has_images THEN 'uploaded' ELSE 'blocked' END WHEN task_state IS DISTINCT FROM 'accepted' OR delivery_result IS DISTINCT FROM 'accepted' THEN 'blocked'
           WHEN images_uploaded THEN 'uploaded' ELSE 'ready' END AS image_state
       FROM base
     ), model AS (
       SELECT *,NOT completed AND NOT legacy_inflight AND NOT coalesce(legacy_takeover AND task_state='accepted' AND
         (legacy_edit_request->>'task_id' IS DISTINCT FROM task_id::text OR NOT coalesce(legacy_edit_request->'sections' ? 'facts',false)),false) AND facts_version IS NULL AS pending_facts,
         NOT completed AND NOT legacy_inflight AND NOT coalesce(legacy_takeover AND task_state='accepted' AND
-        (legacy_edit_request->>'task_id' IS DISTINCT FROM task_id::text OR NOT coalesce(legacy_edit_request->'sections' ? 'listing',false)),false) AND listing_version IS NULL AS pending_listing,
+        (legacy_edit_request->>'task_id' IS DISTINCT FROM task_id::text OR NOT coalesce(legacy_edit_request->'sections' ? 'listing',false)),false) AND CASE WHEN editor_mode='pan_eu' THEN market_pending_listing ELSE listing_version IS NULL END AS pending_listing,
         NOT completed AND NOT legacy_inflight AND NOT coalesce(legacy_takeover AND task_state='accepted' AND
         (legacy_edit_request->>'task_id' IS DISTINCT FROM task_id::text OR NOT coalesce(legacy_edit_request->'sections' ? 'brief',false)),false) AND
-        (brief_version IS NULL OR task_id IS NULL OR task_state='withdrawn' OR task_brief_version IS DISTINCT FROM brief_version) AS pending_brief
+        CASE WHEN editor_mode='pan_eu' THEN market_pending_brief ELSE (brief_version IS NULL OR task_id IS NULL OR task_state='withdrawn' OR task_brief_version IS DISTINCT FROM brief_version) END AS pending_brief
       FROM flags
     ) """, args
 
@@ -109,10 +123,10 @@ def tab_clause(tab, user):
         own = 'true' if user.get('preview_all_artists') or user.get('preview_artist_id') else 'assignee_id=%(actor)s'
         return f"task_id IS NOT NULL AND assignee_id IS NOT NULL AND task_state NOT IN ('pool','withdrawn') AND {own}"
     if tab == 'review':
-        return "delivery_id IS NOT NULL AND task_state IN ('pending','revision','accepted')" + ('' if ops or 'art_lead' in roles else ' AND assignee_id=%(actor)s')
+        return "(delivery_id IS NOT NULL OR jsonb_array_length(task_markets)>0) AND task_state IN ('pending','revision','accepted')" + ('' if ops or 'art_lead' in roles else ' AND assignee_id=%(actor)s')
     if tab == 'copyPublication':
-        return '(listing_version IS NOT NULL OR copy_history)'
-    return "((task_state='accepted' AND delivery_result='accepted') OR image_history)"
+        return '(listing_version IS NOT NULL OR (marketplace IS NULL AND market_has_copy) OR copy_history)'
+    return "((task_state='accepted' AND delivery_result='accepted') OR (marketplace IS NULL AND market_has_images) OR image_history)"
 
 
 def row_json(r):
@@ -120,8 +134,10 @@ def row_json(r):
     task = None if not r['task_id'] else {k: r[v] for k,v in {
         'id':'task_id','state':'task_state','assignee_id':'assignee_id','urgent':'urgent','due_date':'due_date','batch':'batch',
         'revision':'task_revision','brief_version':'task_brief_version','legacy_takeover':'legacy_takeover',
-        'current_delivery_id':'current_delivery_id','created_at':'submitted_at'}.items()}
+        'current_delivery_id':'current_delivery_id','created_at':'submitted_at','market_sites':'market_sites'}.items()}
     return {**{k:r[k] for k in ('id','environment','site','code','name','owner_id','owner_name','group_name','review_status','created_at','updated_at','task_number','document_id','revision','facts_version','listing_version','brief_version','legacy_edit_request','published_version','images_uploaded','completed','submitted_at','delivered_at','reviewed_at','copy_published_at','image_published_at')},
+        'review_site':r['review_site'],'marketplace':r['marketplace'],'editor_mode':r['editor_mode'],'editor_targets':r['editor_targets'],'task_markets':r['task_markets'],'market_has_copy':r['market_has_copy'],'market_has_images':r['market_has_images'],
+        'market_editing':{'facts':r['pending_facts'],'listing':r['pending_listing'],'brief':r['pending_brief']} if r['editor_mode']=='pan_eu' else None,
         'thumbnail_id':r['thumbnail_id'],'thumbnail_pending':bool(r['thumbnail_token'] and not r['thumbnail_id']),'task':task,
         'delivery': None if not r['delivery_id'] else {'id':r['delivery_id'],'result':r['delivery_result'],'version':r['delivery_version'],'delivered_at':r['delivered_at']},
         'publication':None if not r['publication_id'] else {'id':r['publication_id'],'listing_version':r['published_version']},
@@ -132,7 +148,11 @@ def row_json(r):
 
 def workbench_page(c, user, *, tab='facts', scope='pending', q='', days=7, date_from=None, date_to=None,
                    page=1, state='', task_range='assigned', site='', owner='', group='', person='', urgent=False):
-    cte,args=model(user)
+    # These short interactive queries expand several permission and market CTEs.
+    # PostgreSQL's estimated cost can trigger expensive JIT compilation even when
+    # actual execution is small. Keep this setting local to the read transaction.
+    c.execute("SET LOCAL jit = off")
+    cte,args=model(user,tab)
     if tab in ('copyPublication','imagePublication') and state=='update': state='ready'
     if tab=='imagePublication' and state=='unlisted': state='ready'
     base=tab_clause(tab,user)
@@ -200,6 +220,7 @@ def workbench_page(c, user, *, tab='facts', scope='pending', q='', days=7, date_
 
 
 def workbench_summary(c,user):
+    c.execute("SET LOCAL jit = off")
     cte,args=model(user)
     expr=[]
     for tab in TABS:
@@ -218,4 +239,11 @@ def workbench_summary(c,user):
         expr.append(f'count(*) FILTER(WHERE ({scope}) AND ({todo})) AS "{tab}"')
     expr.extend(['count(*) FILTER(WHERE NOT completed) AS editor_total','count(*) FILTER(WHERE NOT completed AND facts_version IS NOT NULL) AS facts_confirmed'])
     result=c.execute(cte+'SELECT '+','.join(expr)+' FROM model',args).fetchone()
+    for tab, todo in [('review', "task_state='pending'"), ('copyPublication', "copy_state='ready'"), ('imagePublication', "image_state='ready'")]:
+        try:
+            scope = tab_clause(tab, user)
+        except HTTPException:
+            continue
+        market_cte, market_args = model(user, tab)
+        result[tab] = c.execute(market_cte + f"SELECT count(*) n FROM model WHERE ({scope}) AND ({todo})", market_args).fetchone()['n']
     return {'badges':{k:result.get(k,0) for k in TABS},'editor_total':result['editor_total'],'facts_confirmed':result['facts_confirmed']}

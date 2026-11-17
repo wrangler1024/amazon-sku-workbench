@@ -43,7 +43,7 @@ describe("粗算展示与正式评审口径", () => {
       lengthCm: 20, widthCm: 10, heightCm: 5, unitWeightG: 400 };
     const formal = calculateSite(draft, tax, finance, [])!;
     render(<QuickOpportunity site={site} tax={tax} finance={finance} purchaseCny={100}
-      onPurchaseChange={vi.fn()} onCarry={vi.fn()} disabled={false} sitePicker={null} cards={[]} />);
+      onPurchaseChange={vi.fn()} onCarry={vi.fn()} disabled={false} sitePicker={null} />);
     for (const [label, value] of [
       [`售价（${currency}）`, example.price], ["包装长（cm）", 20], ["包装宽（cm）", 10],
       ["包装高（cm）", 5], ["包装重量（g）", 400], [`FBA 费用（${currency}）`, 5],
@@ -72,7 +72,7 @@ describe("粗算损耗占比默认值", () => {
   };
   const view = (profile: FinanceProfile | null) =>
     <QuickOpportunity site="US" tax={null} finance={profile} purchaseCny={null}
-      onPurchaseChange={vi.fn()} onCarry={vi.fn()} disabled={false} sitePicker={null} cards={[]} />;
+      onPurchaseChange={vi.fn()} onCarry={vi.fn()} disabled={false} sitePicker={null} />;
 
   it("异步加载配置后填默认值，未手改字段随配置刷新", () => {
     const { rerender } = render(view(null));

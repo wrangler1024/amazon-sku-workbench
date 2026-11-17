@@ -8,6 +8,9 @@ export const MARKETPLACES = {
   AE: { label: "阿联酋", currency: "AED" },
   SA: { label: "沙特", currency: "SAR" },
   JP: { label: "日本", currency: "JPY" },
+  DE: { label: "德国", currency: "EUR" },
+  FR: { label: "法国", currency: "EUR" },
+  ES: { label: "西班牙", currency: "EUR" },
 } as const;
 
 export type Marketplace = keyof typeof MARKETPLACES;
@@ -139,6 +142,30 @@ export interface SiteDraft {
   patentRisk: "未排查" | "无风险" | "有风险" | "待确认";
   copyrightRisk: "未排查" | "无风险" | "有风险" | "待确认";
   complianceNotes: string;
+}
+
+export type DraftProductIdentity = Pick<SiteDraft, "entitySku" | "productName" | "sourceUrl">;
+
+export function draftProductIdentity(draft: DraftProductIdentity): DraftProductIdentity {
+  return {
+    entitySku: draft.entitySku.trim().toUpperCase(),
+    productName: draft.productName.trim(),
+    sourceUrl: draft.sourceUrl.trim(),
+  };
+}
+
+export function draftProductIdentityChanged(
+  previous: DraftProductIdentity,
+  current: DraftProductIdentity,
+): boolean {
+  const before = draftProductIdentity(previous);
+  const after = draftProductIdentity(current);
+  return (["entitySku", "productName", "sourceUrl"] as const)
+    .some((key) => {
+      const normalize = (value: string) =>
+        key === "productName" ? value.toLocaleLowerCase() : value;
+      return Boolean(before[key] && after[key] && normalize(before[key]) !== normalize(after[key]));
+    });
 }
 
 export interface SiteCalculation {

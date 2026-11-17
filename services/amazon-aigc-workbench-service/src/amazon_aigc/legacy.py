@@ -139,6 +139,12 @@ def migrate(c, settings, rows, *, commit=False):
 def ensure_asset(c, settings, asset, gateway=None):
     """Cache a legacy original through the pinned Feishu attachment endpoint."""
     path = settings.storage_root / asset["object_key"]
+    if asset["sha256"] != "pending":
+        from .asset_storage import asset_path
+        try:
+            path = asset_path(settings.storage_root, asset)
+        except FileNotFoundError:
+            pass
     if path.is_file() and asset["sha256"] != "pending":
         return asset
     link = c.execute("SELECT * FROM legacy_attachment_links WHERE asset_id=%s", (asset["id"],)).fetchone()
@@ -155,13 +161,7 @@ def ensure_asset(c, settings, asset, gateway=None):
     digest = hashlib.sha256(data).hexdigest()
     if asset["sha256"] != "pending" and asset["sha256"] != digest:
         raise ValueError("Legacy original checksum mismatch")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    from uuid import uuid4
-    temp = path.with_suffix('.' + uuid4().hex + '.tmp')
-    try:
-        temp.write_bytes(data)
-        temp.replace(path)
-    finally:
-        temp.unlink(missing_ok=True)
+    from .asset_storage import publish_bytes
+    publish_bytes(settings.storage_root, asset['object_key'], data, mime=asset['mime'])
     c.execute("UPDATE assets SET sha256=%s,size_bytes=%s WHERE id=%s", (digest, len(data), asset["id"]))
     return {**asset, "sha256": digest, "size_bytes": len(data)}

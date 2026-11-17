@@ -6,7 +6,7 @@
 
 在线计算器：**https://fbacc.samforo.icu**；[公开 OpenAPI](https://fbacc.samforo.icu/openapi.json)。
 
-当前版本 `0.3.0`，费率快照为 `2026-10-31.2`，支持 **AU、US、CA、MX、UK、DE、FR、IT、ES、NL、SE、PL、BE、IE 以及 AE、SA、JP 共 17 站**。运行时无第三方依赖，计算不请求外部服务。
+当前版本 `0.3.1`，费率快照为 `2026-11-16.1`，支持 **AU、US、CA、MX、UK、DE、FR、IT、ES、NL、SE、PL、BE、IE 以及 AE、SA、JP 共 17 站**。运行时无第三方依赖，计算不请求外部服务。
 
 
 ## 网页使用
@@ -108,7 +108,7 @@ else console.log(result.reason);
 
 费率数字、尺寸条件和生效时间来自亚马逊官方来源。社区项目只作为结构与核查方向的参考，未打包或执行无许可证项目的计算代码。详见 [来源与维护说明](docs/sources.md)。
 
-- `rates/2026-10-31.2.json`：运行时唯一费率快照，整数最小货币单位存价（JPY 为日元，其他币种为分）；服务离线可计算。
+- `rates/2026-11-16.1.json`：运行时唯一费率快照，整数最小货币单位存价（JPY 为日元，其他币种为分）；服务离线可计算。
 - `evidence/`：官方页面提取、欧洲 PDF 表格、三站既有核验数据与本次验证记录。
 - `scripts/build-reviewed-rates.py`：从已审阅的本地证据重新组织数据。原始官方页面/PDF不随仓库分发；该维护脚本需要自备其列出的输入文件，运行计算器不需要这些文件。
 - `scripts/check-rates.mjs`：检查站点、金额、单位、分档顺序与来源；修改费率后运行该检查及 `npm test`。

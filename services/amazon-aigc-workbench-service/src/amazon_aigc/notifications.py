@@ -38,8 +38,8 @@ def enqueue_event(c, event_id, item_id, actor, action, detail):
         return
     task = c.execute(
         "SELECT t.* FROM artwork_tasks t JOIN content_documents d ON d.id=t.document_id "
-        "WHERE d.work_item_id=%s ORDER BY t.batch DESC LIMIT 1",
-        (item_id,),
+        "WHERE d.work_item_id=%s AND (%s::uuid IS NULL OR t.id=%s::uuid) ORDER BY t.batch DESC LIMIT 1",
+        (item_id, detail.get("task_id"), detail.get("task_id")),
     ).fetchone()
     if not task:
         return
@@ -58,18 +58,23 @@ def enqueue_event(c, event_id, item_id, actor, action, detail):
         "artwork.cancel-review": [task["assignee_id"]],
     }.get(action, [])
     maker = c.execute("SELECT name FROM users WHERE id=%s", (task["assignee_id"],)).fetchone()
+    market = detail.get("site") if detail.get("site") in task["market_sites"] else None
+    child = c.execute("SELECT * FROM artwork_task_markets WHERE task_id=%s AND site=%s", (task["id"], market)).fetchone() if market else None
     result = detail.get("result")
     title = TITLES[action] if action != "artwork.review" else "图稿验收通过" if result == "accepted" else "图稿需返修"
     payload = {
         "title": title,
         "code": item["code"],
         "name": item["name"],
-        "site": item["site"],
+        "site": market or item["site"],
+        "review_site": item["site"],
+        "marketplace": market,
+        "market_sites": task["market_sites"],
         "group": item["group_name"],
         "actor": actor["name"],
         "maker": maker["name"] if maker else "",
         "batch": task["batch"],
-        "delivery_id": str(task["current_delivery_id"] or ""),
+        "delivery_id": str((child or task)["current_delivery_id"] or ""),
         "state": task["state"],
         "assignee_id": str(task["assignee_id"] or ""),
         "note": str(detail.get("note") or detail.get("reason") or "")[:1200],
@@ -91,6 +96,10 @@ def content(payload, settings=None):
         f"站点 / 小组：{payload.get('site', '')} / {payload.get('group', '')}",
         f"制作批次：{payload.get('batch', '—')} · 操作人：{payload.get('actor', '系统')}",
     ]
+    if payload.get("market_sites"):
+        lines.append("本批目标站点：" + " / ".join(payload["market_sites"]))
+    if payload.get("marketplace"):
+        lines.append("本次交付 / 验收站点：" + payload["marketplace"] + "（评审来源：" + payload["review_site"] + "）")
     if payload.get("maker"):
         lines.append("执行美工：" + payload["maker"])
     if payload.get("note"):
@@ -151,6 +160,11 @@ def still_relevant(c, row):
         "artwork.review": ["accepted" if p.get("result") == "accepted" else "revision"],
         "artwork.cancel-review": ["pending"],
     }
+    if p.get("marketplace"):
+        child = c.execute("SELECT * FROM artwork_task_markets WHERE task_id=%s AND site=%s", (task["id"], p["marketplace"])).fetchone()
+        if not child or action not in ("artwork.deliver", "artwork.review", "artwork.cancel-review"):
+            return False
+        return child["state"] in allowed[action] and p.get("delivery_id") == str(child["current_delivery_id"])
     if task["state"] not in allowed.get(action, []):
         return False
     if action in ("artwork.assign", "artwork.claim") and p.get("assignee_id") != str(task["assignee_id"] or ""):

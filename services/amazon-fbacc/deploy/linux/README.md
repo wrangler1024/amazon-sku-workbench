@@ -19,7 +19,7 @@ COPYFILE_DISABLE=1 tar -czf .local/releases/fbacc.tar.gz \
 shasum -a 256 .local/releases/fbacc.tar.gz
 ```
 
-From the monorepo root, prefer `npm run package:fbacc -- fbacc/v0.3.0` to export
+From the monorepo root, prefer `npm run package:fbacc -- fbacc/v0.3.1` to export
 only committed module files with a SHA-256 and source-commit manifest. Do not pass
 the whole monorepo archive to the module installer.
 

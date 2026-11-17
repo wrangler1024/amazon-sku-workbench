@@ -75,7 +75,8 @@ def asset_preview(storage, asset, size):
     if not path.is_file():
         with _locks[int(key[:4], 16) % len(_locks)]:
             if not path.is_file():
-                _atomic_write(path, encode_preview((storage / asset["object_key"]).read_bytes(), size))
+                from .asset_storage import asset_path
+                _atomic_write(path, encode_preview(asset_path(storage, asset).read_bytes(), size))
     return path
 
 
@@ -86,6 +87,12 @@ def source_preview(storage: Path, url, size):
         with _locks[int(key[:4], 16) % len(_locks)]:
             if not path.is_file():
                 original = storage / "source-previews" / "v1" / f"{key}.original"
+                if not original.is_file():
+                    from .asset_storage import file_path
+                    try:
+                        original = file_path(storage, str(original.relative_to(storage)))
+                    except FileNotFoundError:
+                        pass
                 if original.is_file():
                     data = original.read_bytes()
                 else:
@@ -96,7 +103,8 @@ def source_preview(storage: Path, url, size):
                         data = asyncio.run(read())
                 preview = encode_preview(data, size)
                 if not original.is_file():
-                    _atomic_write(original, data)
+                    from .asset_storage import publish_bytes
+                    publish_bytes(storage, str(original.relative_to(storage)), data)
                 _atomic_write(path, preview)
     return path
 

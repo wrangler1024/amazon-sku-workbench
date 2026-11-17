@@ -1,8 +1,8 @@
-import book from '../rates/2026-10-31.2.json' with { type: 'json' };
+import book from '../rates/2026-11-16.1.json' with { type: 'json' };
 import { InputError, validateRequest } from './validation.mjs';
 
 export { InputError };
-export const VERSION = '0.3.0';
+export const VERSION = '0.3.1';
 export const RATE_VERSION = book.version;
 const EPSILON = 1e-9;
 const within = (value, maximum) => maximum == null || value <= maximum + EPSILON;
@@ -143,7 +143,11 @@ export function calculateFbaFee(input) {
   const discountCents = market.lowPriceDiscount && request.price.amount < market.lowPriceDiscount.below
     ? Math.min(baseCents, market.lowPriceDiscount.cents) : 0;
   const subtotalCents = baseCents - discountCents;
-  const fuelBasisPoints = market.fuel && request.saleDate >= market.fuel.from ? market.fuel.basisPoints : 0;
+  // Preserve historical rates: later source reviews add dated changes rather
+  // than replacing the rate applied before their effective date.
+  const fuelPeriods = market.fuel ? [market.fuel, ...(market.fuel.changes ?? [])] : [];
+  const fuelBasisPoints = fuelPeriods.filter(period => request.saleDate >= period.from)
+    .at(-1)?.basisPoints ?? 0;
   // All monetary rates are integer minor units; round the surcharge once, half up.
   const fuelCents = Math.floor((subtotalCents * fuelBasisPoints + 5000) / 10000);
   return { ...common, status: 'estimated',

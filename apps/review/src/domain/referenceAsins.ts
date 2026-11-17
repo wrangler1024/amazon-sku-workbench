@@ -3,7 +3,8 @@ import type { Marketplace } from "../multisite/domain";
 const domains: Record<Marketplace, string> = {
   CA: "www.amazon.ca", MX: "www.amazon.com.mx", UK: "www.amazon.co.uk",
   US: "www.amazon.com", AU: "www.amazon.com.au", AE: "www.amazon.ae",
-  SA: "www.amazon.sa", JP: "www.amazon.co.jp",
+  SA: "www.amazon.sa", JP: "www.amazon.co.jp", DE: "www.amazon.de",
+  FR: "www.amazon.fr", ES: "www.amazon.es",
 };
 export interface ReferenceAsin { asin: string; site: Marketplace; href: string }
 /** Only recognized Amazon product URLs or complete ASIN tokens become links. */

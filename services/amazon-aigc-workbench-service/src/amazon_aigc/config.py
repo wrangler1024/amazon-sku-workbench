@@ -1,12 +1,11 @@
-from pathlib import Path
-
-from pydantic import Field, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
 # Explicit server-owned target allowlist, loaded once at process startup.
 # Defaults are synthetic fixtures and cannot address an existing tenant.
 import json
 import os
+from pathlib import Path
+
+from pydantic import Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _DEFAULT_TARGETS = {
     "integration": {"base_id": "EXAMPLE_INTEGRATION_BASE", "table_id": "tblExampleIntegration"},
@@ -65,6 +64,7 @@ class Settings(BaseSettings):
     sync_enabled: bool = True
     base_login_enabled: bool = False
     personnel_table_id: str = ""
+    handover_log_table_id: str = ""
     production_enabled: bool = False
     base_auth_table: str = "tblExampleProofTest"
     base_auth_fields: dict[str, tuple[str, int]] = {
