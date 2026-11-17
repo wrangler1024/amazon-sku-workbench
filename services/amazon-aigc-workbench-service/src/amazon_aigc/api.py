@@ -4,6 +4,7 @@ import json
 import os
 import secrets
 import tempfile
+import weakref
 import zipfile
 from contextlib import asynccontextmanager
 from datetime import date
@@ -56,13 +57,13 @@ class _DownloadResponse(FileResponse):
     """Release the bounded temporary archive even when a client disconnects."""
     def __init__(self, path, *, cleanup, **kwargs):
         super().__init__(path, **kwargs)
-        self.cleanup = cleanup
+        self.finalizer = weakref.finalize(self, cleanup)
 
     async def __call__(self, scope, receive, send):
         try:
             await super().__call__(scope, receive, send)
         finally:
-            self.cleanup()
+            self.finalizer()
 
 
 def create_app(settings=None, db=None):
