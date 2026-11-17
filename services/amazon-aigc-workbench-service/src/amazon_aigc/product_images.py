@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from PIL import Image
 
-from .asset_storage import asset_path, file_path, publish_bytes
+from .asset_storage import original_exists, publish_bytes
 
 PREFIX = "feishu-product-image:"
 _retry_after = {}
@@ -44,12 +44,8 @@ def cache_product_images(db, gateway, items, *, max_attempts=5):
                     "SELECT id,object_key,sha256,size_bytes FROM assets WHERE work_item_id=%s AND source_url=%s LIMIT 1",
                     (item_id, source),
                 ).fetchone()
-                if asset:
-                    try:
-                        if asset_path(gateway.s.storage_root, asset).is_file():
-                            continue
-                    except FileNotFoundError:
-                        pass
+                if asset and original_exists(gateway.s.storage_root, asset['object_key']):
+                    continue
                 # Bound each sync pass so image backfill cannot starve business projections.
                 if attempts >= max_attempts or time.monotonic() >= deadline:
                     break
@@ -118,10 +114,7 @@ def cache_missing_product_images(db, gateway):
         """, (gateway.s.environment,)).fetchall()
     missing = []
     for r in rows:
-        try:
-            present = r['object_key'] and file_path(gateway.s.storage_root, r['object_key']).is_file()
-        except FileNotFoundError:
-            present = False
+        present = r['object_key'] and original_exists(gateway.s.storage_root, r['object_key'])
         if not present:
             missing.append((r['id'], r['owner_id'], r['attachments']))
     return {"pending": len(missing), **cache_product_images(db, gateway, missing, max_attempts=20)}

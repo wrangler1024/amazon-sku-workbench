@@ -217,7 +217,7 @@ async def prepare_images(storage, item_id, rows, progress=None):
                     width, height = im.size
             else:
                 path = safe_path(storage, row["object_key"]) if row["object_key"] else None
-                if path and not path.is_file():
+                if path:
                     from .asset_storage import file_path
                     try:
                         path = await asyncio.to_thread(file_path, storage, row['object_key'])

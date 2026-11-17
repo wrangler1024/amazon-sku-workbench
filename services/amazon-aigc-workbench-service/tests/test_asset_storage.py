@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from amazon_aigc.asset_storage import CosStore, StorageError, safe_path
+from amazon_aigc.asset_storage import CosStore, StorageError, original_exists, safe_path
 
 
 class Missing(Exception):
@@ -114,6 +114,16 @@ def test_cache_retention_requires_observation_independent_backup_and_access_grac
     assert store.prune_cache(backed_up, max_bytes=0)['removed_files'] == 1
     assert not path.exists()
     assert store.ensure('uploads/synthetic').read_bytes() == b'original'
+
+
+def test_periodic_presence_checks_leave_evicted_cache_cold(store, monkeypatch):
+    from amazon_aigc import asset_storage
+    path = store.put_bytes('uploads/synthetic', b'original')
+    path.unlink()
+    monkeypatch.setattr(asset_storage, 'store_for', lambda root: store)
+    assert original_exists(store.root, 'uploads/synthetic')
+    assert not path.exists()
+    assert not original_exists(store.root, 'uploads/missing')
 
 
 @pytest.mark.parametrize('key', ['', '../outside', '/absolute', 'a/../../outside', 'a\\b', '\x00'])

@@ -306,6 +306,14 @@ def file_path(root, key, *, expected_sha=None, expected_size=None):
     return safe_path(root, key)
 
 
+def original_exists(root, key):
+    """Check availability without warming the cache during periodic sync scans."""
+    if safe_path(root, key).is_file():
+        return True
+    store = store_for(root)
+    return bool(store and store._index(key))
+
+
 def asset_path(root, asset):
     digest = asset.get('sha256')
     return file_path(root, asset['object_key'], expected_sha=digest if digest != 'pending' else None,
