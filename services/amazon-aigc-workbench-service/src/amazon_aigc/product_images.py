@@ -10,6 +10,8 @@ from uuid import uuid4
 
 from PIL import Image
 
+from .asset_storage import asset_path, file_path, publish_bytes
+
 PREFIX = "feishu-product-image:"
 _retry_after = {}
 
@@ -39,11 +41,15 @@ def cache_product_images(db, gateway, items, *, max_attempts=5):
                 if not lock["acquired"]:
                     continue
                 asset = c.execute(
-                    "SELECT id,object_key FROM assets WHERE work_item_id=%s AND source_url=%s LIMIT 1",
+                    "SELECT id,object_key,sha256,size_bytes FROM assets WHERE work_item_id=%s AND source_url=%s LIMIT 1",
                     (item_id, source),
                 ).fetchone()
-                if asset and (gateway.s.storage_root / asset["object_key"]).is_file():
-                    continue
+                if asset:
+                    try:
+                        if asset_path(gateway.s.storage_root, asset).is_file():
+                            continue
+                    except FileNotFoundError:
+                        pass
                 # Bound each sync pass so image backfill cannot starve business projections.
                 if attempts >= max_attempts or time.monotonic() >= deadline:
                     break
@@ -60,14 +66,7 @@ def cache_product_images(db, gateway, items, *, max_attempts=5):
                     raise ValueError("Product image format unsupported")
                 aid = asset["id"] if asset else uuid4()
                 key = asset["object_key"] if asset else "product-images/" + str(aid)
-                path = gateway.s.storage_root / key
-                path.parent.mkdir(parents=True, exist_ok=True)
-                temp = path.with_suffix("." + uuid4().hex + ".tmp")
-                try:
-                    temp.write_bytes(data)
-                    temp.replace(path)
-                finally:
-                    temp.unlink(missing_ok=True)
+                publish_bytes(gateway.s.storage_root, key, data, mime=mime)
                 if not asset:
                     c.execute(
                         "INSERT INTO assets(id,work_item_id,uploaded_by,object_key,name,sha256,size_bytes,mime,width,height,source_url) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -117,8 +116,14 @@ def cache_missing_product_images(db, gateway):
             WHERE w.environment=%s AND coalesce(w.review_snapshot->'产品图片'->0->>'file_token','')<>''
             ORDER BY w.created_at,w.id
         """, (gateway.s.environment,)).fetchall()
-    missing = [(r["id"], r["owner_id"], r["attachments"]) for r in rows
-               if not r["object_key"] or not (gateway.s.storage_root / r["object_key"]).is_file()]
+    missing = []
+    for r in rows:
+        try:
+            present = r['object_key'] and file_path(gateway.s.storage_root, r['object_key']).is_file()
+        except FileNotFoundError:
+            present = False
+        if not present:
+            missing.append((r['id'], r['owner_id'], r['attachments']))
     return {"pending": len(missing), **cache_product_images(db, gateway, missing, max_attempts=20)}
 
 

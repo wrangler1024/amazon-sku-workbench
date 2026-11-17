@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 — 2026-11-17
+
+API 0.27.0 supports private COS originals with pinned object versions, full SHA-256 publication/read-back checks and a recoverable local cache. Asset identities, authorization and historical delivery ZIP contents remain stable. COS configuration is optional and external to the repository; existing local deployments remain supported. SQL 020 and both frontends are unchanged.
+
 ## 0.7.1 — 2026-11-16
 
 API 0.26.1 disables PostgreSQL JIT only inside workbench list and summary read transactions. This avoids compilation delays from the expanded multi-market permission queries while preserving filters, counts, database-wide settings and worker behavior. Editor 0.24.0 and SQL 020 remain unchanged.

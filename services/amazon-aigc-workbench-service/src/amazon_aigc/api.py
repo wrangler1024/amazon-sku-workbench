@@ -23,6 +23,7 @@ from PIL import Image
 from psycopg import IntegrityError
 
 from . import __version__
+from .asset_storage import StorageError, asset_path, publish_bytes
 from .auth import COOKIE, authenticate, new_session
 from .config import settings as load_settings
 from .db import Database
@@ -97,6 +98,10 @@ def create_app(settings=None, db=None):
     @app.exception_handler(IntegrityError)
     async def integrity(request, exc):
         return Response(json.dumps({"detail": "记录冲突，请刷新后重试"}), 409, media_type="application/json")
+
+    @app.exception_handler(StorageError)
+    async def storage_error(request, exc):
+        return Response(json.dumps({"detail": str(exc)}, ensure_ascii=False), 503, media_type="application/json")
 
     @app.get("/health")
     def health():
@@ -433,9 +438,7 @@ def create_app(settings=None, db=None):
                 fail("支持JPEG、PNG和WebP原图", 422)
             aid = uuid4()
             key = "uploads/" + str(aid)
-            path = s.storage_root / key
-            path.parent.mkdir(exist_ok=True, parents=True)
-            path.write_bytes(data)
+            publish_bytes(s.storage_root, key, data, mime=mime)
             name = Path(file.filename or "image").name[:200]
             c.execute(
                 "INSERT INTO assets(id,work_item_id,uploaded_by,object_key,name,sha256,size_bytes,mime,width,height) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
@@ -462,7 +465,7 @@ def create_app(settings=None, db=None):
             except (ValueError, OSError):
                 fail("图片预览生成失败，请尝试查看原图", 422)
         return FileResponse(
-            s.storage_root / a["object_key"], media_type=a["mime"], filename=a["name"] if download else None
+            asset_path(s.storage_root, a), media_type=a["mime"], filename=a["name"] if download else None
         )
 
     def display_image(path, request):
@@ -521,7 +524,7 @@ def create_app(settings=None, db=None):
                     if (a.get("source_url") or "").startswith("feishu-legacy:"):
                         from .legacy import ensure_asset
                         a = ensure_asset(c, s, a)
-                    data = (s.storage_root / a["object_key"]).read_bytes()
+                    data = asset_path(s.storage_root, a).read_bytes()
                     if hashlib.sha256(data).hexdigest() != a["sha256"]:
                         fail("原图完整性校验失败", 500)
                     z.writestr(folder + "/" + str(i).zfill(2) + "_" + archive_filename(a["name"]), data)

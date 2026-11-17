@@ -346,7 +346,8 @@ def user_profile(gateway, union_id):
 
 
 def upload_asset(gateway, asset, storage_root):
-    path = storage_root / asset["object_key"]
+    from .asset_storage import asset_path
+    path = asset_path(storage_root, asset)
     with path.open("rb") as stream:
         r = httpx.post(
             "https://open.feishu.cn/open-apis/drive/v1/medias/upload_all",

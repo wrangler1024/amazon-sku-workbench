@@ -175,8 +175,9 @@ def main():
                 (out / (t + ".ndjson")).write_text(body)
                 manifest["tables"][t] = {"rows": len(rows), "sha256": hashlib.sha256(body.encode()).hexdigest()}
                 if t == "assets":
+                    from .asset_storage import asset_path
                     for a in rows:
-                        src = s.storage_root / a["object_key"]
+                        src = asset_path(s.storage_root, a)
                         dest = out / "files" / a["object_key"]
                         dest.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copyfile(src, dest)
@@ -188,9 +189,10 @@ def main():
                     for snapshot in rows:
                         key = snapshot.get("object_key")
                         if key:
+                            from .asset_storage import file_path
                             dest = out / "files" / key
                             dest.parent.mkdir(parents=True, exist_ok=True)
-                            shutil.copyfile(s.storage_root / key, dest)
+                            shutil.copyfile(file_path(s.storage_root, key), dest)
                             manifest["files"][key] = hashlib.sha256(dest.read_bytes()).hexdigest()
         (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
         print(json.dumps({"exported": str(out), "tables": len(tables)}))

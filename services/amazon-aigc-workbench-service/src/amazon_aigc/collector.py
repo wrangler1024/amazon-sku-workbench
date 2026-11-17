@@ -252,6 +252,8 @@ async def persist_result(result, html, storage, method, filename="page.html"):
     folder.mkdir(parents=True, exist_ok=True)
     snapshot = folder / filename
     snapshot.write_text(html)
+    from .asset_storage import publish_bytes, publish_file
+    publish_file(storage, str(snapshot.relative_to(storage)), mime='text/html')
     downloads = []
     image_deadline = asyncio.get_running_loop().time() + 45
     for image_url in result["images"][:12]:
@@ -268,7 +270,7 @@ async def persist_result(result, html, storage, method, filename="page.html"):
             if mime not in ("image/jpeg", "image/png", "image/webp"):
                 raise CollectionError("不支持的图片格式")
             key = "sources/" + folder.name + "/" + str(uuid4())
-            (storage / key).write_bytes(data)
+            publish_bytes(storage, key, data, mime=mime)
             downloads.append(
                 {
                     "key": key,

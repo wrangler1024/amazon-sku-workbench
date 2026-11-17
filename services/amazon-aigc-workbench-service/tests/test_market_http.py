@@ -3,6 +3,7 @@ import io
 import zipfile
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 from psycopg.types.json import Jsonb
@@ -14,12 +15,19 @@ from amazon_aigc.auth import new_session
 from amazon_aigc.config import Settings
 
 
-def test_http_five_markets_confirm_deliver_review_and_exact_download(db, setup, tmp_path):
+@pytest.mark.parametrize('cloud', [False, True])
+def test_http_five_markets_confirm_deliver_review_and_exact_download(db, setup, tmp_path, monkeypatch, cloud):
+    from test_asset_storage import FakeCos
+
+    from amazon_aigc import asset_storage
+    storage = tmp_path / 'assets'
+    store = asset_storage.CosStore(storage, {'bucket': 'synthetic', 'prefix': 'assets/'}, FakeCos()) if cloud else None
+    monkeypatch.setattr(asset_storage, 'store_for', lambda root: store)
     users, item, _ = setup
     with db.connection() as c:
         c.execute("UPDATE work_items SET site='ES',review_snapshot=%s WHERE id=%s", (Jsonb({"记录序号": "R-SYNTHETIC"}), item))
         tokens = {r: new_session(c,u["id"]) for r,u in users.items()}
-    client = TestClient(create_app(Settings(database_url="postgresql://unused/test", storage_root=tmp_path, sync_enabled=False), db))
+    client = TestClient(create_app(Settings(database_url="postgresql://unused/test", storage_root=storage, sync_enabled=False), db))
     prefix = f"/api/items/{item}"
     def read():
         return client.get(prefix, headers={"Authorization": "Bearer "+tokens["operator"]}).json()
@@ -61,6 +69,12 @@ def test_http_five_markets_confirm_deliver_review_and_exact_download(db, setup, 
             d=action("deliver",site=site,asset_ids=ids)
         delivery=next(m["current_delivery_id"] for m in d["task_markets"] if m["site"]==site)
         d=action("review","operator",site=site,delivery_id=delivery,result="accepted")
+        if cloud:
+            # Every market ZIP must recover the original versions after cache/catalog loss.
+            for path in storage.glob('uploads/*'):
+                path.unlink()
+            for path in store.index_root.glob('*.json'):
+                path.unlink()
         response=client.get(f"/api/deliveries/{delivery}/download",headers={"Authorization":"Bearer "+tokens["operator"]})
         assert response.status_code==200
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
