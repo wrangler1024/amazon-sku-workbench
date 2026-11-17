@@ -36,6 +36,7 @@ in an isolated environment before local backup reclamation.
 
 `CosStore.prune_cache` requires an independent backup SHA set, seven days of
 verified observation, and a one-day last-access grace. It removes only cold,
-catalogued local cache files, targeting 2 GiB where these protections permit.
+catalogued local cache files after another full read-back of their fixed cloud
+versions, targeting 2 GiB where these protections permit.
 Cloud originals and history are retained. The deployment must arrange a backup
 job and call cache maintenance only after its validation gates pass.

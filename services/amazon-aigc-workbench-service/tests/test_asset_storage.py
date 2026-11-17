@@ -126,6 +126,21 @@ def test_periodic_presence_checks_leave_evicted_cache_cold(store, monkeypatch):
     assert not original_exists(store.root, 'uploads/missing')
 
 
+@pytest.mark.parametrize('fault', ['corrupt', 'missing'])
+def test_cache_retention_preserves_original_if_pinned_cloud_version_fails(store, fault):
+    path = store.put_bytes('uploads/synthetic', b'original')
+    value = store._index('uploads/synthetic')
+    value.update(verified_at=time.time()-8*86400, last_access=time.time()-2*86400)
+    store._save('uploads/synthetic', value)
+    if fault == 'corrupt':
+        store.client.corrupt = True
+    else:
+        del store.client.objects[value['object_key'], value['version_id']]
+    with pytest.raises(StorageError):
+        store.prune_cache({value['sha256']}, max_bytes=0)
+    assert path.read_bytes() == b'original'
+
+
 @pytest.mark.parametrize('key', ['', '../outside', '/absolute', 'a/../../outside', 'a\\b', '\x00'])
 def test_rejects_unsafe_paths(tmp_path, key):
     with pytest.raises(StorageError):

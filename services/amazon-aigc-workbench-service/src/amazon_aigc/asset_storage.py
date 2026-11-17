@@ -278,6 +278,26 @@ class CosStore:
                 size = path.stat().st_size
                 if size != current['size'] or file_sha(path) != current['sha256']:
                     raise StorageError('缓存回收前原图校验失败')
+                # Revalidate the fixed cloud version immediately before eviction.
+                # An old catalog or successful backup alone cannot prove it is readable now.
+                try:
+                    remote = self.client.get_object(Bucket=self.bucket, Key=current['object_key'],
+                                                    VersionId=current['version_id'])
+                    stream = remote['Body'].get_raw_stream()
+                    digest = hashlib.sha256()
+                    remote_size = 0
+                    try:
+                        for data in iter(lambda stream=stream: stream.read(1024 * 1024), b''):
+                            digest.update(data)
+                            remote_size += len(data)
+                    finally:
+                        stream.close()
+                    if remote_size != size or digest.hexdigest() != current['sha256']:
+                        raise StorageError('缓存回收前云端原图校验失败')
+                except StorageError:
+                    raise
+                except Exception:  # noqa: BLE001 - sanitize SDK and transport errors
+                    raise StorageError('云端原图暂时不可用，保留本地副本') from None
                 path.unlink()
                 total -= size
                 removed += size
