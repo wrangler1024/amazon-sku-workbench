@@ -52,7 +52,7 @@ def test_http_five_markets_confirm_deliver_review_and_exact_download(db, setup, 
     action("claim");action("start")
     ids=[];original=[]
     for color in ("white","green"):
-        buf=io.BytesIO();Image.new("RGB",(80,80),color).save(buf,"PNG");blob=buf.getvalue();original.append(blob)
+        buf=io.BytesIO();image=Image.new("RGB",(80,80),color) if color=="white" else Image.effect_noise((300,300),80).convert("RGB");image.save(buf,"PNG");blob=buf.getvalue();original.append(blob)
         r=client.post(prefix+"/assets/upload", headers={"Authorization":"Bearer "+tokens["artist"],"Idempotency-Key":str(uuid4())},files={"file":(color+".png",blob,"image/png")})
         assert r.status_code==200,r.text
         ids.append(r.json()["id"])
@@ -77,7 +77,16 @@ def test_http_five_markets_confirm_deliver_review_and_exact_download(db, setup, 
                 path.unlink()
         response=client.get(f"/api/deliveries/{delivery}/download",headers={"Authorization":"Bearer "+tokens["operator"]})
         assert response.status_code==200
+        assert response.headers['content-type'].startswith('application/zip')
+        assert not list((storage.parent/'download-cache').glob('*.zip'))
         with zipfile.ZipFile(io.BytesIO(response.content)) as z:
             assert len(z.namelist())==2 and all('_'+site+'_' in name for name in z.namelist())
             assert [hashlib.sha256(z.read(name)).digest() for name in z.namelist()]==[hashlib.sha256(blob).digest() for blob in original]
     assert d["tasks"][0]["state"]=="accepted"
+    if cloud:
+        for path in storage.glob('uploads/*'):
+            path.unlink()
+        store.client.corrupt = True
+        response = client.get(f'/api/deliveries/{delivery}/download', headers={'Authorization': 'Bearer '+tokens['operator']})
+        assert response.status_code == 503
+        assert not list((storage.parent/'download-cache').glob('*.zip'))

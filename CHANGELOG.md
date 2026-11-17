@@ -2,7 +2,7 @@
 
 ## 0.8.0 — 2026-11-17
 
-API 0.27.0 supports private COS originals with pinned object versions, full SHA-256 publication/read-back checks and a recoverable local cache. Asset identities, authorization and historical delivery ZIP contents remain stable. COS configuration is optional and external to the repository; existing local deployments remain supported. SQL 020 and both frontends are unchanged.
+API 0.27.0 adds bounded temporary ZIP downloads with cleanup on disconnect and supports private COS originals with pinned object versions, full SHA-256 publication/read-back checks and a recoverable local cache. Asset identities, authorization and historical delivery ZIP contents remain stable. COS configuration is optional and external to the repository; existing local deployments remain supported. SQL 020 and both frontends are unchanged.
 
 ## 0.7.1 — 2026-11-16
 

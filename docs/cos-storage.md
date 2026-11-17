@@ -3,7 +3,9 @@
 API 0.27.0 optionally publishes immutable originals to private COS storage. The
 application keeps existing asset UUIDs, object keys, permissions and delivery
 versions. Downloads still pass through the authenticated API, including ordered
-historical ZIP downloads. SQL 020 remains compatible; no business rows are moved.
+historical ZIP downloads. ZIPs stream originals into at most two temporary archives,
+with cleanup on completion or client disconnect, keeping memory and temporary disk bounded.
+SQL 020 remains compatible; no business rows are moved.
 
 Set `AIGC_COS_CONFIG_FILE` to a private JSON file, or place it at
 `storage_root.parent/private/cos-media.json`. Required fields are `enabled`,

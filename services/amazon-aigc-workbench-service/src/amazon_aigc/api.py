@@ -1,13 +1,15 @@
 import hashlib
 import io
 import json
+import os
 import secrets
+import tempfile
 import zipfile
 from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
-from threading import Lock
-from time import monotonic
+from threading import BoundedSemaphore, Lock
+from time import localtime, monotonic
 from typing import Annotated, Literal
 from urllib.parse import urlencode
 from uuid import UUID, uuid4
@@ -50,9 +52,23 @@ from .publication import withdraw_registration
 from .schemas import Command, DocumentWrite, JobRequest
 
 
+class _DownloadResponse(FileResponse):
+    """Release the bounded temporary archive even when a client disconnects."""
+    def __init__(self, path, *, cleanup, **kwargs):
+        super().__init__(path, **kwargs)
+        self.cleanup = cleanup
+
+    async def __call__(self, scope, receive, send):
+        try:
+            await super().__call__(scope, receive, send)
+        finally:
+            self.cleanup()
+
+
 def create_app(settings=None, db=None):
     s = settings or load_settings()
     db = db or Database(s.database_url)
+    download_slots = BoundedSemaphore(2)
 
     @asynccontextmanager
     async def lifespan(app):
@@ -516,25 +532,47 @@ def create_app(settings=None, db=None):
             delivery, _, info = delivery_download_context(c, user, delivery_id, short_name)
             assets = c.execute("SELECT * FROM assets WHERE id=ANY(%s)", (delivery["asset_ids"],)).fetchall()
             by_id = {str(a["id"]): a for a in assets}
-            folder = info["folder"]
-            buf = io.BytesIO()
-            with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:
+        folder = info["folder"]
+        download_slots.acquire()
+        temporary = None
+
+        def cleanup():
+            try:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
+            finally:
+                download_slots.release()
+
+        try:
+            cache = s.storage_root.parent / 'download-cache'
+            cache.mkdir(parents=True, exist_ok=True)
+            fd, name = tempfile.mkstemp(prefix='delivery-', suffix='.zip', dir=cache)
+            os.close(fd)
+            temporary = Path(name)
+            with zipfile.ZipFile(temporary, "w", zipfile.ZIP_STORED) as z:
                 for i, aid in enumerate(delivery["asset_ids"], 1):
                     a = by_id[str(aid)]
                     if (a.get("source_url") or "").startswith("feishu-legacy:"):
                         from .legacy import ensure_asset
-                        a = ensure_asset(c, s, a)
-                    data = asset_path(s.storage_root, a).read_bytes()
-                    if hashlib.sha256(data).hexdigest() != a["sha256"]:
+                        with db.connection() as c:
+                            a = ensure_asset(c, s, a)
+                    path = asset_path(s.storage_root, a)
+                    entry = zipfile.ZipInfo(folder + "/" + str(i).zfill(2) + "_" + archive_filename(a["name"]), localtime()[:6])
+                    digest = hashlib.sha256()
+                    with path.open('rb') as original, z.open(entry, 'w') as output:
+                        for data in iter(lambda: original.read(1024 * 1024), b''):
+                            digest.update(data)
+                            output.write(data)
+                    if digest.hexdigest() != a["sha256"]:
                         fail("原图完整性校验失败", 500)
-                    z.writestr(folder + "/" + str(i).zfill(2) + "_" + archive_filename(a["name"]), data)
-        from urllib.parse import quote
-
-        return Response(
-            buf.getvalue(),
-            media_type="application/zip",
-            headers={"Content-Disposition": "attachment; filename*=UTF-8''" + quote(folder + ".zip")},
-        )
+            from urllib.parse import quote
+            return _DownloadResponse(
+                temporary, cleanup=cleanup, media_type="application/zip",
+                headers={"Content-Disposition": "attachment; filename*=UTF-8''" + quote(folder + ".zip")},
+            )
+        except BaseException:
+            cleanup()
+            raise
 
     @app.get("/api/admin/notifications")
     def notification_status(request: Request):
